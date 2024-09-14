@@ -6,7 +6,41 @@ import { MdAdminPanelSettings } from "react-icons/md";
 
 
 
+
+
+
+
+
+
+
+
 const Login = () => {
+
+    // HOOKS
+    const [username, setUsername] = useState("");
+    const [passowrd, setPassword] = useState("");
+    // const [error, setError] = useState("");
+
+    const navigate = useNavigate();
+
+    // Handle subm.
+    const handleLogin = (e) => {
+        e.prevetDefault();
+
+
+
+        // ....
+    }
+
+
+
+
+
+
+
+
+
+
   return (
     <>
 
@@ -14,7 +48,7 @@ const Login = () => {
         <div className='flex justify-center items-center min-h-screen hero bg-white'>
             <div className='flex w-full hero-content bg-gray-100'>
                 <div className='card w-[600px] border border-red-600 shadow-2xl rounded-lg p-3'>
-                    <form onSubmit={""} className='card-body'>
+                    <form onSubmit={handleLogin} className='card-body'>
                         <h1 className='text-lg text-center font-bold text-black mb-4 leading-none'>LOGIN</h1>
                         <div className='flex flex-col'>
 
@@ -26,8 +60,8 @@ const Login = () => {
                             <input type="text"
                             placeholder='Enter Your Username'
                             className='input input-bordered w-full py-3 pl-10 pr-4 text-lg border-red-500 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-200' 
-                            value={""}
-                            onChange={""}
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             />
                             <FaUser className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'/>
                             </div>
@@ -42,8 +76,8 @@ const Login = () => {
                                         placeholder='Enter Your Password'
                                         className='input input-bordered w-full py-3 pl-10 pr-4 text-lg
                                         border-red-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-200'
-                                        value={""}
-                                        onChange={""} />
+                                        value={passowrd}
+                                        onChange={(e) => setPassword(e.target.value)} />
                                         <FaLock className='absolute left-3 top-1/2 transform translate-y-1/2 text-gray-500' />
                                     </div>
                                 </div>
