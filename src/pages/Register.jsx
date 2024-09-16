@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import React, { useState } from 'react'
 import { MdEmail } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
@@ -148,5 +148,3 @@ const Register = () => {
 }
 
 export default Register
-=======
->>>>>>> 2a71d80 (Commit)
