@@ -1,254 +1,169 @@
-import { useState } from "react";
+import React, { useState } from 'react'
+import logo from '../assets/layout.png'
+import { Link } from 'react-router-dom';
+import { MdOutlineScreenshotMonitor } from 'react-icons/md';
+import { FaUser,FaUserFriends } from "react-icons/fa";
+import { IoDocuments,IoDocument } from 'react-icons/io5';
+import { GoWorkflow } from "react-icons/go";
+import { IoDocumentTextOutline } from "react-icons/io5";
+import { MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
+import { TiDocumentText } from "react-icons/ti";
+import { PiUsersThreeFill } from "react-icons/pi";
 
-import { MdOutlineScreenshotMonitor } from "react-icons/md";
-import { BsBoxSeam } from "react-icons/bs";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import {
-  IoFileTrayOutline,
-  IoChatboxOutline,
-  IoDocumentTextOutline,  
-} from "react-icons/io5";
-import { RiFilePaper2Line } from "react-icons/ri";
-import { FiBox } from "react-icons/fi";
-import { FaWpforms } from "react-icons/fa";
+
 
 const Sidebar = () => {
+
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isDropdownOpenGrievance, setIsDropdownOpenGrievance] = useState(false);
-  const [isDropdownOpenEngagement, setIsDropdownOpenEngagement] = useState(false);
-  const [isDropdownOpenCommunication, setIsDropdownOpenCommunication] = useState(false);
-  const [isDropdownOpenAnalytics, setIsDropdownOpenAnalytics] = useState(false);
+
+  
 
   const toggleSidebar = () => {
     setIsCollapsed((prev) => !prev);
   };
 
-  const toggleDropdownGrievance = () => {
-    setIsDropdownOpenGrievance((prev) => !prev);
-  };
 
-  const toggleDropdownEngagement = () => {
-    setIsDropdownOpenEngagement((prev) => !prev);
-  };
 
-  const toggleDropdownCommunication = () => {
-    setIsDropdownOpenCommunication((prev) => !prev);
-  };
 
-  const toggleDropdownAnalytics = () => {
-    setIsDropdownOpenAnalytics((prev) => !prev);
-  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   return (
-    <div
-      className={`flex flex-col h-screen bg-white text-black px-4 py-4 border-r-2 sticky top-0 max-md:hidden transition-all duration-300 ${
-        isCollapsed ? "w-20" : "w-72 lg:w-80"
-      }`}
-      aria-label="Sidebar"
+    <div 
+    className={`flex flex-col overflow-y-clip bg-white text-black border-r-2 sticky top-0  transition-all duration-300 ${
+      isCollapsed ? "w-20 px-4 py-4" : "w-72 lg:w-80 px-2 py-4"
+    } ${isCollapsed ? "md:w-20 px-4 py-4" : "w-52 lg:w-70 px-2 py-4" }`}
+    aria-label='Sidebar'
     >
       {/* Toggle Button */}
-      <div className="flex justify-e">
-        <button
-          onClick={toggleSidebar}
-          className={`mb-4 p-1 text-black border border-gray-300 rounded-md hover:bg-gray-200 transition duration-200  ${
-            isCollapsed ? "w-11" : "w-11 "
-          }`}
-          aria-expanded={!isCollapsed}
-          aria-label={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+      <div className='flex justify-end'>
+        <button onClick={toggleSidebar} className={`mb-4 p-1 text-base border border-gray-300 rounded-md hover:bg-gray-200 transition duration-200 ${isCollapsed ? "w-11" : "w-11"
+        }`}
+        aria-expanded={!isCollapsed}
+        aria-label={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
           {isCollapsed ? "▶" : "◀"}
         </button>
       </div>
 
+
       {/* Logo */}
-      <div
-        className="flex items-center gap-2 cursor-pointer mb-8 justify-center"
-        aria-label="Dashboard Logo"
-      >
-        <img src={""} alt="Dashboard logo" className="w-10 h-10" />
-        {!isCollapsed && <p className="text-xl font-bold">Dashboard</p>}
-      </div>
+
+        <div className='flex items-center gap-2 cursor-pointer mb-8 justify-center'
+        aria-label='Dashboard Logo'
+        >
+          <img src={logo} alt="Dashboard logo" className='w-10 h-10' />
+          {!isCollapsed && <Link to="/home" className='text-xl font-bold'><p>Dashboard</p></Link>}
+        </div>
 
       {/* Dashboard */}
-      <div
-        className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 transition-all duration-300 p-2 rounded-md mb-4 cursor-pointer"
-        aria-label="Dashboard"
-      >
-        <MdOutlineScreenshotMonitor className="w-5 h-5" />
-        {!isCollapsed && <p className="text-sm font-semibold">Dashboard</p>}
-      </div>
-
-      {/* Grievance Section */}
-      <div className="mb-2">
-        <div
-          className="flex gap-2 items-center cursor-pointer text-sm hover:text-blue-500 transition duration-200"
-          onClick={toggleDropdownGrievance}
-          aria-expanded={isDropdownOpenGrievance}
-          aria-controls="grievance-dropdown"
-          aria-label="Grievance Apps"
+      <Link to="/home">
+        <div className='flex items-center gap-2 hover:bg-gray-300 transition-all duration-300 p-2 rounded-md cursor-pointer'
+        aria-label='Dashboard'
         >
-          <BsBoxSeam className="w-5 h-5" />
-          {!isCollapsed && <span>Grievance</span>}
-          {!isCollapsed && (
-            <div className="ml-auto">
-              {isDropdownOpenGrievance ? (
-                <IoIosArrowUp size={15} />
-              ) : (
-                <IoIosArrowDown size={15} />
-              )}
-            </div>
-          )}
+          <MdOutlineScreenshotMonitor className='w-5 h-5' />
+          {!isCollapsed && <p className='text-sm font-semibold'>Dashboard</p>}
         </div>
-        <ul
-          id="grievance-dropdown"
-          className={`pl-6 mt-1 space-y-1 overflow-hidden transition-max-height duration-500 ease-in-out ${
-            isDropdownOpenGrievance ? "max-h-screen" : "max-h-0"
-          }`}
+      </Link>
+
+      {/* Modules */}
+      <div className={`mb-2 space-y-2 ${!isCollapsed ? "overflow-auto" : ""}`} >
+        <p className={`text-gray-500 mb-2 font-semibold text-sm ${isCollapsed ? "hidden " : ""
+        }`}
         >
-          {[
-            "Submission",
-            "Tracking",
-            "Case Management",
-            "Investigation & Solution",
-            "Feedback & Satisfaction",
-          ].map((item) => (
-            <li key={item}>
-              <a
-                className={`text-sm flex justify-between py-1 cursor-pointer hover:text-blue-500 transition ${
-                  isCollapsed ? "hidden" : ""
-                }`}
-              >
-                {item}
-              </a>
+          Modules
+        </p>
+
+        {/* User Management */}
+        <ul className='menu rounded-box w-56'>
+          {isCollapsed && <PiUsersThreeFill className='w-5 h-5' />}
+          {!isCollapsed && 
+            <li>
+              <details open>
+                <summary><PiUsersThreeFill className='w-5 h-5'/>User Management</summary>
+                <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><FaUserFriends/>Admin List</p></li></Link>
+                <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><FaUser/>Hr List</p></li></Link>
+                <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><FaUser/>Core List</p></li></Link>
+                <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><FaUser/>Logistic List</p></li></Link>
+                <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><FaUser/>Finance List</p></li></Link>
+              </details>
             </li>
-          ))}
+          }
+
         </ul>
-      </div>
 
-      {/* Employee Engagement Section */}
-      <div className="mb-2">
-        <div
-          className="flex gap-2 items-center cursor-pointer text-sm hover:text-blue-500 transition duration-200"
-          onClick={toggleDropdownEngagement}
-          aria-expanded={isDropdownOpenEngagement}
-          aria-controls="engagement-dropdown"
-          aria-label="Employee Engagement Apps"
-        >
-          <IoFileTrayOutline className="w-5 h-5" />
-          {!isCollapsed && <span>Employee Engagement</span>}
-          {!isCollapsed && (
-            <div className="ml-auto">
-              {isDropdownOpenEngagement ? (
-                <IoIosArrowUp size={15} />
-              ) : (
-                <IoIosArrowDown size={15} />
-              )}
-            </div>
-          )}
-        </div>
-        <ul
-          id="engagement-dropdown"
-          className={`pl-6 mt-1 space-y-1 overflow-hidden transition-max-height duration-500 ease-in-out ${
-            isDropdownOpenEngagement ? "max-h-screen" : "max-h-0"
-          }`}
-        >
-          {["Surveys", "Recognition", "Events"].map((item) => (
-            <li key={item}>
-              <a
-                className={`text-sm flex justify-between py-1 cursor-pointer hover:text-blue-500 transition ${
-                  isCollapsed ? "hidden" : ""
-                }`}
-              >
-                {item}
-              </a>
+        {/* Document Management */}
+        <ul className='menu rounded-box w-56'>
+          {isCollapsed && <IoDocuments className='w-5 h-5' />}
+          {!isCollapsed && 
+            <li>
+              <details open>
+                <summary><IoDocuments className='w-5 h-5'/>Document Management</summary>
+                <ul>
+                  <Link to="DocumentStorage"><li className='hover:text-blue-500'><p><IoDocument/>DocumentStorage</p></li></Link>
+                  <Link to="VersionControl"><li className='hover:text-blue-500'><p><IoDocument/>VersionControl</p></li></Link>
+                  <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><IoDocument/>DocumentTracking</p></li></Link>
+                </ul>
+              </details>
             </li>
-          ))}
+          }
+
         </ul>
-      </div>
 
-      {/* Employee Communication Section */}
-      <div className="mb-2">
-        <div
-          className="flex gap-2 items-center cursor-pointer text-sm hover:text-blue-500 transition duration-200"
-          onClick={toggleDropdownCommunication}
-          aria-expanded={isDropdownOpenCommunication}
-          aria-controls="communication-dropdown"
-          aria-label="Employee Communication Apps"
-        >
-          <IoChatboxOutline className="w-5 h-5" />
-          {!isCollapsed && <span>Employee Communication</span>}
-          {!isCollapsed && (
-            <div className="ml-auto">
-              {isDropdownOpenCommunication ? (
-                <IoIosArrowUp size={15} />
-              ) : (
-                <IoIosArrowDown size={15} />
-              )}
-            </div>
-          )}
-        </div>
-        <ul
-          id="communication-dropdown"
-          className={`pl-6 mt-1 space-y-1 overflow-hidden transition-max-height duration-500 ease-in-out ${
-            isDropdownOpenCommunication ? "max-h-screen" : "max-h-0"
-          }`}
-        >
-          {["Messages", "Forums", "Announcements"].map((item) => (
-            <li key={item}>
-              <a
-                className={`text-sm flex justify-between py-1 cursor-pointer hover:text-blue-500 transition ${
-                  isCollapsed ? "hidden" : ""
-                }`}
-              >
-                {item}
-              </a>
+        {/* Legal Management */}
+        <ul className='menu rounded-box w-56'>
+          {isCollapsed && <IoDocumentTextOutline className='w-5 h-5' />}
+          {!isCollapsed && 
+            <li>
+              <details open>
+                <summary><IoDocumentTextOutline className='w-5 h-5'/>Legal Management</summary>
+                <ul>
+                  <Link to="DocumentStorage"><li className='hover:text-blue-500'><p><TiDocumentText/>Contract Management</p></li></Link>
+                  <Link to="VersionControl"><li className='hover:text-blue-500'><p><TiDocumentText/>Legal Document</p></li></Link>
+                  <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><TiDocumentText/>Risk Management</p></li></Link>
+                  <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><TiDocumentText/>Litigation Management</p></li></Link>
+                  <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><TiDocumentText/>Compliances and Regulatory</p></li></Link>
+                </ul>
+              </details>
             </li>
-          ))}
+          }
+
         </ul>
-      </div>
 
-      {/* Workforce Analytics Section */}
-      <div className="mb-2">
-        <div
-          className="flex gap-2 items-center cursor-pointer text-sm hover:text-blue-500 transition duration-200"
-          onClick={toggleDropdownAnalytics}
-          aria-expanded={isDropdownOpenAnalytics}
-          aria-controls="analytics-dropdown"
-          aria-label="Workforce Analytics"
-        >
-          <IoDocumentTextOutline className="w-5 h-5" />
-          {!isCollapsed && <span>Workforce Analytics</span>}
-          {!isCollapsed && (
-            <div className="ml-auto">
-              {isDropdownOpenAnalytics ? (
-                <IoIosArrowUp size={15} />
-              ) : (
-                <IoIosArrowDown size={15} />
-              )}
-            </div>
-          )}
-        </div>
-        <ul
-          id="analytics-dropdown"
-          className={`pl-6 mt-1 space-y-1 overflow-hidden transition-max-height duration-500 ease-in-out ${
-            isDropdownOpenAnalytics ? "max-h-screen" : "max-h-0"
-          }`}
-        >
-          {["Employee Metrics", "Performance Analytics", "Attrition Rates"].map((item) => (
-            <li key={item}>
-              <a
-                className={`text-sm flex justify-between py-1 cursor-pointer hover:text-blue-500 transition ${
-                  isCollapsed ? "hidden" : ""
-                }`}
-              >
-                {item}
-              </a>
+        {/* Initiating Workflow */}
+        <ul className='menu rounded-box w-56'>
+          {isCollapsed && <GoWorkflow className='w-5 h-5' />}
+          {!isCollapsed && 
+            <li>
+              <details open>
+                <summary><GoWorkflow className='w-5 h-5'/>Initiating Workflow</summary>
+                <ul>
+                  <Link to="DocumentStorage"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Workflow Identification</p></li></Link>
+                  <Link to="VersionControl"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Communication Plan</p></li></Link>
+                  <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Resources Allocation</p></li></Link>
+                </ul>
+              </details>
             </li>
-          ))}
+          }
+
         </ul>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar
