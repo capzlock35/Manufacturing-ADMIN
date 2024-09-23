@@ -6,6 +6,7 @@ import { FaLock } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import { FaEyeSlash } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
+import axios from 'axios'
 
 
 const Register = () => {
@@ -133,7 +134,7 @@ const Register = () => {
           </button>
 
           <span className=' flex justify-center mt-4'>
-            <Link to="/login" className='text-blue-500 hover:underline'>
+            <Link to="/" className='text-blue-500 hover:underline'>
             Back to Login</Link>
           </span>
 

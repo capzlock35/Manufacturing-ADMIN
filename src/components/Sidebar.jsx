@@ -95,11 +95,11 @@ const Sidebar = () => {
             <li>
               <details open>
                 <summary><PiUsersThreeFill className='w-5 h-5'/>User Management</summary>
-                <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><FaUserFriends/>Admin List</p></li></Link>
-                <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><FaUser/>Hr List</p></li></Link>
-                <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><FaUser/>Core List</p></li></Link>
-                <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><FaUser/>Logistic List</p></li></Link>
-                <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><FaUser/>Finance List</p></li></Link>
+                <Link to="AdminList"><li className='hover:text-blue-500'><p><FaUserFriends/>Admin List</p></li></Link>
+                <Link to="HrList"><li className='hover:text-blue-500'><p><FaUser/>Hr List</p></li></Link>
+                <Link to="CoreList"><li className='hover:text-blue-500'><p><FaUser/>Core List</p></li></Link>
+                <Link to="LogisticList"><li className='hover:text-blue-500'><p><FaUser/>Logistic List</p></li></Link>
+                <Link to="FinanceList"><li className='hover:text-blue-500'><p><FaUser/>Finance List</p></li></Link>
               </details>
             </li>
           }
@@ -132,11 +132,11 @@ const Sidebar = () => {
               <details open>
                 <summary><IoDocumentTextOutline className='w-5 h-5'/>Legal Management</summary>
                 <ul>
-                  <Link to="DocumentStorage"><li className='hover:text-blue-500'><p><TiDocumentText/>Contract Management</p></li></Link>
-                  <Link to="VersionControl"><li className='hover:text-blue-500'><p><TiDocumentText/>Legal Document</p></li></Link>
-                  <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><TiDocumentText/>Risk Management</p></li></Link>
-                  <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><TiDocumentText/>Litigation Management</p></li></Link>
-                  <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><TiDocumentText/>Compliances and Regulatory</p></li></Link>
+                  <Link to=""><li className='hover:text-blue-500'><p><TiDocumentText/>Contract Management</p></li></Link>
+                  <Link to=""><li className='hover:text-blue-500'><p><TiDocumentText/>Legal Document</p></li></Link>
+                  <Link to=""><li className='hover:text-blue-500'><p><TiDocumentText/>Risk Management</p></li></Link>
+                  <Link to=""><li className='hover:text-blue-500'><p><TiDocumentText/>Litigation Management</p></li></Link>
+                  <Link to=""><li className='hover:text-blue-500'><p><TiDocumentText/>Compliances and Regulatory</p></li></Link>
                 </ul>
               </details>
             </li>
@@ -152,9 +152,9 @@ const Sidebar = () => {
               <details open>
                 <summary><GoWorkflow className='w-5 h-5'/>Initiating Workflow</summary>
                 <ul>
-                  <Link to="DocumentStorage"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Workflow Identification</p></li></Link>
-                  <Link to="VersionControl"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Communication Plan</p></li></Link>
-                  <Link to="DocumentTracking"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Resources Allocation</p></li></Link>
+                  <Link to=""><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Workflow Identification</p></li></Link>
+                  <Link to=""><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Communication Plan</p></li></Link>
+                  <Link to=""><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Resources Allocation</p></li></Link>
                 </ul>
               </details>
             </li>
