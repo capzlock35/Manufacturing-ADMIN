@@ -21,9 +21,11 @@ import { FaEye } from "react-icons/fa";
 const Login = () => {
 
     // HOOKS
+    const [user, setUsers] = useState([])
     const [username, setUsername] = useState("");
-    const [passowrd, setPassword] = useState("");
+    const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate();
 
@@ -40,13 +42,26 @@ const Login = () => {
       }
 
     // Handle subm.
-    const handleLogin = (e) => {
-        e.prevetDefault();
+    const handleLogin = async (event) => {
+        event.preventDefault();
+        try {
+          const response = await axios.post('http://localhost:8000/login', { username, password })
+          const token = response.data.token
+          alert('Login successfull')
+          setUsername('')
+          setPassword('')
+          fetchUsers();
+          navigate('/Home')
+          window.location.reload()
+          localStorage.setItem('token', token)
+        } catch (error) {
+          console.log('Login Error')
+        }
+      }
 
 
 
         // ....
-    }
 
 
 
@@ -76,12 +91,10 @@ const Login = () => {
                                 <span className='label-text font-semibold text-lg text-gray-500'>Username</span>
                             </label>
                             <div className='relative mb-2'>
-                            <input type="text"
-                            placeholder='Enter Your Username'
-                            className='input input-bordered w-full py-3 pl-10 pr-4 text-lg border-red-500 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-200' 
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            />
+                            <input className='input input-bordered w-full py-3 pl-10 pr-4 text-lg border-red-500 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-200' 
+                            type='text' 
+                            placeholder="Username" 
+                            value={username} onChange={(e) => setUsername(e.target.value)} />
                             <FaUser className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'/>
                             </div>
                             
@@ -91,20 +104,15 @@ const Login = () => {
                                         <label className='label mb-2'>
                                             <span className='label-text font-semibold text-lg text-gray-500'>Password</span>
                                         </label>
-                                        <input type="passowrd"
-                                        placeholder='Enter Your Password'
-                                        className='input input-bordered w-full py-3 pl-10 pr-4 text-lg
-                                        border-zinc-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-200 text-black'
-                                        value={passowrd}
-                                        onChange={(e) => setPassword(e.target.value)} />
+                                        <input className='input input-bordered w-full py-3 pl-10 pr-4 text-lg border-red-500 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-200'
+                                        type={showPassword ? "text" : "password"}
+                                        value={password} onChange={(e) => setPassword(e.target.value)} />
                                         <FaLock className='absolute left-3 top-1/2 transform translate-y-1/2 text-gray-500' />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute inset-y-0 right-0 flex items-center px-3 top-7 text-xl"
-                                        >
-                                            {showPassword ? <FaEyeSlash className='text-red-500'/> : <FaEye className='text-blue-500'/>}
-                                        </button>
+                                       <button type='button' onClick={() => setShowPassword(!showPassword)} 
+                                       className='absolute inset-y-0 right-0 flex items-center px-3 top-6 text-xl'>
+                                         {showPassword ? <FaEyeSlash className='text-red-500'/> : 
+                                        <FaEye className='text-blue-500' />}
+            </button>
                                     </div>
                                 </div>
 
