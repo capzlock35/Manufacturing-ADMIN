@@ -10,14 +10,14 @@ const Search = () => {
       <div className='flex items-center justify-between '>
 
                 {/* Sidebar toggle button */}
-        <div className="lg:hidden flex items-center">
+        <div className="md:hidden flex items-center">
           <label htmlFor="my-drawer" className="drawer-button">
               {/* <IoIosMenu size={24}/> */}
           </label>
        </div>
         
         {/* Search form */}
-        <form action="" class="md:flex flex-grow mx-auto max-w-xl md:max-w-lg sm:max-w-sm min-[500px]:max-w-sm">
+        <form action="" className="md:flex flex-grow mx-auto max-w-xl md:max-w-lg sm:max-w-sm min-[500px]:max-w-sm">
           <div className='relative flex items-center w-full bg-white border rounded-full shadow-lg'>
 
             <input type="text"
@@ -67,7 +67,7 @@ const Search = () => {
                 </a>
               </li>
               <li>
-                <a href="#" onClick={""} className='hover:bg-gray-100 p-2 rounded'>
+                <a href="#"  className='hover:bg-gray-100 p-2 rounded'>
                   Log out
                 </a>
               </li>

@@ -23,7 +23,7 @@ const Login = () => {
     // HOOKS
     const [username, setUsername] = useState("");
     const [passowrd, setPassword] = useState("");
-    // const [error, setError] = useState("");
+    const [error, setError] = useState("");
 
     const navigate = useNavigate();
 
@@ -94,7 +94,7 @@ const Login = () => {
                                         <input type="passowrd"
                                         placeholder='Enter Your Password'
                                         className='input input-bordered w-full py-3 pl-10 pr-4 text-lg
-                                        border-red-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-200'
+                                        border-zinc-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-200 text-black'
                                         value={passowrd}
                                         onChange={(e) => setPassword(e.target.value)} />
                                         <FaLock className='absolute left-3 top-1/2 transform translate-y-1/2 text-gray-500' />
