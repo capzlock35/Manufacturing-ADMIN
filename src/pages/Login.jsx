@@ -42,6 +42,7 @@ const Login = () => {
       }
 
     // Handle subm.
+<<<<<<< Updated upstream
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
@@ -58,6 +59,10 @@ const Login = () => {
           console.log('Login Error')
         }
       }
+=======
+    const handleLogin = (e) => {
+        e.preventDefault();
+>>>>>>> Stashed changes
 
 
 
