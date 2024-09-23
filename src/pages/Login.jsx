@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom' 
+import React, { useState, useEffect } from "react"
+import axios from 'axios'
+import { useNavigate } from "react-router-dom"
 import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
 import { MdAdminPanelSettings } from "react-icons/md";
@@ -17,20 +18,45 @@ import { MdAdminPanelSettings } from "react-icons/md";
 const Login = () => {
 
     // HOOKS
+    const [user, setUsers] = useState([]);
     const [username, setUsername] = useState("");
-    const [passowrd, setPassword] = useState("");
+    const [password, setPassword] = useState("");
     // const [error, setError] = useState("");
 
     const navigate = useNavigate();
 
-    // Handle subm.
-    const handleLogin = (e) => {
-        e.prevetDefault();
+    useEffect(() => {
+        fetchUsers();
+      }, [])
+    
+      const fetchUsers = () => {
+        axios
+        .get('http://localhost:8000/register')
+        .then((res) => {
+          
+        })
+      }
 
+    // Handle subm.
+    const handleLogin = async (event) => {
+        event.preventDefault();
+        try {
+          const response = await axios.post('http://localhost:8000/login', { username, password })
+          const token = response.data.token
+          alert('Login successfull')
+          setUsername('')
+          setPassword('')
+          fetchUsers();
+          navigate('/dashboard')
+          window.location.reload()
+          localStorage.setItem('token', token)
+        } catch (error) {
+          console.log('Login Error')
+        }
+      }
 
 
         // ....
-    }
 
 
 
@@ -48,7 +74,7 @@ const Login = () => {
         <div className='flex justify-center items-center min-h-screen hero bg-white'>
             <div className='flex w-full hero-content bg-gray-100'>
                 <div className='card w-[600px] border border-red-600 shadow-2xl rounded-lg p-3'>
-                    <form onSubmit={handleLogin} className='card-body'>
+                    <form className='card-body' onSubmit={handleLogin} >
                         <h1 className='text-lg text-center font-bold text-black mb-4 leading-none'>LOGIN</h1>
                         <div className='flex flex-col'>
 
@@ -57,12 +83,10 @@ const Login = () => {
                                 <span className='label-text font-semibold text-lg text-gray-500'>Username</span>
                             </label>
                             <div className='relative mb-2'>
-                            <input type="text"
-                            placeholder='Enter Your Username'
-                            className='input input-bordered w-full py-3 pl-10 pr-4 text-lg border-red-500 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-200' 
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            />
+                            <input className='input input-bordered w-full py-3 pl-10 pr-4 text-lg border-red-500 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-200' 
+                            type='text' 
+                            placeholder="Username" 
+                            value={username} onChange={(e) => setUsername(e.target.value)} />
                             <FaUser className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'/>
                             </div>
                             
@@ -72,11 +96,11 @@ const Login = () => {
                                         <label className='label mb-2'>
                                             <span className='label-text font-semibold text-lg text-gray-500'>Password</span>
                                         </label>
-                                        <input type="passowrd"
+                                        <input type="password"
                                         placeholder='Enter Your Password'
                                         className='input input-bordered w-full py-3 pl-10 pr-4 text-lg
                                         border-red-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-200'
-                                        value={passowrd}
+                                        value={password}
                                         onChange={(e) => setPassword(e.target.value)} />
                                         <FaLock className='absolute left-3 top-1/2 transform translate-y-1/2 text-gray-500' />
                                     </div>
@@ -85,7 +109,7 @@ const Login = () => {
                                 
                                                     {/* BTN */}
                                                     <div className='form-control'>
-                                        <button className='btn btn-primary w-full py-2 text-lg font-semibold bg-blue-500 hover:bg-blue-700 text-white rounded-lg'> LOGIN
+                                        <button className='btn btn-primary w-full py-2 text-lg font-semibold bg-blue-500 hover:bg-blue-700 text-white rounded-lg' type="submit" > LOGIN
                                         </button>
                                     </div>
                         </div>
