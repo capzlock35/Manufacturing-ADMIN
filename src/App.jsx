@@ -6,8 +6,6 @@ import AdminHome from './pages/AdminHome'
 import Register from './pages/Register'
 
 
-
-
 function App() {
 
   return (

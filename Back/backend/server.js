@@ -17,7 +17,7 @@ const port = 8000;
 
 
 //MongoDB connection
-const dbURI = 'mongodb+srv://olandakent10:test112@cluster10.bixwa.mongodb.net/UsersDB?retryWrites=true&w=majority&appName=Cluster10'
+const dbURI = 'mongodb+srv://olandakent10:test112@cluster10.bixwa.mongodb.net/UnsersDB?retryWrites=true&w=majority&appName=Cluster10'
 mongoose
 .connect(dbURI, { 
 })
