@@ -1,9 +1,10 @@
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import './App.css'
 import Login from './pages/Login'
-import AdminHome from './pages/AdminHome'
 import Register from './pages/Register'
+import AdminHome from './pages/AdminHome'
+
+
 
 
 function App() {
@@ -25,3 +26,4 @@ function App() {
 }
 
 export default App
+
