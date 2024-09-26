@@ -35,7 +35,7 @@ const Login = () => {
     
       const fetchUsers = () => {
         axios
-        .get('http://localhost:8000/register')
+        .get('http://localhost:7690/api/user/get')
         .then((res) => {
           
         })
@@ -45,7 +45,7 @@ const Login = () => {
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
-          const response = await axios.post('http://localhost:8000/login', { username, password })
+          const response = await axios.post('http://localhost:7690/api/user/login', { username, password })
           const token = response.data.token
           alert('Login successfull')
           setUsername('')

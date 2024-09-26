@@ -9,8 +9,12 @@ import userRouter from './routes/userRoute.js'
 
 const app = express();
 
-const port = process.env.PORT || 4000;
-app.use(cors());
+const port = 7690;
+app.use(cors({
+      credentials: true,
+    origin: 'http://localhost:5173'
+})
+);
 app.use(express.json());
 
 ConnectDB(); 
