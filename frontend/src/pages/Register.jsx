@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { MdEmail } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
@@ -8,6 +7,7 @@ import { FaEyeSlash } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
 import { MdOutlinePermIdentity } from "react-icons/md";
 import { MdOutlineCake } from "react-icons/md";
+import { useNavigate } from "react-router-dom"
 
 import axios from 'axios'
 
@@ -16,19 +16,52 @@ const Register = () => {
 
 
   //Hooks
+  const [user, setUsers] = useState([])
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [firstname, setFirstName] = useState("");
+  const [lastname, setLastName] = useState("");
   const [birthday, setBirthday] = useState("");
   const [gender, setGender] = useState("");
+  const navigate = useNavigate()
 
 
+  useEffect(() => {
+    fetchUsers();
+  }, [])
 
+  const fetchUsers = () => {
+    axios
+    .get('http://localhost:7690/api/user/get')
+    .then((res) => {
+      
+    })
+  }
+
+  const handlecreateUser = (event) => {
+    event.preventDefault()
+    axios
+    .post('http://localhost:7690/api/user/create', { firstname, lastname, birthday, gender, email, username, password })
+    .then(() =>{
+      alert('Registration is Complete')
+      setFirstName('')
+      setLastName('')
+      setBirthday('')
+      setGender('')
+      setEmail('')
+      setUsername('')
+      setPassword('')
+      fetchUsers()
+      navigate('/')
+    })
+    .catch((error) => {
+      console.log('Unable to register user')
+    })
+  }
 
 
 
@@ -49,7 +82,7 @@ const Register = () => {
       <div className='flex items-center justify-center min-h-screen bg-gray-100 p-7 '>
         <div className='w-full lg:w-[600px] md:w-[600px] p-6 bg-white rounded-lg shadow-lg border border-zinc-500'>
           <h2 className='text-2xl font-bold text-center mb-6 text-black'>Create Account</h2>
-          <form onSubmit={""} className='space-y-4'>
+          <form onSubmit={handlecreateUser} className='space-y-4'>
 
                     {/* FirstName and Lastname */}
               <div className='space-y-1 relative flex flex-col'>
@@ -60,9 +93,8 @@ const Register = () => {
                     </label>
                     <input 
                       type="text" 
-                      id='firstname' 
                       className='input input-bordered py-3 pl-10 pr-4 text-lg border border-zinc-500 bg-white focus:border-blue-500 text-black'
-                      value={firstName}
+                      value={firstname}
                       onChange={(e) => setFirstName(e.target.value)}
                       required
                     />
@@ -74,10 +106,9 @@ const Register = () => {
                       Last Name
                     </label>
                     <input 
-                      type="text" 
-                      id='lastname' 
+                      type="text"  
                       className='input input-bordered py-3 pl-10 pr-4 text-lg border border-zinc-500 bg-white focus:border-blue-500 text-black'
-                      value={lastName}
+                      value={lastname}
                       onChange={(e) => setLastName(e.target.value)}
                       required
                     />
@@ -96,7 +127,6 @@ const Register = () => {
                 </label>
                 <input 
                   type="date"  
-                  id='birthday' 
                   className='input input-bordered py-3 pl-10 pr-4 text-lg border border-zinc-500 bg-white focus:border-blue-500 text-black'
                   value={birthday}
                   onChange={(e) => setBirthday(e.target.value)}
@@ -115,7 +145,6 @@ const Register = () => {
                 <div className='flex space-x-4 justify-evenly'>
                   <div className='flex items-center'>
                     <input type="radio"
-                    id='male'
                     name='gender'
                     value="male"
                     className='mr-2'
@@ -126,7 +155,6 @@ const Register = () => {
                   </div>
                   <div className='flex items-center'>
                     <input type="radio"
-                    id='female'
                     name='gender'
                     value="female"
                     className='mr-2'
@@ -137,7 +165,6 @@ const Register = () => {
                   </div>
                   <div className='flex items-center'>
                     <input type="radio"
-                    id='preferNotToSay'
                     name='gender'
                     value="preferNotToSay"
                     className='mr-2'
@@ -158,11 +185,10 @@ const Register = () => {
               <label htmlFor="email" className='block text-md font-medium pl-2 text-gray-700'>
                 E-mail
               </label>
-              <input type='email' id='email'
-              className='input input-bordered w-full py-3 pl-10 pr-4 text-lg border border-zinc-500 bg-white focus:border-blue-500 text-black'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required/>
+              <input className='input input-bordered w-full py-3 pl-10 pr-4 text-lg text-black border border-zinc-500 bg-white focus:border-blue-500'
+                            type='text' 
+                            placeholder="Email" 
+                            value={email} onChange={(e) => setEmail(e.target.value)} />
               <MdEmail size={24} className='absolute left-3 top-6 transform translate-y-1/2 text-gray-500 '/>
             </div>
 
@@ -171,11 +197,10 @@ const Register = () => {
               <label htmlFor="username" className='block text-md font-medium pl-2 text-gray-700'>
                 Username
               </label>
-              <input type='text' id='username'
-              className='input input-bordered w-full py-3 pl-10 pr-4 text-lg text-black border border-zinc-500 bg-white focus:border-blue-500'
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required/>
+              <input className='input input-bordered w-full py-3 pl-10 pr-4 text-lg text-black border border-zinc-500 bg-white focus:border-blue-500'
+                            type='text' 
+                            placeholder="Username" 
+                            value={username} onChange={(e) => setUsername(e.target.value)} />
               <FaUser size={20} className='absolute left-3 top-7 transform translate-y-1/2 text-gray-500'/>
             </div>
 
@@ -184,12 +209,10 @@ const Register = () => {
               <label htmlFor="password" className='block text-md font-medium pl-2 text-gray-700'>
                 Password
               </label>
-              <input type={showPassword ? "text" : "password"} 
-              id='password'
-              className='input input-bordered w-full py-3 pl-10 pr-4 text-lg text-black border border-zinc-500 bg-white focus:border-blue-500'
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required/>
+              <input className='input input-bordered w-full py-3 pl-10 pr-4 text-lg text-black border border-zinc-500 bg-white focus:border-blue-500'
+              type={showPassword ? "text" : "password"} 
+              placeholder="Password" 
+              value={password} onChange={(e) => setPassword(e.target.value)} />
               <FaLock size={20} className='absolute left-3 top-7 transform translate-y-1/2 text-gray-500'
               />
               <button
@@ -208,12 +231,10 @@ const Register = () => {
               <label htmlFor="confirmpassword" className='block text-md font-medium pl-2 text-gray-700'>
                 Confirm Password
               </label>
-              <input type={showConfirmPassword ? "text" : "password"} 
-              id='confirmpassword'
-              className='input input-bordered w-full py-3 pl-10 pr-4 text-lg text-black border border-zinc-500 bg-white focus:border-blue-500'
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required/>
+              <input className='input input-bordered w-full py-3 pl-10 pr-4 text-lg text-black border border-zinc-500 bg-white focus:border-blue-500'
+              type={showConfirmPassword ? "text" : "password"} 
+              placeholder="Confirmpassword" 
+              value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
               <FaLock size={20} className='absolute left-3 top-7 transform translate-y-1/2 text-gray-500'
               />
               <button
