@@ -1,64 +1,122 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import ModalAnnouncement from './ModalAnnouncement';
+
+const dummyAnnouncements = [
+  { id: 1, title: 'New Feature Release', content: 'We are excited to announce the release of our latest feature...' },
+  { id: 2, title: 'System Maintenance', content: 'There will be a scheduled maintenance on Saturday...' },
+  { id: 3, title: 'Important Update', content: 'Please update your application to the latest version...' },
+];
 
 const VersionControl = () => {
-  const [versions, setVersions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [announcements, setAnnouncements] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState(null);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
 
   useEffect(() => {
-    const fetchVersions = async () => {
-      try {
-        // Replace with your actual API endpoint when backend is ready
-        // const response = await axios.get('/api/versions');
-        // setVersions(response.data);
-        
-        // Mock data for now
-        setVersions([
-          { id: 1, documentName: 'Report Q1', version: 'v1.2', lastModified: '2024-03-15', modifiedBy: 'Alice' },
-          { id: 2, documentName: 'Contract XYZ', version: 'v2.0', lastModified: '2024-03-10', modifiedBy: 'Bob' },
-          { id: 3, documentName: 'Budget 2024', version: 'v1.5', lastModified: '2024-03-05', modifiedBy: 'Charlie' },
-        ]);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching versions:', error);
-        setError('Failed to fetch version data. Please try again later.');
-        setLoading(false);
-      }
-    };
-
-    fetchVersions();
+    const storedAnnouncements = localStorage.getItem('announcements');
+    if (storedAnnouncements) {
+      setAnnouncements(JSON.parse(storedAnnouncements));
+    } else {
+      setAnnouncements(dummyAnnouncements);
+      localStorage.setItem('announcements', JSON.stringify(dummyAnnouncements));
+    }
   }, []);
 
-  if (loading) return <div className="text-center p-4">Loading...</div>;
-  if (error) return <div className="text-center text-red-500 p-4">{error}</div>;
+  const updateLocalStorage = (newAnnouncements) => {
+    localStorage.setItem('announcements', JSON.stringify(newAnnouncements));
+    setAnnouncements(newAnnouncements);
+  };
+
+  const handleCreate = () => {
+    setModalType('create');
+    setSelectedAnnouncement(null);
+    setIsModalOpen(true);
+  };
+
+  const handleView = (announcement) => {
+    setModalType('view');
+    setSelectedAnnouncement(announcement);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (announcement) => {
+    setModalType('edit');
+    setSelectedAnnouncement(announcement);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (announcement) => {
+    setModalType('delete');
+    setSelectedAnnouncement(announcement);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedAnnouncement(null);
+    setModalType(null);
+  };
+
+  const handleSubmit = (data) => {
+    let newAnnouncements;
+    if (modalType === 'create') {
+      newAnnouncements = [...announcements, { ...data, id: Date.now() }];
+    } else if (modalType === 'edit') {
+      newAnnouncements = announcements.map(a => a.id === selectedAnnouncement.id ? { ...a, ...data } : a);
+    } else if (modalType === 'delete') {
+      newAnnouncements = announcements.filter(a => a.id !== selectedAnnouncement.id);
+    }
+    updateLocalStorage(newAnnouncements);
+    closeModal();
+  };
 
   return (
-    <div className='p-4 bg-gray-200 h-screen'>
-      <div className="container mx-auto ">
-        <h1 className="text-2xl font-bold mb-4">Version Control</h1>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Document Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Version</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Modified</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modified By</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {versions.map((version) => (
-                <tr key={version.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">{version.documentName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{version.version}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{version.lastModified}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{version.modifiedBy}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="p-2 sm:p-4 min-h-screen bg-gray-200">
+      <div className="container mx-auto p-2 sm:p-4">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4">Version Control</h1>
+        <button
+          onClick={handleCreate}
+          className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded mb-4"
+        >
+          Create Announcement
+        </button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {announcements.map((announcement) => (
+            <div key={announcement.id} className="bg-white p-4 rounded shadow">
+              <h2 className="text-lg sm:text-xl font-semibold mb-2">{announcement.title}</h2>
+              <p className="mb-4 text-sm sm:text-base">{announcement.content.substring(0, 100)}...</p>
+              <div className="flex flex-wrap justify-end space-x-2 space-y-2">
+                <button
+                  onClick={() => handleView(announcement)}
+                  className="bg-green-500 text-white px-3 py-1 rounded text-sm"
+                >
+                  View
+                </button>
+                <button
+                  onClick={() => handleEdit(announcement)}
+                  className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(announcement)}
+                  className="bg-red-500 text-white px-3 py-1 rounded text-sm"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
+        {isModalOpen && (
+          <ModalAnnouncement
+            type={modalType}
+            announcement={selectedAnnouncement}
+            onClose={closeModal}
+            onSubmit={handleSubmit}
+          />
+        )}
       </div>
     </div>
   );

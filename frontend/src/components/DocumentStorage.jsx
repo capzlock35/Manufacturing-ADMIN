@@ -1,43 +1,111 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import ModalStorage from './ModalStorage';
+
+const dummyDocuments = [
+  { id: 1, name: 'Project Proposal', type: 'pdf', size: '2.5 MB', uploadDate: '2023-05-15' },
+  { id: 2, name: 'Financial Report', type: 'xlsx', size: '1.8 MB', uploadDate: '2023-05-20' },
+  { id: 3, name: 'User Manual', type: 'docx', size: '3.2 MB', uploadDate: '2023-05-25' },
+];
 
 const DocumentStorage = () => {
-  return (
-    <div className="p-4 bg-gray-200 h-screen"> {/* Added bg-white class here */}
-      <h1 className="text-2xl font-bold mb-4">Document Storage</h1>
-      <p>This is the Document Storage overview. Add your components and logic here.</p>
+  const [documents, setDocuments] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState(null);
+  const [selectedDocument, setSelectedDocument] = useState(null);
 
-      {/* Sample Table */}
-      <table className="min-w-full  bg-white border border-white mt-4">
-        <thead>
-          <tr className="bg-gray-200 text-left">
-            <th className="py-2 px-4 border-b">Document Name</th>
-            <th className="py-2 px-4 border-b">Upload Date</th>
-            <th className="py-2 px-4 border-b">Status</th>
-            <th className="py-2 px-4 border-b">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="py-2 px-4 border-b">Vendor Agreement</td>
-            <td className="py-2 px-4 border-b">2024-09-15</td>
-            <td className="py-2 px-4 border-b">Approved</td>
-            <td className="py-2 px-4 border-b">
-              <button className="text-blue-500 hover:underline">View</button>
-              <button className="text-red-500 hover:underline ml-2">Delete</button>
-            </td>
-          </tr>
-          <tr>
-            <td className="py-2 px-4 border-b">Purchase Order #12345</td>
-            <td className="py-2 px-4 border-b">2024-09-10</td>
-            <td className="py-2 px-4 border-b">Pending</td>
-            <td className="py-2 px-4 border-b">
-              <button className="text-blue-500 hover:underline">View</button>
-              <button className="text-red-500 hover:underline ml-2">Delete</button>
-            </td>
-          </tr>
-          {/* Add more rows as needed */}
-        </tbody>
-      </table>
+  useEffect(() => {
+    setDocuments(dummyDocuments);
+  }, []);
+
+  const handleUpload = () => {
+    setModalType('upload');
+    setSelectedDocument(null);
+    setIsModalOpen(true);
+  };
+
+  const handleView = (document) => {
+    setModalType('view');
+    setSelectedDocument(document);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (document) => {
+    setModalType('delete');
+    setSelectedDocument(document);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedDocument(null);
+    setModalType(null);
+  };
+
+  const handleSubmit = (data) => {
+    if (modalType === 'upload') {
+      setDocuments([...documents, { ...data, id: Date.now() }]);
+    } else if (modalType === 'delete') {
+      setDocuments(documents.filter(d => d.id !== selectedDocument.id));
+    }
+    closeModal();
+  };
+
+  return (
+    <div className="p-2 sm:p-4 min-h-screen bg-gray-100">
+      <div className="container mx-auto p-2 sm:p-4">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4">Document Storage</h1>
+        <button
+          onClick={handleUpload}
+          className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded mb-4"
+        >
+          Upload Document
+        </button>
+        <div className="overflow-x-auto">
+          <table className="w-full bg-white shadow-md rounded">
+            <thead className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+              <tr>
+                <th className="py-3 px-6 text-left">Name</th>
+                <th className="py-3 px-6 text-left hidden sm:table-cell">Type</th>
+                <th className="py-3 px-6 text-left hidden md:table-cell">Size</th>
+                <th className="py-3 px-6 text-left hidden lg:table-cell">Upload Date</th>
+                <th className="py-3 px-6 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="text-gray-600 text-sm font-light">
+              {documents.map((document) => (
+                <tr key={document.id} className="border-b border-gray-200 hover:bg-gray-100">
+                  <td className="py-3 px-6 text-left whitespace-nowrap">{document.name}</td>
+                  <td className="py-3 px-6 text-left hidden sm:table-cell">{document.type}</td>
+                  <td className="py-3 px-6 text-left hidden md:table-cell">{document.size}</td>
+                  <td className="py-3 px-6 text-left hidden lg:table-cell">{document.uploadDate}</td>
+                  <td className="py-3 px-6 text-center">
+                    <button
+                      onClick={() => handleView(document)}
+                      className="bg-green-500 text-white px-2 py-1 rounded text-xs mr-1 sm:mr-2"
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={() => handleDelete(document)}
+                      className="bg-red-500 text-white px-2 py-1 rounded text-xs"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {isModalOpen && (
+          <ModalStorage
+            type={modalType}
+            document={selectedDocument}
+            onClose={closeModal}
+            onSubmit={handleSubmit}
+          />
+        )}
+      </div>
     </div>
   );
 };
