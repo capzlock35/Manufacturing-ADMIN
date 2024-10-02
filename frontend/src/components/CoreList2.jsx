@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Modal from './ModalUser'; 
 
-const FinanceList = () => {
+const CoreList2 = () => {
   // Hooks to manage users and modal state
   const [users, setUsers] = useState([]); // store user data
   const [selectedUser, setSelectedUser] = useState(null); // To track the selected user for viewing, updating, or deleting
@@ -51,7 +51,7 @@ const FinanceList = () => {
   return (
     <div className='p-4 h-screen bg-gray-200'>
       <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4 text-black">Finance User List</h1>
+        <h1 className="text-2xl font-bold mb-4 text-black">Core2 User List</h1>
 
         {/* Table displaying the list of users */}
         <table className="min-w-full bg-white">
@@ -94,4 +94,4 @@ const FinanceList = () => {
   );
 };
 
-export default FinanceList;
+export default CoreList2;

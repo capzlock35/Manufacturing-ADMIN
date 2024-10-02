@@ -60,14 +60,14 @@ const Dashboard = () => {
               <HiOutlineCurrencyDollar className="text-gray-600 text-xl" />
             </div>
             <div className="flex gap-3 my-3">
-              <p className="text-3xl font-bold">$537.83</p>
+              <p className="text-3xl font-bold">₱4,560.75</p>
               <p className="flex items-center gap-1 bg-green-100 text-green-700 rounded-full px-3 py-1 text-sm font-semibold">
-                <IoIosArrowUp className="text-green-700" /> 10.8%
+                <IoIosArrowUp className="text-green-700" /> 8.2%
               </p>
             </div>
             <div className="my-3">
               <p className="text-green-700 font-semibold">
-                +$128.58 <span className="text-gray-500">than past week</span>
+              +₱450.00 <span className="text-gray-500">than last week</span>
               </p>
             </div>
           </div>
@@ -79,14 +79,14 @@ const Dashboard = () => {
               <GrMoney className="text-gray-600 text-xl" />
             </div>
             <div className="flex gap-3 my-3">
-              <p className="text-3xl font-bold">4859</p>
+              <p className="text-3xl font-bold">₱13,890.50</p>
               <p className="flex items-center gap-1 bg-green-100 text-green-700 rounded-full px-3 py-1 text-sm font-semibold">
-                <IoIosArrowUp className="text-green-700" /> 18.2%
+                <IoIosArrowUp className="text-green-700" /> 15.5%
               </p>
             </div>
             <div className="my-3">
               <p className="text-green-700 font-semibold">
-                +47 <span className="text-gray-500">than past week</span>
+              +32 <span className="text-gray-500">than last week</span>
               </p>
             </div>
           </div>
@@ -98,14 +98,14 @@ const Dashboard = () => {
               <MdOutlinePeopleAlt className="text-gray-600 text-xl" />
             </div>
             <div className="flex gap-3 my-3">
-              <p className="text-3xl font-bold">2235</p>
+              <p className="text-3xl font-bold">1,850</p>
               <p className="flex items-center gap-1 bg-red-100 text-red-700 rounded-full px-3 py-1 text-sm font-semibold">
-                <IoIosArrowDown className="text-red-700" /> 12.4%
+                <IoIosArrowDown className="text-red-700" /> 10.5%
               </p>
             </div>
             <div className="my-3">
               <p className="text-red-700 font-semibold">
-                -215 <span className="text-gray-500">than past week</span>
+                -120 <span className="text-gray-500">than last week</span>
               </p>
             </div>
           </div>
@@ -117,14 +117,14 @@ const Dashboard = () => {
               <RiPassPendingLine className="text-gray-600 text-xl" />
             </div>
             <div className="flex gap-3 my-3">
-              <p className="text-3xl font-bold">$219.65</p>
+              <p className="text-3xl font-bold">₱247.30</p>
               <p className="flex items-center gap-1 bg-green-100 text-green-700 rounded-full px-3 py-1 text-sm font-semibold">
-                <IoIosArrowUp className="text-green-700" /> 9.1%
+                <IoIosArrowUp className="text-green-700" /> 7.0%
               </p>
             </div>
             <div className="my-3">
               <p className="text-green-700 font-semibold">
-                +$88.67 <span className="text-gray-500">than past week</span>
+              +₱36.50 <span className="text-gray-500">than last week</span>
               </p>
             </div>
           </div>
@@ -227,7 +227,7 @@ const Dashboard = () => {
                   />
                   <p className="font-semibold">Shampoo</p>
                 </div>
-                <p className="font-semibold">$1.99</p>
+                <p className="font-semibold">₱111.46</p>
                 <p>18 Sept 2024</p>
                 <p className="border border-green-600 w-20 text-center rounded-full text-green-600 bg-green-100 text-sm font-medium">
                   Delivered
@@ -248,7 +248,7 @@ const Dashboard = () => {
                   />
                   <p className="font-semibold">perfume</p>
                 </div>
-                <p className="font-semibold">$1.99</p>
+                <p className="font-semibold">₱111.46</p>
                 <p>18 Sept 2024</p>
                 <p className="border border-blue-600 w-20 text-center rounded-full text-blue-600 bg-blue-100 text-sm font-medium">
                   On Going
@@ -269,7 +269,7 @@ const Dashboard = () => {
                   />
                   <p className="font-semibold">E-juice</p>
                 </div>
-                <p className="font-semibold">$1.59</p>
+                <p className="font-semibold">₱89.05</p>
                 <p>18 Sept 2024</p>
                 <p className="border border-green-600 w-20 text-center rounded-full text-green-600 bg-green-100 text-sm font-medium">
                   Delivered
@@ -290,7 +290,7 @@ const Dashboard = () => {
                   />
                   <p className="font-semibold">Lotion</p>
                 </div>
-                <p className="font-semibold">$2.55</p>
+                <p className="font-semibold">₱142.82</p>
                 <p>18 Sept 2024</p>
                 <p className="border border-red-600 w-20 text-center rounded-full text-red-600 bg-red-100 text-sm font-medium">
                   Canceled

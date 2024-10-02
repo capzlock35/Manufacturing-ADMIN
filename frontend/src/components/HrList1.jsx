@@ -1,14 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import Modal from './ModalUser'; 
+import Modal from './ModalUser'; // Assuming ModalUser is used for HR purposes too
 
-const FinanceList = () => {
+const HrList1 = () => {
   // Hooks to manage users and modal state
-  const [users, setUsers] = useState([]); // store user data
+  const [users, setUsers] = useState([]); // State to store user data
   const [selectedUser, setSelectedUser] = useState(null); // To track the selected user for viewing, updating, or deleting
-  const [modalType, setModalType] = useState(null); // control modal type (view, update, delete)
-  const [isModalOpen, setIsModalOpen] = useState(false); //toggle modal
+  const [modalType, setModalType] = useState(null); // To control the modal type (view, update, delete)
+  const [isModalOpen, setIsModalOpen] = useState(false); // To toggle modal visibility
 
-
+  // Placeholder: Fetch users from the backend API
+  useEffect(() => {
+    // Add the axios fetch code here to get user data from the backend
+    // Example:
+    // const fetchUsers = async () => {
+    //   try {
+    //     const response = await axios.get('/api/users'); // Replace with actual API endpoint
+    //     setUsers(response.data); // Set the fetched users in state
+    //   } catch (error) {
+    //     console.error('Error fetching users', error);
+    //   }
+    // };
+    // fetchUsers(); // Calls the function to fetch users when the component mounts
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   // Open modal for viewing user details
   const handleView = (user) => {
@@ -40,18 +53,36 @@ const FinanceList = () => {
 
   // Placeholder: Updating user's information (this will be passed as a prop to the Modal)
   const updateUser = async (userId, updatedInfo) => {
-
+    // Add axios PUT request code here to update user data in the backend
+    // Example:
+    // try {
+    //   await axios.put(`/api/users/${userId}`, updatedInfo); // Replace with actual API endpoint
+    //   alert('User information updated successfully!');
+    //   // Optionally, refresh the user list by fetching data again
+    // } catch (error) {
+    //   console.error('Error updating user information', error);
+    //   alert('Failed to update user information');
+    // }
   };
 
   // Placeholder: Deleting a user (this will be passed as a prop to the Modal)
   const deleteUser = async (userId) => {
-
+    // Add axios DELETE request code here to delete user data in the backend
+    // Example:
+    // try {
+    //   await axios.delete(`/api/users/${userId}`); // Replace with actual API endpoint
+    //   setUsers(users.filter((user) => user.id !== userId)); // Updates the state
+    //   alert('User deleted successfully!');
+    // } catch (error) {
+    //   console.error('Error deleting user', error);
+    //   alert('Failed to delete user');
+    // }
   };
 
   return (
     <div className='p-4 h-screen bg-gray-200'>
       <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4 text-black">Finance User List</h1>
+        <h1 className="text-2xl font-bold mb-4 text-black">HR1 User List</h1>
 
         {/* Table displaying the list of users */}
         <table className="min-w-full bg-white">
@@ -94,4 +125,4 @@ const FinanceList = () => {
   );
 };
 
-export default FinanceList;
+export default HrList1;

@@ -9,6 +9,7 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
 import { TiDocumentText } from "react-icons/ti";
 import { PiUsersThreeFill } from "react-icons/pi";
+import jjm from "../assets/jjmlogo.jpg"
 
 
 
@@ -66,7 +67,7 @@ const Sidebar = () => {
         <div className='flex items-center gap-2 cursor-pointer mb-8 justify-center'
         aria-label='Dashboard Logo'
         >
-          <img src={logo} alt="Dashboard logo" className='w-10 h-10' />
+          <img src={jjm} alt="Dashboard logo" className='w-16 h-16' />
           {!isCollapsed && <Link to="/home" className='text-xl font-bold'><p>Dashboard</p></Link>}
         </div>
 
@@ -82,10 +83,10 @@ const Sidebar = () => {
 
       {/* Modules */}
       <div className={`mb-2 space-y-2 ${!isCollapsed ? "overflow-auto" : ""}`} >
-        <p className={`text-gray-500 mb-2 font-semibold text-sm ${isCollapsed ? "hidden " : ""
+        <p className={`bg-gradient-to-r from-green-700 to-green-300 text-transparent bg-clip-text mb-2 font-semibold text-sm text-center ${isCollapsed ? "hidden " : ""
         }`}
         >
-          Modules
+          Modules & Features
         </p>
 
         {/* User Management */}
@@ -95,16 +96,44 @@ const Sidebar = () => {
             <li>
               <details open>
                 <summary><PiUsersThreeFill className='w-5 h-5'/>User Management</summary>
-                <Link to="AdminList"><li className='hover:text-blue-500'><p><FaUserFriends/>Admin List</p></li></Link>
-                <Link to="HrList"><li className='hover:text-blue-500'><p><FaUser/>Hr List</p></li></Link>
-                <Link to="CoreList"><li className='hover:text-blue-500'><p><FaUser/>Core List</p></li></Link>
-                <Link to="LogisticList"><li className='hover:text-blue-500'><p><FaUser/>Logistic List</p></li></Link>
-                <Link to="FinanceList"><li className='hover:text-blue-500'><p><FaUser/>Finance List</p></li></Link>
+                <ul>
+                  <Link to="AdminList"><li className='hover:text-blue-500'><p><FaUserFriends/>Admin List</p></li></Link>
+
+                  <li>
+                    <details open>
+                      <summary><PiUsersThreeFill className='w-5 h-5'/>HR List</summary>
+                        <Link to="HrList1"><li className='hover:text-blue-500'><p><FaUser/>Hr1</p></li></Link>
+                        <Link to="HrList2"><li className='hover:text-blue-500'><p><FaUser/>Hr2</p></li></Link>
+                        <Link to="HrList3"><li className='hover:text-blue-500'><p><FaUser/>Hr3</p></li></Link>
+                        <Link to="HrList4"><li className='hover:text-blue-500'><p><FaUser/>Hr4</p></li></Link>
+                    </details>
+                  </li>
+
+
+
+                  <li>
+                    <details open>
+                      <summary><PiUsersThreeFill className='w-5 h-5'/>Core List</summary>
+                        <Link to="CoreList1"><li className='hover:text-blue-500'><p><FaUser/>Core1</p></li></Link>
+                        <Link to="CoreList2"><li className='hover:text-blue-500'><p><FaUser/>Core2</p></li></Link>
+                    </details>
+                  </li>
+
+                  <li>
+                    <details open>
+                      <summary><PiUsersThreeFill className='w-5 h-5'/>Logistic List</summary>
+                        <Link to="LogisticList1"><li className='hover:text-blue-500'><p><FaUser/>Logistic1</p></li></Link>
+                        <Link to="LogisticList2"><li className='hover:text-blue-500'><p><FaUser/>Logistic2</p></li></Link>
+                    </details>    
+                  </li>
+
+                  <Link to="FinanceList"><li className='hover:text-blue-500'><p><FaUser/>Finance List</p></li></Link>
+                </ul>
               </details>
             </li>
           }
-
         </ul>
+
 
         {/* Document Management */}
         <ul className='menu rounded-box w-56'>
