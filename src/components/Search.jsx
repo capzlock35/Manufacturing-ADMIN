@@ -5,6 +5,13 @@ import { IoIosMenu, IoMdNotificationsOutline } from "react-icons/io";
 import Pic from '../assets/Mole.jpg'
 
 const Search = () => {
+
+
+  const handleSignOut = () => {
+    localStorage.removeItem('token')
+    navigate('/login')
+  }
+
   return (
     <div className='w-full top-0 py-4 px-4 bg-white text-gray-800 shadow-md sticky z-20'>
       <div className='flex items-center justify-between '>
@@ -66,11 +73,9 @@ const Search = () => {
                   Settings
                 </a>
               </li>
-              <li>
-                <a href="#"  className='hover:bg-gray-100 p-2 rounded'>
-                  Log out
-                </a>
-              </li>
+                <li>
+                  <button onClick={handleSignOut}>Logout</button>
+                  </li>
             </ul>
           </div>
         </div>

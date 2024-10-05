@@ -3,8 +3,16 @@ import { FaSearch } from "react-icons/fa";
 import { MdOutlineDarkMode } from "react-icons/md";
 import { IoIosMenu, IoMdNotificationsOutline } from "react-icons/io";
 import Pic from '../assets/Mole.jpg'
+import { useNavigate } from 'react-router-dom';
 
 const Search = () => {
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    localStorage.removeItem('token')
+    navigate('/')
+  }
+
   return (
     <div className='w-full top-0 py-4 px-4 bg-white text-gray-800 shadow-md sticky z-20'>
       <div className='flex items-center justify-between '>
@@ -67,10 +75,8 @@ const Search = () => {
                 </a>
               </li>
               <li>
-                <a href="#"  className='hover:bg-gray-100 p-2 rounded'>
-                  Log out
-                </a>
-              </li>
+                <button onClick={handleSignOut}>Log out</button>
+                </li>
             </ul>
           </div>
         </div>
