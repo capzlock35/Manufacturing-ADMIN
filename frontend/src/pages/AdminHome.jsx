@@ -19,6 +19,14 @@ import CoreList1 from '../components/CoreList1'
 import CoreList2 from '../components/CoreList2'
 import LogisticList1 from '../components/LogisticList1'
 import LogisticList2 from '../components/LogisticList2'
+import ContractManagement from '../components/ContractManagement'
+import LegalDocument from '../components/LegalDocument'
+import RiskManagement from '../components/RiskManagement'
+import LitigationManagement from '../components/LitigationManagement'
+import CompliancesandRegulatory from '../components/CompliancesandRegulatory'
+import WorkflowIdentification from '../components/WorkflowIdentification'
+import CommunicationPlan from '../components/CommunicationPlan'
+import ResourcesAllocation from '../components/ResourcesAllocation'
 
 
 const AdminHome = () => {
@@ -43,6 +51,14 @@ const AdminHome = () => {
           <Route path='DocumentStorage' element={<DocumentStorage/>} />
           <Route path='VersionControl' element={<VersionControl/>} />
           <Route path='DocumentTracking' element={<DocumentTracking/>} />
+          <Route path='ContractManagement' element={<ContractManagement/>} />
+          <Route path='LegalDocument' element={<LegalDocument/>} />
+          <Route path='RiskManagement' element={<RiskManagement/>} />
+          <Route path='LitigationManagement' element={<LitigationManagement/>} />
+          <Route path='CompliancesandRegulatory' element={<CompliancesandRegulatory/>} />
+          <Route path='WorkflowIdentification' element={<WorkflowIdentification/>} />
+          <Route path='CommunicationPlan' element={<CommunicationPlan/>} />
+          <Route path='ResourcesAllocation' element={<ResourcesAllocation/>} />
         </Routes>
       </div>
     </div>

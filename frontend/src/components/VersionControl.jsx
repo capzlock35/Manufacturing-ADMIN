@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ModalAnnouncement from './ModalAnnouncement';
+import ModalAnnouncement from '../Modal/ModalAnnouncement';
 
 const dummyAnnouncements = [
   { id: 1, title: 'New Feature Release', content: 'We are excited to announce the release of our latest feature...' },

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ModalTracking from './ModalTracking';
+import ModalTracking from '../Modal/ModalTracking';
 
 const dummyTrackings = [
   { id: 1, documentId: 1, documentName: 'Project Proposal', action: 'Viewed', user: 'John Doe', date: '2023-05-16' },

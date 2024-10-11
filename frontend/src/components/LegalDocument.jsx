@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Clock, FileText, History, Plus, Search, Upload } from 'lucide-react';
-import ModalLegal from './ModalLegal'; // Added this import
+import ModalLegal from '../Modal/ModalLegal';
 
 // Dummy data for documents
 const dummyDocuments = [
