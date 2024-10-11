@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Eye, CheckCircle, XCircle } from 'lucide-react';
-import ModalContract from '../Modal/ModalContract';
+import ModalContract from '../Modals/ModalContract';
 
 const ContractManagement = () => {
   const [contracts, setContracts] = useState([

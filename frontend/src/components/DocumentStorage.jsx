@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ModalStorage from '../Modal/ModalStorage';
+import ModalStorage from '../Modals/ModalStorage';
 
 const dummyDocuments = [
   { id: 1, name: 'Project Proposal', type: 'pdf', size: '2.5 MB', uploadDate: '2023-05-15' },

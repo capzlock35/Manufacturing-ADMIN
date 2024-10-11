@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Modal from '../Modal/ModalUser'; 
+import Modal from '../Modals/ModalUser'; 
 
 const FinanceList = () => {
   // Hooks to manage users and modal state
