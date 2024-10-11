@@ -161,11 +161,11 @@ const Sidebar = () => {
               <details open>
                 <summary><IoDocumentTextOutline className='w-5 h-5'/>Legal Management</summary>
                 <ul>
-                  <Link to=""><li className='hover:text-blue-500'><p><TiDocumentText/>Contract Management</p></li></Link>
-                  <Link to=""><li className='hover:text-blue-500'><p><TiDocumentText/>Legal Document</p></li></Link>
-                  <Link to=""><li className='hover:text-blue-500'><p><TiDocumentText/>Risk Management</p></li></Link>
-                  <Link to=""><li className='hover:text-blue-500'><p><TiDocumentText/>Litigation Management</p></li></Link>
-                  <Link to=""><li className='hover:text-blue-500'><p><TiDocumentText/>Compliances and Regulatory</p></li></Link>
+                  <Link to="ContractManagement"><li className='hover:text-blue-500'><p><TiDocumentText/>Contract Management</p></li></Link>
+                  <Link to="LegalDocument"><li className='hover:text-blue-500'><p><TiDocumentText/>Legal Document</p></li></Link>
+                  <Link to="RiskManagement"><li className='hover:text-blue-500'><p><TiDocumentText/>Risk Management</p></li></Link>
+                  <Link to="LitigationManagement"><li className='hover:text-blue-500'><p><TiDocumentText/>Litigation Management</p></li></Link>
+                  <Link to="CompliancesandRegulatory"><li className='hover:text-blue-500'><p><TiDocumentText/>Compliances and Regulatory</p></li></Link>
                 </ul>
               </details>
             </li>
@@ -181,9 +181,9 @@ const Sidebar = () => {
               <details open>
                 <summary><GoWorkflow className='w-5 h-5'/>Initiating Workflow</summary>
                 <ul>
-                  <Link to=""><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Workflow Identification</p></li></Link>
-                  <Link to=""><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Communication Plan</p></li></Link>
-                  <Link to=""><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Resources Allocation</p></li></Link>
+                  <Link to="WorkflowIdentification"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Workflow Identification</p></li></Link>
+                  <Link to="CommunicationPlan"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Communication Plan</p></li></Link>
+                  <Link to="ResourcesAllocation"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Resources Allocation</p></li></Link>
                 </ul>
               </details>
             </li>

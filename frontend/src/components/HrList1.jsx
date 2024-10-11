@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Modal from './ModalUser'; // Assuming ModalUser is used for HR purposes too
+import Modal from '../Modal/ModalUser'; // Assuming ModalUser is used for HR purposes too
 
 const HrList1 = () => {
   // Hooks to manage users and modal state

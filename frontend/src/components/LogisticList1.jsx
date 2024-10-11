@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Modal from './ModalUser'; 
+import Modal from '../Modal/ModalUser'; 
 
 const LogisticList1 = () => {
   // Hooks to manage users and modal state
