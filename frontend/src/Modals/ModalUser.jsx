@@ -23,11 +23,13 @@ const ModalUser = ({ type, user, onClose, onUpdate, onDelete }) => {
 
         {type === 'view' && (
           <div className="mb-4">
-            <p><strong>First Name:</strong> {user.firstName}</p>
-            <p><strong>Last Name:</strong> {user.lastName}</p>
+            <p><strong>First Name:</strong> {user.firstname}</p>
+            <p><strong>Last Name:</strong> {user.lastname}</p>
             <p><strong>Username:</strong> {user.username}</p>
             <p><strong>Email:</strong> {user.email}</p>
             <p><strong>Gender:</strong> {user.gender}</p>
+            <p><strong>Age:</strong> {user.age}</p>
+            <p><strong>Birthday:</strong> {user.birthday}</p>
           </div>
         )}
 
@@ -38,14 +40,14 @@ const ModalUser = ({ type, user, onClose, onUpdate, onDelete }) => {
               placeholder="Current Password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full p-2 mb-2 border rounded"
+              className="w-full p-2 mb-2 border rounded bg-white"
             />
             <input
               type="password"
               placeholder="New Password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full p-2 mb-4 border rounded"
+              className="w-full p-2 mb-4 border rounded bg-white"
             />
           </div>
         )}
