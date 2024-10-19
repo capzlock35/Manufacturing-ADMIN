@@ -4,11 +4,11 @@ import Modal from '../Modals/ModalUser';
 const HrList4 = () => {
   // Hooks to manage users and modal state
   const [users, setUsers] = useState([
-    { id: 1, firstName: 'Oliver', lastName: 'King', gender: 'Male', age: '32', birthday: '1991-08-29', username: 'oliverking', email: 'oliverking@example.com' },
-    { id: 2, firstName: 'Sophia', lastName: 'Thompson', gender: 'Female', age: '27', birthday: '1996-02-14', username: 'sophiathompson', email: 'sophiathompson@example.com' },
-    { id: 3, firstName: 'Lucas', lastName: 'Carter', gender: 'Male', age: '30', birthday: '1993-05-05', username: 'lucascarter', email: 'lucascarter@example.com' },
-    { id: 4, firstName: 'Mia', lastName: 'Robinson', gender: 'Female', age: '24', birthday: '1999-12-22', username: 'miarobinson', email: 'miarobinson@example.com' },
-    { id: 5, firstName: 'Benjamin', lastName: 'Anderson', gender: 'Male', age: '35', birthday: '1988-11-17', username: 'benjaminanderson', email: 'benjaminanderson@example.com' }
+    { id: 1, firstname: 'Oliver', lastname: 'King', gender: 'Male', age: '32', birthday: '1991-08-29', username: 'oliverking', email: 'oliverking@example.com' },
+    { id: 2, firstname: 'Sophia', lastname: 'Thompson', gender: 'Female', age: '27', birthday: '1996-02-14', username: 'sophiathompson', email: 'sophiathompson@example.com' },
+    { id: 3, firstname: 'Lucas', lastname: 'Carter', gender: 'Male', age: '30', birthday: '1993-05-05', username: 'lucascarter', email: 'lucascarter@example.com' },
+    { id: 4, firstname: 'Mia', lastname: 'Robinson', gender: 'Female', age: '24', birthday: '1999-12-22', username: 'miarobinson', email: 'miarobinson@example.com' },
+    { id: 5, firstname: 'Benjamin', lastname: 'Anderson', gender: 'Male', age: '35', birthday: '1988-11-17', username: 'benjaminanderson', email: 'benjaminanderson@example.com' }
   ]);
   const [selectedUser, setSelectedUser] = useState(null); // To track the selected user for viewing, updating, or deleting
   const [modalType, setModalType] = useState(null); // control modal type (view, update, delete)
