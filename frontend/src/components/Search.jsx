@@ -11,6 +11,7 @@ const Search = () => {
   const handleSignOut = () => {
     localStorage.removeItem('token')
     navigate('/')
+    window.location.reload()
   }
 
   return (

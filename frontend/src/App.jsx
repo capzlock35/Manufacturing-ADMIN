@@ -8,14 +8,14 @@ import AdminHome from './pages/AdminHome'
 
 
 function App() {
-
+  const isUserSignedIn = !!localStorage.getItem('token')
   return (
   <>
     <BrowserRouter>
       <Routes>
         <Route path='/' element={ <Login/> } />
         <Route path='/register' element={ <Register />} />
-        <Route path='/home/*' element={ <AdminHome/> } />
+        {isUserSignedIn && <Route path='/home/*' element={ <AdminHome/> } />}
       </Routes>
     </BrowserRouter>
   </>
