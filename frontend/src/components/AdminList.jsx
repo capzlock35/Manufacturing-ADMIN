@@ -1,26 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import ModalUser from '../Modals/ModalUser'; // Import ModalUser component
 
 const AdminList = () => {
   // Hooks
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState('');
+
   useEffect(() => {
     axios.get('http://localhost:7690/api/user/get')
-    .then(users => setUsers(users.data))
-    .catch(err => console.log(err))
-  }, [])
-
+      .then(users => setUsers(users.data))
+      .catch(err => console.log(err));
+  }, []);
 
   // Handle
   const handleView = (user) => {
-    setSelectedUser(user._id);
+    setSelectedUser(user);
     setModalType('view');
     setIsModalOpen(true);
   };
 
-  const handleUpdate = (users) => {
-    setSelectedUser(users);
+  const handleUpdate = (user) => {
+    setSelectedUser(user);
     setModalType('update');
     setIsModalOpen(true);
   };
@@ -31,9 +34,41 @@ const AdminList = () => {
     setIsModalOpen(true);
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedUser(null); // Clear selected user when modal closes
+  };
+
+  const handleUpdatePassword = (userId, currentPassword, newPassword) => {
+    // Axios PUT request for updating password
+    axios.put(`http://localhost:7690/api/user/${userId}/update-password`, {
+      currentPassword,
+      newPassword,
+    })
+    .then(response => {
+      console.log('Password updated:', response.data);
+      setIsModalOpen(false);
+    })
+    .catch(error => {
+      console.error('Error updating password:', error);
+    });
+  };
+
+  const handleDeleteUser = (userId) => {
+    // Axios DELETE request for deleting user
+    axios.delete(`http://localhost:7690/api/user/${userId}`)
+    .then(response => {
+      console.log('User deleted:', response.data);
+      setUsers(users.filter(user => user._id !== userId)); // Update the list after deletion
+      setIsModalOpen(false);
+    })
+    .catch(error => {
+      console.error('Error deleting user:', error);
+    });
+  };
 
   return (
-    <div className='p-4  h-screen bg-gray-200'>
+    <div className='p-4 h-screen bg-gray-200'>
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4 text-black">Admin Account List</h1>
         <table className="min-w-full bg-white">
@@ -45,22 +80,31 @@ const AdminList = () => {
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
-            {
-            users.map(user => {
-              return <tr key={ user._id }>
+            {users.map(user => (
+              <tr key={user._id}>
                 <td className="py-3 px-6 text-left">{user.username}</td>
                 <td className="py-3 px-6 text-left">{user.email}</td>
                 <td className="py-3 px-6 text-center flex">
-                  <button onClick={() => handleView(users)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2">View</button>
-                  <button onClick={() => handleUpdate(users)} className="bg-green-500 text-white px-3 py-1 rounded mr-2">Update</button>
-                  <button onClick={() => handleDelete(users)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                  <button onClick={() => handleView(user)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2">View</button>
+                  <button onClick={() => handleUpdate(user)} className="bg-green-500 text-white px-3 py-1 rounded mr-2">Update</button>
+                  <button onClick={() => handleDelete(user)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
                 </td>
               </tr>
-})
-}
+            ))}
           </tbody>
         </table>
       </div>
+
+      {/* ModalUser  gumana ang modal */}
+      {isModalOpen && (
+        <ModalUser
+          type={modalType}
+          user={selectedUser}
+          onClose={handleCloseModal}
+          onUpdate={handleUpdatePassword}
+          onDelete={handleDeleteUser}
+        />
+      )}
     </div>
   );
 };
