@@ -3,7 +3,19 @@ import Modal from '../Modals/ModalUser';
 
 const HrList3 = () => {
   // Hooks to manage users and modal state
-  const [users, setUsers] = useState([]); // store user data
+  const [users, setUsers] = useState([
+    { id: 1, firstName: 'Luna', lastName: 'Mitchell', gender: 'Female', age: '26', birthday: '1997-03-21', username: 'lunamitchell', email: 'lunamitchell@example.com' },
+    { id: 2, firstName: 'James', lastName: 'Roberts', gender: 'Male', age: '29', birthday: '1994-10-05', username: 'jamesroberts', email: 'jamesroberts@example.com' },
+    { id: 3, firstName: 'Isabella', lastName: 'Hernandez', gender: 'Female', age: '24', birthday: '1999-01-12', username: 'isabellahernandez', email: 'isabellahernandez@example.com' },
+    { id: 4, firstName: 'Mason', lastName: 'Hall', gender: 'Male', age: '31', birthday: '1992-05-28', username: 'masonhall', email: 'masonhall@example.com' },
+    { id: 5, firstName: 'Zoe', lastName: 'Gonzalez', gender: 'Female', age: '28', birthday: '1995-07-18', username: 'zoegonzalez', email: 'zoegonzalez@example.com' },
+  
+    { id: 1, firstName: 'Aiden', lastName: 'Lee', gender: 'Male', age: '30', birthday: '1993-09-14', username: 'aidenlee', email: 'aidenlee@example.com' },
+    { id: 2, firstName: 'Chloe', lastName: 'Parker', gender: 'Female', age: '23', birthday: '2000-12-11', username: 'chloeparker', email: 'chloeparker@example.com' },
+    { id: 3, firstName: 'Ethan', lastName: 'Turner', gender: 'Male', age: '29', birthday: '1994-04-03', username: 'ethanturner', email: 'ethanturner@example.com' },
+    { id: 4, firstName: 'Aria', lastName: 'Bennett', gender: 'Female', age: '25', birthday: '1998-06-09', username: 'ariabennett', email: 'ariabennett@example.com' },
+    { id: 5, firstName: 'Logan', lastName: 'Harris', gender: 'Male', age: '27', birthday: '1996-11-23', username: 'loganharris', email: 'loganharris@example.com' }
+  ]);
   const [selectedUser, setSelectedUser] = useState(null); // To track the selected user for viewing, updating, or deleting
   const [modalType, setModalType] = useState(null); // control modal type (view, update, delete)
   const [isModalOpen, setIsModalOpen] = useState(false); //toggle modal
