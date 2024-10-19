@@ -15,7 +15,7 @@ const ModalUser = ({ type, user, onClose, onUpdate, onDelete }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg w-96">
         <h2 className="text-xl font-bold mb-4">
           {type === 'view' ? 'User Details' : type === 'update' ? 'Update Password' : 'Delete User'}
