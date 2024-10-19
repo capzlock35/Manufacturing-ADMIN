@@ -4,11 +4,11 @@ import Modal from '../Modals/ModalUser'; // Assuming ModalUser is used for HR pu
 const HrList1 = () => {
   // Hooks to manage users and modal state
   const [users, setUsers] = useState([
-    { id: 1, firstName: 'Liam', lastName: 'Wilson', gender: 'Male', age: '30', birthday: '1993-03-15', username: 'liamw', email: 'liamw@example.com' },
-    { id: 2, firstName: 'Emma', lastName: 'Taylor', gender: 'Female', age: '28', birthday: '1995-07-22', username: 'emmat', email: 'emmat@example.com' },
-    { id: 3, firstName: 'Noah', lastName: 'Anderson', gender: 'Male', age: '32', birthday: '1991-09-04', username: 'noaha', email: 'noaha@example.com' },
-    { id: 4, firstName: 'Ava', lastName: 'Thomas', gender: 'Female', age: '26', birthday: '1997-01-13', username: 'avath', email: 'avath@example.com' },
-    { id: 5, firstName: 'William', lastName: 'Jackson', gender: 'Male', age: '35', birthday: '1988-10-29', username: 'williamj', email: 'williamj@example.com' }
+    { id: 1, firstname: 'Liam', lastname: 'Wilson', gender: 'Male', age: '30', birthday: '1993-03-15', username: 'liamw', email: 'liamw@example.com' },
+    { id: 2, firstname: 'Emma', lastname: 'Taylor', gender: 'Female', age: '28', birthday: '1995-07-22', username: 'emmat', email: 'emmat@example.com' },
+    { id: 3, firstname: 'Noah', lastname: 'Anderson', gender: 'Male', age: '32', birthday: '1991-09-04', username: 'noaha', email: 'noaha@example.com' },
+    { id: 4, firstname: 'Ava', lastname: 'Thomas', gender: 'Female', age: '26', birthday: '1997-01-13', username: 'avath', email: 'avath@example.com' },
+    { id: 5, firstname: 'William', lastname: 'Jackson', gender: 'Male', age: '35', birthday: '1988-10-29', username: 'williamj', email: 'williamj@example.com' }
   ]);
   const [selectedUser, setSelectedUser] = useState(null); // To track the selected user for viewing, updating, or deleting
   const [modalType, setModalType] = useState(null); // To control the modal type (view, update, delete)

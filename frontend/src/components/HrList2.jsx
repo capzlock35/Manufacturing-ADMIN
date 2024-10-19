@@ -4,17 +4,17 @@ import Modal from '../Modals/ModalUser';
 const HrList2 = () => {
   // Hooks to manage users and modal state
   const [users, setUsers] = useState([
-    { id: 1, firstName: 'Oliver', lastName: 'Jones', gender: 'Male', age: '26', birthday: '1997-01-15', username: 'oliverjones', email: 'oliverjones@example.com' },
-    { id: 2, firstName: 'Sophia', lastName: 'Taylor', gender: 'Female', age: '31', birthday: '1992-04-22', username: 'sophiataylor', email: 'sophiataylor@example.com' },
-    { id: 3, firstName: 'Lucas', lastName: 'King', gender: 'Male', age: '24', birthday: '1999-07-09', username: 'lucasking', email: 'lucasking@example.com' },
-    { id: 4, firstName: 'Mia', lastName: 'Davis', gender: 'Female', age: '29', birthday: '1994-03-14', username: 'miadavis', email: 'miadavis@example.com' },
-    { id: 5, firstName: 'Elijah', lastName: 'Garcia', gender: 'Male', age: '33', birthday: '1990-11-30', username: 'elijahgarcia', email: 'elijahgarcia@example.com' },
+    { id: 1, firstname: 'Oliver', lastname: 'Jones', gender: 'Male', age: '26', birthday: '1997-01-15', username: 'oliverjones', email: 'oliverjones@example.com' },
+    { id: 2, firstname: 'Sophia', lastname: 'Taylor', gender: 'Female', age: '31', birthday: '1992-04-22', username: 'sophiataylor', email: 'sophiataylor@example.com' },
+    { id: 3, firstname: 'Lucas', lastname: 'King', gender: 'Male', age: '24', birthday: '1999-07-09', username: 'lucasking', email: 'lucasking@example.com' },
+    { id: 4, firstname: 'Mia', lastname: 'Davis', gender: 'Female', age: '29', birthday: '1994-03-14', username: 'miadavis', email: 'miadavis@example.com' },
+    { id: 5, firstname: 'Elijah', lastname: 'Garcia', gender: 'Male', age: '33', birthday: '1990-11-30', username: 'elijahgarcia', email: 'elijahgarcia@example.com' },
   
-    { id: 1, firstName: 'Charlotte', lastName: 'Martinez', gender: 'Female', age: '27', birthday: '1996-06-05', username: 'charlottemartinez', email: 'charlottemartinez@example.com' },
-    { id: 2, firstName: 'Henry', lastName: 'Lopez', gender: 'Male', age: '30', birthday: '1993-09-12', username: 'henrylopez', email: 'henrylopez@example.com' },
-    { id: 3, firstName: 'Amelia', lastName: 'Wilson', gender: 'Female', age: '22', birthday: '2001-08-21', username: 'ameliawilson', email: 'ameliawilson@example.com' },
-    { id: 4, firstName: 'Jackson', lastName: 'Anderson', gender: 'Male', age: '29', birthday: '1994-12-01', username: 'jacksonanderson', email: 'jacksonanderson@example.com' },
-    { id: 5, firstName: 'Avery', lastName: 'Thomas', gender: 'Female', age: '25', birthday: '1998-02-17', username: 'averythomas', email: 'averythomas@example.com' }
+    { id: 1, firstname: 'Charlotte', lastname: 'Martinez', gender: 'Female', age: '27', birthday: '1996-06-05', username: 'charlottemartinez', email: 'charlottemartinez@example.com' },
+    { id: 2, firstname: 'Henry', lastname: 'Lopez', gender: 'Male', age: '30', birthday: '1993-09-12', username: 'henrylopez', email: 'henrylopez@example.com' },
+    { id: 3, firstname: 'Amelia', lastname: 'Wilson', gender: 'Female', age: '22', birthday: '2001-08-21', username: 'ameliawilson', email: 'ameliawilson@example.com' },
+    { id: 4, firstname: 'Jackson', lastname: 'Anderson', gender: 'Male', age: '29', birthday: '1994-12-01', username: 'jacksonanderson', email: 'jacksonanderson@example.com' },
+    { id: 5, firstname: 'Avery', lastname: 'Thomas', gender: 'Female', age: '25', birthday: '1998-02-17', username: 'averythomas', email: 'averythomas@example.com' }
   ]);
   const [selectedUser, setSelectedUser] = useState(null); // To track the selected user for viewing, updating, or deleting
   const [modalType, setModalType] = useState(null); // control modal type (view, update, delete)
