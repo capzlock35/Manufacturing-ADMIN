@@ -57,17 +57,17 @@ const deleteUser = async (req, res) =>{
 }
 
 
-    const createUser = async(req,res) => {
-        try{
-            const { firstname, lastname, birthday, gender, email, username, password } = req.body
-            const hashedPassword = await bcrypt.hash(password, 10)
-            const newUser = new User({ firstname, lastname, birthday, gender, email, username, password:hashedPassword })
-            await newUser.save()
-            res.status(201).json({ message: 'User created successfully' })
-        } catch (error) {
-            res.status(500).json({ error: 'Error signing up' })
-        }
+const createUser = async(req,res) => {
+    try{
+        const { firstname, lastname, birthday, gender, email, username, password } = req.body
+        const hashedPassword = await bcrypt.hash(password, 10)
+        const newUser = new User({ firstname, lastname, birthday, gender, email, username, password:hashedPassword })
+        await newUser.save()
+        res.status(201).json({ message: 'User created successfully' })
+    } catch (error) {
+        res.status(500).json({ error: 'Error signing up' })
     }
+}
     const Login = async (req, res) => {
         try{
             const { username, password } = req.body
@@ -79,8 +79,8 @@ const deleteUser = async (req, res) =>{
             if (!isPasswordValid) {
                 return res.status(401).json({ error: 'Invalid credentials' })
             }
-            const token = jwt.sign({ userId: user._Id }, SECRET_KEY, { expiresIn: '1hr' })
-            res.json({ message: 'Login successful' })
+            const token = jwt.sign({ userid: user._id }, SECRET_KEY, { expiresIn: '1hr' })
+            res.json({ message: 'Login successful',token})
         } catch (error) {
             res.status(500).json({ error: 'Error logging in' })
         }
