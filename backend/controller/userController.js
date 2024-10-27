@@ -60,6 +60,7 @@ const deleteUser = async (req, res) =>{
 const createUser = async(req,res) => {
     try{
         const { firstname, lastname, birthday, gender, email, username, password } = req.body
+        // hash the password before saving to database
         const hashedPassword = await bcrypt.hash(password, 10)
         const newUser = new User({ firstname, lastname, birthday, gender, email, username, password:hashedPassword })
         await newUser.save()
@@ -74,11 +75,11 @@ const createUser = async(req,res) => {
             const user = await User.findOne({ username })
             if (!user){
                 return res.status(401).json({ error: 'Invalid credentials' })
-            }
+            }// check if password is matches
             const isPasswordValid = await bcrypt.compare(password, user.password)
             if (!isPasswordValid) {
                 return res.status(401).json({ error: 'Invalid credentials' })
-            }
+            }// sign JWT token
             const token = jwt.sign({ userid: user._id }, SECRET_KEY, { expiresIn: '1hr' })
             res.json({ message: 'Login successful',token})
         } catch (error) {

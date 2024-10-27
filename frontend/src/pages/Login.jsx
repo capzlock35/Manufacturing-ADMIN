@@ -7,6 +7,7 @@ import { MdAdminPanelSettings } from "react-icons/md";
 import { Link } from 'react-router-dom'
 import { FaEyeSlash } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
+import {toast} from "react-hot-toast"
 
 const Login = () => {
 
@@ -16,6 +17,7 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    
 
     const navigate = useNavigate();
 
@@ -29,14 +31,12 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-    console.log("Current users:", user);
 }, [user]);
 
 const fetchUsers = () => {
     axios
         .get(`${baseURL}/get`) // Corrected: Use /get directly
         .then((res) => {
-            console.log("Fetched users:", res.data); // Log the response
             setUsers(res.data); // Update user data if needed
         })
         .catch((error) => console.error("Error fetching users:", error));
@@ -46,20 +46,20 @@ const fetchUsers = () => {
 const handleLogin = async (event) => {
     event.preventDefault();
 
-    console.log("Logging in with:", { username, password }); // Log credentials
+    console.log("Checking credentials"); // Log credentials
 
     try {
         const response = await axios.post(`${baseURL}/login`, { username, password }); // Corrected: Use /login directly
         console.log("Login response:", response.data); // Log the response
         const token = response.data.token;
-        alert('Login successful');
+        toast.success('Login successful');
         setUsername('');
         setPassword('');
         localStorage.setItem('token', token);
         navigate('/home');
         window.location.reload();
     } catch (error) {
-        console.error('Error during login:', error);
+        toast.error('Login Error');
         setError('Wrong Username or Password.');
     }
 };

@@ -5,12 +5,12 @@ const ModalUser = ({ type, user, onClose, onUpdate, onDelete }) => {
   const [currentPassword, setCurrentPassword] = useState('');
 
   const handleUpdatePassword = () => {
-    onUpdate(user.id, currentPassword, newPassword);
+    onUpdate(user._id, currentPassword, newPassword);
     onClose();
   };
 
   const handleDelete = () => {
-    onDelete(user.id);
+    onDelete(user._id);
     onClose();
   };
 

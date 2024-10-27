@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import AdminHome from './pages/AdminHome'
-
+import { Toaster } from 'react-hot-toast'
 
 
 
@@ -12,6 +12,7 @@ function App() {
   return (
   <>
     <BrowserRouter>
+    <Toaster position='bottom-right' toastOptions={{duration: 2000}} />
       <Routes>
         <Route path='/' element={ <Login/> } />
         <Route path='/register' element={ <Register />} />
