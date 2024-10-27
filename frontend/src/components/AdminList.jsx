@@ -40,7 +40,7 @@ const AdminList = () => {
     setModalType('delete');
     setIsModalOpen(true);
   };
-
+    
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedUser(null); // Clear selected user when modal closes

@@ -8,7 +8,7 @@ import { FaEye } from "react-icons/fa";
 import { MdOutlinePermIdentity } from "react-icons/md";
 import { MdOutlineCake } from "react-icons/md";
 import { useNavigate } from "react-router-dom"
-
+import {toast} from "react-hot-toast"
 import axios from 'axios'
 
 
@@ -47,7 +47,7 @@ const Register = () => {
     axios
     .post('http://localhost:7690/api/user/create', { firstname, lastname, birthday, gender, email, username, password })
     .then(() =>{
-      alert('Registration is Complete')
+      toast.success('Registration is Complete')
       setFirstName('')
       setLastName('')
       setBirthday('')
@@ -59,7 +59,7 @@ const Register = () => {
       navigate('/')
     })
     .catch((error) => {
-      console.log('Unable to register user')
+      toast.error('Unable to register user')
     })
   }
 
