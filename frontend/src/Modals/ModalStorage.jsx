@@ -1,96 +1,174 @@
 import React, { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 
-const ModalStorage = ({ type, document, onClose, onSubmit }) => {
+const ModalStorage = ({ isOpen, onClose, onSubmit, document, viewOnly }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    type: '',
-    size: '',
-    uploadDate: ''
+    title: '',
+    date: '',
+    category: 'Invoice',
+    status: 'Pending',
+    description: '',
+    attachmentName: ''
   });
 
   useEffect(() => {
+    // Check local storage for existing attachment name
+    const storedAttachmentName = localStorage.getItem('attachmentName');
+    if (storedAttachmentName) {
+      setFormData(prev => ({ ...prev, attachmentName: storedAttachmentName }));
+    }
+    
     if (document) {
       setFormData(document);
     }
   }, [document]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Save attachment name to local storage
+    localStorage.setItem('attachmentName', formData.attachmentName);
     onSubmit(formData);
+    onClose();
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
-        <div className="mt-3 text-center">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">
-            {type === 'upload' ? 'Upload Document' : type === 'view' ? 'View Document' : 'Delete Document'}
-          </h3>
-          <div className="mt-2 px-7 py-3">
-            {type === 'delete' ? (
-              <p className="text-sm text-gray-500">
-                Are you sure you want to delete this document?
-              </p>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Document Name"
-                  className="mt-2 p-2 w-full border rounded"
-                  readOnly={type === 'view'}
-                />
-                <input
-                  type="text"
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  placeholder="Document Type"
-                  className="mt-2 p-2 w-full border rounded"
-                  readOnly={type === 'view'}
-                />
-                <input
-                  type="text"
-                  name="size"
-                  value={formData.size}
-                  onChange={handleChange}
-                  placeholder="Document Size"
-                  className="mt-2 p-2 w-full border rounded"
-                  readOnly={type === 'view'}
-                />
-                <input
-                  type="date"
-                  name="uploadDate"
-                  value={formData.uploadDate}
-                  onChange={handleChange}
-                  className="mt-2 p-2 w-full border rounded"
-                  readOnly={type === 'view'}
-                />
-              </form>
-            )}
-          </div>
-          <div className="items-center px-4 py-3">
-            {type !== 'view' && (
-              <button
-                onClick={handleSubmit}
-                className="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-              >
-                {type === 'upload' ? 'Upload' : 'Confirm Delete'}
-              </button>
-            )}
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">
+              {viewOnly ? 'View Document' : document ? 'Edit Document' : 'Add New Document'}
+            </h2>
             <button
               onClick={onClose}
-              className="mt-3 px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
-              Close
+              <X size={24} />
             </button>
           </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Title
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                disabled={viewOnly}
+                required
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Date
+              </label>
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                disabled={viewOnly}
+                required
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-300 text-black"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category
+              </label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                disabled={viewOnly}
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
+              >
+                <option value="Invoice">Invoice</option>
+                <option value="Receipt">Receipt</option>
+                <option value="Purchase Order">Purchase Order</option>
+                {/* Add more categories as needed */}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status
+              </label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                disabled={viewOnly}
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
+              >
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+                {/* Add more statuses as needed */}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                disabled={viewOnly}
+                required
+                rows="3"
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Attachment
+              </label>
+              <input
+                type="file"
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
+                disabled={viewOnly}
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    setFormData(prev => ({
+                      ...prev,
+                      attachmentName: file.name
+                    }));
+                  }
+                }}
+              />
+              {formData.attachmentName && (
+                <p className="text-sm text-gray-600 mt-1">Selected file: {formData.attachmentName}</p>
+              )}
+            </div>
+
+            {!viewOnly && (
+              <button
+                type="submit"
+                className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                {document ? 'Update Document' : 'Add Document'}
+              </button>
+            )}
+          </form>
         </div>
       </div>
     </div>
