@@ -1,5 +1,6 @@
 import express from 'express';
-import {getAllUser,createUser,Login,updateUser,deleteUser, viewUser} from '../controller/userController.js'
+import {getAllUser,createUser,Login,updateUser,deleteUser, viewUser, viewProfile} from '../controller/userController.js'
+import authMiddleware from '../middleware/authMiddleware.js';
 
 const  userRouter = express.Router();
 
@@ -10,6 +11,9 @@ userRouter.get("/view/:id", viewUser)
 userRouter.put("/update/:id", updateUser);
 userRouter.delete("/delete/:id", deleteUser);
 //GET Registered users
+userRouter.get("/profile", authMiddleware, viewProfile);
+userRouter.put("/profile/update", authMiddleware, updateUser);
+
 
 //userRouter.put("/update/:id",updateUser);
 //userRouter.delete("/delete/:id",deleteUser);
