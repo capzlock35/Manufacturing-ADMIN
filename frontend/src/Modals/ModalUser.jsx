@@ -28,6 +28,7 @@ const ModalUser = ({ type, user, onClose, onUpdate, onDelete }) => {
             <p><strong>Username:</strong> {user.username}</p>
             <p><strong>Email:</strong> {user.email}</p>
             <p><strong>Gender:</strong> {user.gender}</p>
+            <p><strong>Birthday:</strong> {user.birthday}</p>
           </div>
         )}
 
