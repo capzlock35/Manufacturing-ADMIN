@@ -3,7 +3,13 @@ import Modal from '../Modals/ModalUser';
 
 const CoreList2 = () => {
   // Hooks to manage users and modal state
-  const [users, setUsers] = useState([]); // store user data
+  const [users, setUsers] = useState([
+    { id: 1, firstname: 'Alice', lastname: 'Johnson', gender: 'Female', age: '29', birthday: '1995-05-14', username: 'alicej', email: 'alicej@example.com' },
+    { id: 2, firstname: 'David', lastname: 'Smith', gender: 'Male', age: '34', birthday: '1990-08-20', username: 'davids', email: 'davids@example.com' },
+    { id: 3, firstname: 'Sophia', lastname: 'Brown', gender: 'Female', age: '27', birthday: '1996-12-01', username: 'sophiab', email: 'sophiab@example.com' },
+    { id: 4, firstname: 'Matthew', lastname: 'Garcia', gender: 'Male', age: '31', birthday: '1993-02-10', username: 'matthewg', email: 'matthewg@example.com' },
+    { id: 5, firstname: 'Olivia', lastname: 'Martinez', gender: 'Female', age: '25', birthday: '1998-11-30', username: 'oliviam', email: 'oliviam@example.com' }
+  ]);
   const [selectedUser, setSelectedUser] = useState(null); // To track the selected user for viewing, updating, or deleting
   const [modalType, setModalType] = useState(null); // control modal type (view, update, delete)
   const [isModalOpen, setIsModalOpen] = useState(false); //toggle modal

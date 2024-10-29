@@ -3,7 +3,13 @@ import Modal from '../Modals/ModalUser';
 
 const FinanceList = () => {
   // Hooks to manage users and modal state
-  const [users, setUsers] = useState([]); // store user data
+  const [users, setUsers] = useState([
+    { id: 1, firstname: 'Henry', lastname: 'Baker', gender: 'Male', age: '31', birthday: '1992-06-17', username: 'henrybaker', email: 'henrybaker@example.com' },
+    { id: 2, firstname: 'Sophia', lastname: 'Evans', gender: 'Female', age: '27', birthday: '1996-10-04', username: 'sophiaevans', email: 'sophiaevans@example.com' },
+    { id: 3, firstname: 'James', lastname: 'Carter', gender: 'Male', age: '29', birthday: '1994-02-22', username: 'jamescarter', email: 'jamescarter@example.com' },
+    { id: 4, firstname: 'Isabella', lastname: 'Rodriguez', gender: 'Female', age: '25', birthday: '1998-09-08', username: 'isabellarodriguez', email: 'isabellarodriguez@example.com' },
+    { id: 5, firstname: 'Oliver', lastname: 'Green', gender: 'Male', age: '32', birthday: '1991-12-12', username: 'olivergreen', email: 'olivergreen@example.com' }
+  ]);
   const [selectedUser, setSelectedUser] = useState(null); // To track the selected user for viewing, updating, or deleting
   const [modalType, setModalType] = useState(null); // control modal type (view, update, delete)
   const [isModalOpen, setIsModalOpen] = useState(false); //toggle modal
