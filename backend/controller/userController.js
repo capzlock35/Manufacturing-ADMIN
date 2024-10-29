@@ -33,7 +33,7 @@ const updateUser = async(req,res) => {
         const { firstname, lastname, birthday, gender, email, username, password } = req.body
         const hashedPassword = await bcrypt.hash(password, 10)
 
-        const user = await User.findByIdAndUpdate( userId, {firstname, lastname, birthday, gender, email, username, password:hashedPassword}, { new: true} );
+        const updateUser = await User.findByIdAndUpdate( userId, {firstname, lastname, birthday, gender, email, username, password:hashedPassword}, { new: true} );
         res.status(201).json({ message: 'User Updated successfully' })
         if (!updateUser){
             return res.status(401).json({ error: 'Invalid credentials' })
@@ -87,5 +87,19 @@ const createUser = async(req,res) => {
         }
     }
 
+    const viewProfile = async (req, res) => {
+        try {
+            const userId = req.userId; // Assumes the JWT middleware sets `req.userId`
+            const user = await User.findById(userId);
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            res.status(200).json({ user });
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to retrieve profile' });
+        }
+    };
+    
 
-export {getAllUser,updateUser,viewUser,deleteUser,createUser,Login};
+
+export {getAllUser,updateUser,viewUser,deleteUser,createUser,Login, viewProfile};
