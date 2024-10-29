@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AlertTriangle, ArrowUpDown, Filter, Plus, Search, Shield } from 'lucide-react';
-import ModalRisk from '../Modals/ModalRisk';
+import RiskModal from '../Modals/ModalRisk';
 
 // Dummy data for risk assessments
 const dummyRisks = [
