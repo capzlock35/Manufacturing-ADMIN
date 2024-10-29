@@ -166,12 +166,12 @@ const Register = () => {
                   <div className='flex items-center'>
                     <input type="radio"
                     name='gender'
-                    value="preferNotToSay"
+                    value="others"
                     className='mr-2'
-                    checked={gender === "preferNotToSay"}
+                    checked={gender === "others"}
                     onChange={(e) => setGender(e.target.value)}
                     />
-                    <label htmlFor="preferNotToSay" className='text--700'>PreferNotToSay</label>
+                    <label htmlFor="others" className='text--700'>others</label>
                   </div>
                 </div>
               </div>
@@ -261,10 +261,10 @@ const Register = () => {
               Sign Up
             </button>
 
-            <span className=' flex justify-center mt-4'>
+            {/* <span className=' flex justify-center mt-4'>
               <Link to="/" className='text-blue-500 hover:underline'>
               Back to Login</Link>
-            </span>
+            </span> */}
 
 
 
