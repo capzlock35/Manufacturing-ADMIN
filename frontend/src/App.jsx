@@ -11,14 +11,17 @@ function App() {
   return (
   <>
     <BrowserRouter>
-    <Toaster position='bottom-right' toastOptions={{duration: 2000}} />
+    <Toaster position='top-right' toastOptions={{duration: 2000}} />
       <Routes>
         <Route path='/' element={ <Login/> } />
-        <Route path='/register' element={ <Register />} />
         {isUserSignedIn && <Route path='/home/*' element={ <AdminHome/> } />}
       </Routes>
     </BrowserRouter>
   </>
+
+
+
+
 
  
 
