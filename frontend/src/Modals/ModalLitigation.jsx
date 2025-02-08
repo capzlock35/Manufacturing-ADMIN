@@ -108,7 +108,7 @@ const ModalLitigation = ({ isOpen, onClose, caseData, onSave }) => {
                                     name="caseNumber"
                                     value={formData.caseNumber}
                                     onChange={handleChange}
-                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full p-2 border  rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white text-black border-black"
                                     required
                                 />
                             </div>
@@ -120,7 +120,7 @@ const ModalLitigation = ({ isOpen, onClose, caseData, onSave }) => {
                                     name="status"
                                     value={formData.status}
                                     onChange={handleChange}
-                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full p-2 border  rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white text-black border-black"
                                 >
                                     <option value="Active">Active</option>
                                     <option value="Pending">Pending</option>
@@ -138,7 +138,7 @@ const ModalLitigation = ({ isOpen, onClose, caseData, onSave }) => {
                                 name="title"
                                 value={formData.title}
                                 onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full p-2 border  rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white text-black border-black"
                                 required
                             />
                         </div>
@@ -152,7 +152,7 @@ const ModalLitigation = ({ isOpen, onClose, caseData, onSave }) => {
                                 name="legalCounsel"
                                 value={formData.legalCounsel}
                                 onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white text-black border-black"
                                 required
                             />
                         </div>
@@ -166,7 +166,7 @@ const ModalLitigation = ({ isOpen, onClose, caseData, onSave }) => {
                                 value={formData.description}
                                 onChange={handleChange}
                                 rows="4"
-                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white text-black border-black"
                             />
                         </div>
 
@@ -234,12 +234,12 @@ const ModalLitigation = ({ isOpen, onClose, caseData, onSave }) => {
                                                 type="date"
                                                 value={comm.date}
                                                 onChange={(e) => handleCommunicationChange(index, 'date', e.target.value)}
-                                                className="p-2 border border-gray-300 rounded"
+                                                className="p-2 border border-gray-300 rounded bg-gray-300 text-black"
                                             />
                                             <select
                                                 value={comm.type}
                                                 onChange={(e) => handleCommunicationChange(index, 'type', e.target.value)}
-                                                className="p-2 border border-gray-300 rounded"
+                                                className="p-2 border border-gray-300 rounded bg-gray-300 text-black"
                                             >
                                                 <option value="">Select Type</option>
                                                 <option value="Email">Email</option>
@@ -252,7 +252,7 @@ const ModalLitigation = ({ isOpen, onClose, caseData, onSave }) => {
                                                 placeholder="Description"
                                                 value={comm.description}
                                                 onChange={(e) => handleCommunicationChange(index, 'description', e.target.value)}
-                                                className="p-2 border border-gray-300 rounded"
+                                                className="p-2 border border-gray-300 rounded bg-gray-300 text-black"
                                             />
                                         </div>
                                         <button

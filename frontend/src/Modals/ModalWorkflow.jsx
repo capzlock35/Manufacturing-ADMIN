@@ -51,7 +51,7 @@ const ModalWorkflow = ({ isOpen, onClose, onAddWorkflow }) => {
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black"
               required
             />
           </div>
@@ -62,7 +62,7 @@ const ModalWorkflow = ({ isOpen, onClose, onAddWorkflow }) => {
               id="trigger"
               value={trigger}
               onChange={(e) => setTrigger(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black"
               required
             />
           </div>
@@ -74,7 +74,7 @@ const ModalWorkflow = ({ isOpen, onClose, onAddWorkflow }) => {
                 type="text"
                 value={stakeholder}
                 onChange={(e) => updateStakeholder(index, e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black"
                 placeholder={`Stakeholder ${index + 1}`}
               />
             ))}

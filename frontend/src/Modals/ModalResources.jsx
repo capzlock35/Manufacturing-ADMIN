@@ -53,7 +53,7 @@ const ModalResources = ({ isOpen, onClose, onSave, resource }) => {
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black border"
                 required
                 />
             </div>
@@ -63,7 +63,7 @@ const ModalResources = ({ isOpen, onClose, onSave, resource }) => {
                 id="type"
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black border" 
                 >
                 <option value="Equipment">Equipment</option>
                 <option value="Facility">Facility</option>
@@ -77,7 +77,7 @@ const ModalResources = ({ isOpen, onClose, onSave, resource }) => {
                 id="quantity"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black border"
                 required
                 min="0"
                 />
@@ -88,7 +88,7 @@ const ModalResources = ({ isOpen, onClose, onSave, resource }) => {
                 id="status"
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black border"
                 >
                 <option value="Available">Available</option>
                 <option value="In Use">In Use</option>
