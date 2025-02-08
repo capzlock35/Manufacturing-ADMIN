@@ -106,9 +106,9 @@ const Search = () => {
                 </Link>
               </li>
               <li>
-                <a href="#" className='hover:bg-gray-100 p-2 rounded'>
+              <Link to="/home/settings" className='hover:bg-gray-100 p-2 rounded'>
                   Settings
-                </a>
+                </Link>
               </li>
               <li>
                 <button onClick={handleSignOut} className='hover:bg-gray-100 p-2 rounded w-full text-left'>

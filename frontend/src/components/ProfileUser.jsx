@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import profilePicture from '../assets/Mole.jpg'; // Adjust the path according to your project structure
+import maleProfilePicture from '../assets/male_default.jpg'; // Adjust the path according to your project structure
+import femaleProfilePicture from '../assets/female_default.jpg'; // Adjust the path according to your project structure
+import otherProfilePicture from '../assets/other_default.jpg'; // Adjust the path according to your project structure
 
 const baseURL = process.env.NODE_ENV === 'production' 
     ? 'https://backend-admin.jjm-manufacturing.com/api/user'
@@ -91,6 +94,17 @@ const ProfileUser = () => {
 
     const age = userData.birthday ? calculateAge(userData.birthday) : "N/A";
 
+        // Default profile picture based on gender
+        let profilePic;
+        if (userData.gender === 'male') {
+            profilePic = maleProfilePicture;
+        } else if (userData.gender === 'female') {
+            profilePic = femaleProfilePicture;
+        } else {
+            profilePic = otherProfilePicture; // Fallback for other genders
+        }
+    
+
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-gray-100 p-10">
             <div className="w-full max-w-4xl p-8 bg-white shadow-lg rounded-lg">
@@ -99,7 +113,7 @@ const ProfileUser = () => {
                 {/* Profile Picture */}
                 <div className="flex justify-center mb-8">
                     <img
-                        src={profilePicture}
+                        src={profilePic}
                         alt="Profile"
                         className="w-32 h-32 rounded-full border border-gray-300"
                     />

@@ -9,6 +9,8 @@ import { IoCodeDownloadOutline } from "react-icons/io5";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { CiTrash } from "react-icons/ci";
 import { MdOutlineChat } from "react-icons/md";
+import { Bell } from 'lucide-react';
+import BGAdmin from "../assets/ADMIN.jpg"
 import {
   AreaChart,
   Area,
@@ -46,9 +48,15 @@ const data = [
   },
 ];
 
+const announcements = [
+  { id: 1, title: 'Maintenance Schedule', message: 'Planned maintenance on Production Line A this weekend.' },
+  { id: 2, title: 'New Safety Protocol', message: 'Updated safety guidelines for chemical handling.' },
+  { id: 3, title: 'Production Milestone', message: 'Reached 1 million units milestone!' }
+];
+
 const Dashboard = () => {
   return (
-    <div className="bg-gray-200 text-black h-auto p-5">
+    <div className="bg-gray-200 text-black h-auto p-5 bg-cover bg-center" style={{backgroundImage: `url(${BGAdmin})`}}>
       {/* 4 cards */}
         <p className="font-semibold">Overview</p>
         {/* cards */}
@@ -71,6 +79,8 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
+
+          
 
           {/* Sales Card */}
           <div className="bg-white shadow-lg w-[280px] p-5 rounded-lg mt-3 transition-transform transform hover:scale-105 hover:shadow-xl">
@@ -127,12 +137,28 @@ const Dashboard = () => {
               +₱36.50 <span className="text-gray-500">than last week</span>
               </p>
             </div>
-          </div>
+          </div> 
+          
         </div>
+              {/* Announcements */}
+      <div className="bg-white rounded-lg p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-800">Announcements</h2>
+          <Bell className="h-5 w-5 text-gray-500" />
+        </div>
+        <div className="space-y-4">
+          {announcements.map((announcement) => (
+            <div key={announcement.id} className="border-l-4 border-blue-500 pl-4 py-2">
+              <h3 className="font-semibold text-gray-800">{announcement.title}</h3>
+              <p className="text-gray-600 text-sm mt-1">{announcement.message}</p>
+            </div>
+          ))}
+        </div>
+      </div>
 
         {/* charts */}
         <div className="flex  gap-4 p-4 overflow-x-auto   justify-between">
-          <div className="border bg-white/70 p-2 rounded-lg flex-shrink-0 md:flex-1 ">
+          <div className="border bg-white/70 p-2 rounded-lg flex-shrink-0 md:flex-1 bg-opacity-50">
             <LineChart 
               width={500}
               height={300}
@@ -161,7 +187,7 @@ const Dashboard = () => {
 
           {/* Bar charts */}
           {/* w-full max-w-[430px] max-md:hidden */}
-          <div className="border bg-white/70 p-2 rounded-lg flex-shrink-0  md:flex-1 ">
+          <div className="border bg-white/70 p-2 rounded-lg flex-shrink-0  md:flex-1 bg-opacity-100">
             <BarChart
               width={430}
               height={300}
@@ -304,68 +330,7 @@ const Dashboard = () => {
             </div>
           </div>
           {/* chat */}
-          <div className="border max-md:w-full w-[300px] h-[300px] p-5 rounded-lg bg-white mt-5">
-            <div className="flex gap-2 items-center mb-4">
-              <MdOutlineChat className="text-lg" />
-              <p className="font-semibold">Quick Chat</p>
-            </div>
-            <div className="flex gap-3 items-center">
-              <img
-                src="https://i.pinimg.com/564x/30/e1/68/30e168340e36e773713698f3051cf875.jpg"
-                alt="Profile"
-                className="w-10 h-10 rounded-full"
-              />
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <p className="font-semibold text-lg">Quack</p>
-                  <p className="text-sm text-gray-600">15:23</p>
-                </div>
-                <p className="text-sm text-gray-600">Hello</p>
-              </div>
-            </div>
-            <div className="flex gap-3 items-center mt-3">
-              <img
-                src="https://i.pinimg.com/736x/e0/68/21/e06821a26c25c59066d6a4309361bda2.jpg"
-                alt="Profile"
-                className="w-10 h-10 rounded-full"
-              />
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <p className="font-semibold text-lg">Meo</p>
-                  <p className="text-sm text-gray-600">14:52</p>
-                </div>
-                <p className="text-sm text-gray-600">Hello</p>
-              </div>
-            </div>
-            <div className="flex gap-3 items-center mt-3">
-              <img
-                src="https://i.pinimg.com/564x/4b/fa/f2/4bfaf26416c0aef7c498e38ed1b567fb.jpg"
-                alt="Profile"
-                className="w-10 h-10 rounded-full"
-              />
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <p className="font-semibold text-lg">Lil Kitty</p>
-                  <p className="text-sm text-gray-600">14:42</p>
-                </div>
-                <p className="text-sm text-gray-600">Hello</p>
-              </div>
-            </div>
-            <div className="flex gap-3 items-center mt-3">
-              <img
-                src="https://i.pinimg.com/564x/78/2a/9b/782a9ba357d834585425bedc618445ce.jpg"
-                alt="Profile"
-                className="w-10 h-10 rounded-full"
-              />
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <p className="font-semibold text-lg">Mi</p>
-                  <p className="text-sm text-gray-600">04:30</p>
-                </div>
-                <p className="text-sm text-gray-600">Hello</p>
-              </div>
-            </div>
-          </div>
+
           {/* Top Countries */}
           <div className="mt-5 bg-white rounded-xl max-md:hidden">
             <AreaChart
@@ -406,7 +371,10 @@ const Dashboard = () => {
               />
             </AreaChart>
           </div>
+
+          
         </div>
+        
       
     </div>
   );
