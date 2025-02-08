@@ -6,10 +6,11 @@ const  userRouter = express.Router();
 
 userRouter.get("/get",getAllUser);
 userRouter.post("/create",createUser);
+userRouter.post("/", createUser);
 userRouter.post('/login', Login);
 userRouter.get("/view/:id", viewUser)
 userRouter.put("/update/:id", updateUser);
-userRouter.delete("/delete/:id", deleteUser);
+userRouter.delete("/delete/user/:id", deleteUser);
 //GET Registered users
 userRouter.get("/profile", authMiddleware, viewProfile);
 userRouter.put("/profile/update", authMiddleware, updateUser);
@@ -17,6 +18,9 @@ userRouter.put("/profile/update", authMiddleware, updateUser);
 
 //userRouter.put("/update/:id",updateUser);
 //userRouter.delete("/delete/:id",deleteUser);
+
+
+
 
 
 export default userRouter;
