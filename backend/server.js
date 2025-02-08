@@ -3,9 +3,12 @@ import { ConnectDB } from './config/db.js';
 import "dotenv/config";
 import cors from "cors";
 import userRouter from './routes/userRoute.js';
+import documentRouter from './routes/documentRoute.js'; // Import the documentRouter
+import resourceRoute from './routes/resourceRoute.js'; // Import the resource route
+import requestresourceRoute from './routes/requestresourcesRoute.js';
+
 
 const app = express();
-
 const port = process.env.PORT || 7690;
 const allowedOrigins = [
     'http://localhost:5173',         // Allow localhost for development
@@ -16,28 +19,34 @@ const allowedOrigins = [
 app.use(cors({
     credentials: true,
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps, curl requests)
         if (!origin) return callback(null, true);
         
         if (allowedOrigins.indexOf(origin) !== -1) {
-            // If the origin is in the allowed origins list, allow the request
             callback(null, true);
         } else {
-            // Otherwise, reject the request
             callback(new Error('Not allowed by CORS'));
         }
     }
 }));
 
-app.use(express.json());
+app.use(express.json());  // Middleware to parse JSON
 
-ConnectDB();
+ConnectDB();  // Establish DB connection
 
+// Routes
 app.get("/", (req, res) => {
-    res.send("Hello world ");
+    res.send("Hello world");
 });
 
+// Use the document routes
+app.use("/api/documents", documentRouter); // Prefixing routes with /api/documents
+
+// Use the user routes
 app.use("/api/user", userRouter);
+
+app.use("/api/resources", resourceRoute);
+
+app.use("/api/requestresources", requestresourceRoute);
 
 app.listen(port, () => {
     console.log(`Server Started on http://localhost:${port}`);
