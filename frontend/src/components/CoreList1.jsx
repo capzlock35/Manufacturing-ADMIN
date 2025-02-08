@@ -1,101 +1,231 @@
-import React, { useState } from 'react';
-import Modal from '../Modals/ModalUser'; 
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import Modal from '../Modals/ModalUser'; // Assuming ModalUser is used for HR purposes too
+import { toast } from 'react-hot-toast';
+import { IoMdArrowRoundBack } from "react-icons/io";
+import * as XLSX from 'xlsx'; // Import XLSX for Excel export
+import { CiExport } from "react-icons/ci";
+
+ 
 
 const CoreList1 = () => {
-  // Adding dummy users
-  const [users, setUsers] = useState([
-    { id: 1, firstname:'john', lastname:'Doe', gender:'Male', age:'30', birthday:'01-15-1994', username: 'johndoe', email: 'johndoe@example.com' },
-    { id: 2, firstname:'Jane', lastname:'Smith', gender:'FeMale', age:'28', birthday:'03-22-1996', username: 'janesmith', email: 'janesmith@example.com' },
-    { id: 3, firstname:'Brian', lastname:'Lee', gender:'Male', age:"21", birthday:'03-03-2003', username: 'brianlee', email: 'brianlee@example.com' },
-    { id: 4, firstname:'Emily', lastname:'Watson', gender:'FeMale', age:'25', birthday:'07-03-1999', username: 'emilywatson', email: 'emilywatson@example.com' },
-    { id: 5, firstname:'Michael', lastname:'Wood', gender:'Male', age:'40', birthday:'10-10-1983', username: 'michaelwood', email: 'michaelwood@example.com' }
-  ]);
+  // Hooks to manage users and modal state
+  const location = useLocation();
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState('');
+  const [currentPage, setCurrentPage] = useState(1); // Track current page
+  const [totalPages, setTotalPages] = useState(1); // Track total pages
 
-  const [selectedUser, setSelectedUser] = useState(null); // To track the selected user for viewing, updating, or deleting
-  const [modalType, setModalType] = useState(null); // control modal type (view, update, delete)
-  const [isModalOpen, setIsModalOpen] = useState(false); //toggle modal
+  // Base URL setup
+  const baseURL = process.env.NODE_ENV === 'production'
+    ? 'https://backend-admin.jjm-manufacturing.com/api/user'
+    : 'http://localhost:7690/api/user';
+
+  // Fetch users with pagination
+  useEffect(() => {
+    axios.get(`${baseURL}/get`, {
+      params: { page: currentPage, limit: 10, department: 'core 1' }
+    })
+      .then(response => {
+        setUsers(response.data.users);
+        setTotalPages(response.data.totalPages);
+      })
+      .catch(err => console.log(err));
+  }, [currentPage]); // Re-fetch when page changes
 
   // Open modal for viewing user details
   const handleView = (user) => {
-    setSelectedUser(user); // Sets the user to be viewed
-    setModalType('view'); // Set modal type to 'view'
-    setIsModalOpen(true); // Opens the modal
+    setSelectedUser(user);
+    setModalType('view');
+    setIsModalOpen(true);
   };
 
   // Open modal for updating user's information
   const handleUpdate = (user) => {
-    setSelectedUser(user); // Sets the user whose information will be updated
-    setModalType('update'); // Set modal type to 'update'
-    setIsModalOpen(true); // Opens the modal
+    setSelectedUser(user);
+    setModalType('update');
+    setIsModalOpen(true);
   };
 
   // Open modal for deleting the user
   const handleDelete = (user) => {
-    setSelectedUser(user); // Sets the user to be deleted
-    setModalType('delete'); // Set modal type to 'delete'
-    setIsModalOpen(true); // Opens the modal
+    setSelectedUser(user);
+    setModalType('delete');
+    setIsModalOpen(true);
   };
 
-  // Close the modal and reset the modal state
-  const closeModal = () => {
-    setIsModalOpen(false); // Closes the modal
-    setSelectedUser(null); // Clears the selected user
-    setModalType(null); // Resets the modal type
+  // Handle user deletion
+  const handleDeleteUser = async (userId) => {
+    try {
+      const response = await axios.delete(`${baseURL}/delete/user/${userId}`);
+      if (response.status === 200) {
+        toast.success('User deleted successfully!');
+        setUsers(users.filter(user => user._id !== userId)); // Remove user from state
+      }
+    } catch (error) {
+      console.error('Failed to delete user:', error);
+      toast.error('An error occurred while trying to delete the user.');
+    }
   };
 
-  // Placeholder: Updating user's information (this will be passed as a prop to the Modal)
-  const updateUser = async (userId, updatedInfo) => {
-    console.log('User updated:', userId, updatedInfo);
+  // Close the modal and reset state
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedUser(null);
   };
 
-  // Placeholder: Deleting a user (this will be passed as a prop to the Modal)
-  const deleteUser = async (userId) => {
-    console.log('User deleted:', userId);
-    setUsers(users.filter(user => user.id !== userId)); // Update users list after deletion
+  // Handle pagination
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1); // Go to next page
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1); // Go to previous page
+    }
+  };
+
+  const exportToExcel = () => {
+    // Create an array to hold all users
+    let allUsers = [];
+    
+    // Loop through all pages and fetch users
+    const fetchAllUsers = async () => {
+      try {
+        // Fetch users for each page (you can optimize this with your total page count)
+        for (let page = 1; page <= totalPages; page++) {
+          const response = await axios.get(`${baseURL}/get`, {
+            params: { page: page, limit: 10, department: 'core 1' }
+          });
+          allUsers = [...allUsers, ...response.data.users]; // Concatenate the users of each page
+        }
+  
+        // Now export the combined users data
+        const ws = XLSX.utils.json_to_sheet(allUsers); // Convert all users data to a sheet
+        const wb = XLSX.utils.book_new(); // Create a new workbook
+        XLSX.utils.book_append_sheet(wb, ws, 'Users'); // Append the sheet to the workbook
+        XLSX.writeFile(wb, 'users_Core1_backup.xlsx'); // Save the file
+      } catch (error) {
+        console.error("Error fetching all users:", error);
+        toast.error('Failed to fetch all users for export.');
+      }
+    };
+  
+    // Call the function to fetch all users and export
+    fetchAllUsers();
   };
 
   return (
-    <div className='p-4 h-screen bg-gray-200'>
+    <div className="p-4 h-screen bg-gray-200">
       <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4 text-black">Core1 User List</h1>
+      <Link to="/home/accountlist">
+            <button
+className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow"
+            >
+              <IoMdArrowRoundBack />
 
-        {/* Table displaying the list of users */}
+            </button>
+          </Link>
+
+        <h1 className="text-2xl font-bold mb-4 text-black">Core1 Department</h1>
+
+                {/* Export Button */}
+                <button onClick={exportToExcel} className="bg-yellow-500 text-white px-4 py-2 rounded mb-4">
+        <CiExport />
+        </button>
+
+
+      {/* Navigation Buttons */}
+      <div className="mb-4 flex gap-2">
+          <Link to="/home/CoreList1">
+            <button
+              className={`px-4 py-2 rounded ${
+                location.pathname === '/home/CoreList1'
+                  ? 'bg-blue-600 text-white font-bold'
+                  : 'bg-gray-300 text-black'
+              }`}
+            >
+              Core 1
+            </button>
+          </Link>
+          <Link to="/home/CoreList2">
+            <button
+              className={`px-4 py-2 rounded ${
+                location.pathname === '/home/CoreList2'
+                  ? 'bg-blue-600 text-white font-bold'
+                  : 'bg-gray-300 text-black'
+              }`}
+            >
+              Core 2
+            </button>
+          </Link>
+
+        </div>
+
+
+        
         <table className="min-w-full bg-white">
           <thead>
             <tr className="bg-gray-300 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left border">No.</th>
+            <th className="py-3 px-6 text-left border">No.</th>
               <th className="py-3 px-6 text-left border">Username</th>
               <th className="py-3 px-6 text-left border">Email</th>
+              <th className="py-3 px-6 text-left border">Role</th>
               <th className="py-3 px-6 text-center border">Actions</th>
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
-            {users.map((user, index) => (
-              <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-100">
-                <td className="py-3 px-6 text-left whitespace-nowrap">{index + 1}</td>
-                <td className="py-3 px-6 text-left">{user.username}</td>
-                <td className="py-3 px-6 text-left">{user.email}</td>
-                <td className="py-3 px-6 text-center flex">
-                  <button onClick={() => handleView(user)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2">View</button>
-                  <button onClick={() => handleUpdate(user)} className="bg-green-500 text-white px-3 py-1 rounded mr-2">Update</button>
-                  <button onClick={() => handleDelete(user)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
-                </td>
+            {users.length > 0 ? (
+              users.map((user, index) => (
+                <tr key={user._id}>
+                  <td className="py-3 px-6 text-left border-b border-gray-200">{(currentPage - 1) * 10 + index + 1}</td>
+                  <td className="py-3 px-6 text-left border-b border-gray-200">{user.username}</td>
+                  <td className="py-3 px-6 text-left border-b border-gray-200">{user.email}</td>
+                  <td className="py-3 px-6 text-left border-b border-gray-200 border">{user.role}</td>
+                  <td className="py-3 px-6 text-center flex">
+                    <button onClick={() => handleView(user)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2">View</button>
+                    <button onClick={() => handleUpdate(user)} className="bg-green-500 text-white px-3 py-1 rounded mr-2">Update</button>
+                    <button onClick={() => handleDelete(user)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="py-3 px-6 text-center">No users found</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
 
-        {/* Conditionally renders the modal */}
-        {isModalOpen && (
-          <Modal
-            type={modalType} // Passes the modal type ('view', 'update', or 'delete')
-            user={selectedUser} // Passes the selected user data to the modal
-            onClose={closeModal} // Passes the close modal function
-            onUpdate={updateUser} // Passes the update user function
-            onDelete={deleteUser} // Passes the delete user function
-          />
-        )}
+        <div className="flex justify-center mt-4">
+          {currentPage > 1 && (
+            <button onClick={handlePreviousPage} className="px-4 py-2 bg-blue-500 text-white rounded mr-2">
+              Previous
+            </button>
+          )}
+          <span className="text-sm">Page {currentPage} of {totalPages}</span>
+          {currentPage < totalPages && (
+            <button onClick={handleNextPage} className="px-6 py-2 bg-blue-500 text-white rounded ml-2">
+              Next
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <Modal
+          type={modalType}
+          user={selectedUser}
+          onClose={handleCloseModal}
+          onDelete={handleDeleteUser}
+        />
+      )}
     </div>
   );
 };
