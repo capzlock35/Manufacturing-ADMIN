@@ -12,8 +12,8 @@ import { PiUsersThreeFill } from "react-icons/pi";
 import { GrUserAdmin } from "react-icons/gr";
 import jjm from "../assets/jjmlogo.jpg";
 
-const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+const StaffSide = () => {
+  const [isCollapsed, setIsCollapsed] = useState(true);
   
   // Notification states
   const [hasAnnouncement, setHasAnnouncement] = useState(true);
@@ -80,30 +80,13 @@ const Sidebar = () => {
           Modules & Features
         </p>
 
-        {/* Account Management */}
-        <ul className='menu rounded-box w-56'>
-          {isCollapsed && <PiUsersThreeFill className='w-5 h-5' />}
-          {!isCollapsed && 
-            <li>
-              <details>
-                <summary><PiUsersThreeFill className='w-5 h-5'/>Account Management</summary>
-                <ul>
-                  <Link to="register"><li className='hover:text-blue-500'><p><GrUserAdmin/>Create Account</p></li></Link>
-                  <Link to="accountlist"><li className='hover:text-blue-500'><p><FaUserFriends/>Accounts</p></li></Link>
-
-                </ul>
-              </details>
-            </li>
-          }
-        </ul>
-
 
         {/* Document Management */}
         <ul className='menu rounded-box w-56'>
           {isCollapsed && <IoDocuments className='w-5 h-5' />}
           {!isCollapsed && 
             <li>
-              <details>
+              <details open>
                 <summary><IoDocuments className='w-5 h-5'/>Document Management</summary>
                 <ul>
                   <Link to="DocumentStorage" onClick={markDocumentStorageAsSeen}>
@@ -152,7 +135,7 @@ const Sidebar = () => {
           {isCollapsed && <IoDocumentTextOutline className='w-5 h-5' />}
           {!isCollapsed && 
             <li>
-              <details>
+              <details open>
                 <summary><IoDocumentTextOutline className='w-5 h-5'/>Legal Management</summary>
                 <ul>
                   <Link to="ContractManagement"><li className='hover:text-blue-500'><p><TiDocumentText/>Contract Management</p></li></Link>
@@ -171,12 +154,12 @@ const Sidebar = () => {
           {isCollapsed && <GoWorkflow className='w-5 h-5' />}
           {!isCollapsed && 
             <li>
-              <details>
+              <details open>
                 <summary><GoWorkflow className='w-5 h-5'/>Initiating Workflow</summary>
                 <ul>
                   <Link to="WorkflowIdentification"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Workflow Identification</p></li></Link>
                   <Link to="CommunicationPlan"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Communication Plan</p></li></Link>
-                  <Link to="ResourcesAllocation"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Resources Allocation</p></li></Link>
+                  <Link to="RequestResources"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Request Resources</p></li></Link>
                 </ul>
               </details>
             </li>
@@ -188,4 +171,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default StaffSide;
