@@ -7,6 +7,8 @@ import { FaEyeSlash } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
 import { MdOutlinePermIdentity } from "react-icons/md";
 import { MdOutlineCake } from "react-icons/md";
+import { MdBusinessCenter } from "react-icons/md";
+import { MdWork } from "react-icons/md";
 import { useNavigate } from "react-router-dom"
 import {toast} from "react-hot-toast"
 import axios from 'axios'
@@ -14,6 +16,10 @@ import axios from 'axios'
 
 const Register = () => {
 
+
+  const baseURL = process.env.NODE_ENV === 'production'
+  ? 'https://backend-admin.jjm-manufacturing.com/api/user'
+  : 'http://localhost:7690/api/user';
 
   //Hooks
   const [user, setUsers] = useState([])
@@ -29,6 +35,31 @@ const Register = () => {
   const [gender, setGender] = useState("");
   const navigate = useNavigate()
 
+  const [department, setDepartment] = useState("");
+  const [role, setRole] = useState("");
+
+
+
+  const departments = [
+    "admin",
+    "finance",
+    "core 1",
+    "core 2",
+    "logistic 1",
+    "logistic 2",
+    "hr 1",
+    "hr 2",
+    "hr 3",
+    "hr 4"
+  ];
+  
+  // Get role options based on selected department
+  const getRoleOptions = (dept) => {
+    if (dept === "admin") {
+      return ["admin", "staff"];
+    }
+    return ["employee", "manager"];
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -36,38 +67,56 @@ const Register = () => {
 
   const fetchUsers = () => {
     axios
-    .get('http://localhost:7690/api/user/get')
-    .then((res) => {
+      .get(`${baseURL}/get`)
+      .then((res) => {
+        setUsers(res.data); // Assuming res.data contains the list of users
+      })
+      .catch((error) => {
+        toast.error("Failed to fetch users");
+      });
+  };
+
+
+  // const fetchUsers = () => {
+  //   axios
+  //   .get('http://localhost:7690/api/user/get')
+  //   .then((res) => {
       
-    })
+  //   })
+  // }
+
+const handlecreateUser = (event) => {
+  event.preventDefault();
+
+  // Check if password and confirm password match
+  if (password !== confirmPassword) {
+    toast.error('Password and Confirm Password do not match');
+    return; // Stop the function if passwords do not match
   }
 
-  const handlecreateUser = (event) => {
-    event.preventDefault()
-    axios
-    .post('http://localhost:7690/api/user/create', { firstname, lastname, birthday, gender, email, username, password })
-    .then(() =>{
-      toast.success('Registration is Complete')
-      setFirstName('')
-      setLastName('')
-      setBirthday('')
-      setGender('')
-      setEmail('')
-      setUsername('')
-      setPassword('')
-      fetchUsers()
-      navigate('/')
+  axios
+    .post(`${baseURL}/create`, { firstname, lastname, birthday, gender, email, username, password, role, department })
+    .then(() => {
+      toast.success('Registration is Complete');
+      setFirstName('');
+      setLastName('');
+      setBirthday('');
+      setGender('');
+      setEmail('');
+      setUsername('');
+      setPassword('');
+      setConfirmPassword('');
+      setDepartment('');
+      setRole('');
+      fetchUsers();
+      navigate('/home/register');
     })
     .catch((error) => {
-      toast.error('Unable to register user')
-    })
-  }
+      toast.error('Unable to register user');
+    });
+};
 
-
-
-
-
-
+  
 
 
 
@@ -249,32 +298,69 @@ const Register = () => {
 
             </div>
 
+          {/* Department Selection */}
+          <div className='relative flex flex-col'>
+            <label htmlFor="department" className='font-medium pl-2 text-gray-700'>
+              Department
+            </label>
+            <div className='relative'>
+              <select
+                value={department}
+                onChange={(e) => {
+                  setDepartment(e.target.value);
+                  setRole(''); // Reset role when department changes
+                }}
+                className='input input-bordered w-full py-3 pl-10 pr-4 text-lg border border-zinc-500 bg-white focus:border-blue-500 text-black'
+                required
+              >
+                <option value="">Select Department</option>
+                {departments.map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept.charAt(0).toUpperCase() + dept.slice(1)}
+                  </option>
+                ))}
+              </select>
+              <MdBusinessCenter size={24} className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'/>
+            </div>
+          </div>
 
-
-
-
-
-            <button
-              type="submit"
-              className="w-full py-2 px-4 bg-blue-500 text-white font-medium rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Sign Up
-            </button>
-
-            {/* <span className=' flex justify-center mt-4'>
-              <Link to="/" className='text-blue-500 hover:underline'>
-              Back to Login</Link>
-            </span> */}
-
-
-
-          </form>
-          
+                    {/* Role Selection */}
+                    <div className='relative flex flex-col'>
+            <label htmlFor="role" className='font-medium pl-2 text-gray-700'>
+              Role
+            </label>
+            <div className='relative'>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className='input input-bordered w-full py-3 pl-10 pr-4 text-lg border border-zinc-500 bg-white focus:border-blue-500 text-black'
+                required
+                disabled={!department} // Disable until department is selected
+              >
+                <option value="">Select Role</option>
+                {department && getRoleOptions(department).map((roleOption) => (
+                <option key={roleOption} value={roleOption}>
+                  {roleOption.charAt(0).toUpperCase() + roleOption.slice(1)}
+                </option>
+              ))}
+            </select>
+            <MdWork size={24} className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'/>
+          </div>
         </div>
 
-      </div>
+        {/* Submit Button */}
+        <div className='flex justify-center'>
+          <button
+            type='submit'
+            className='w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500'
+          >
+            Create Account
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+);
+};
 
-  )
-}
-
-export default Register
+export default Register;

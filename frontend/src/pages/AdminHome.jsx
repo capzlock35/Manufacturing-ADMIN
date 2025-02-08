@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
+import StaffSide from '../components/StaffSide';
 import Search from '../components/Search';
 import Dashboard from '../components/Dashboard';
 import { Route, Routes } from 'react-router-dom';
@@ -30,45 +31,62 @@ import ResourcesAllocation from '../components/ResourcesAllocation';
 import ProfileUser from '../components/ProfileUser';
 import Register from './Register';
 import Footer from '../components/Footer'; // Import the Footer component
+import Settings from '../components/Settings';
+import AccountList from '../components/AccountList';
+import RequestResources from '../components/RequestResources';
 
 const AdminHome = () => {
+  const [role, setRole] = useState('');
+
+  useEffect(() => {
+    const userRole = localStorage.getItem('role');
+    setRole(userRole);
+  }, []);
+
+  
+
   return (
     <div className="flex h-screen overflow-auto">
-      <Sidebar />
+      {/* Conditionally render Sidebar or StaffSide based on role */}
+      {role === 'admin' ? <Sidebar /> : role === 'staff' ? <StaffSide /> : null}
+
       <div className="flex-col w-full">
         <Search />
         <Routes>
-          <Route path='/' element={<Dashboard />} />
-          <Route path='AdminList' element={<AdminList />} />
-          <Route path='HrList1' element={<HrList1 />} />
-          <Route path='HrList2' element={<HrList2 />} />
-          <Route path='HrList3' element={<HrList3 />} />
-          <Route path='HrList4' element={<HrList4 />} />
-          <Route path='CoreList1' element={<CoreList1 />} />
-          <Route path='CoreList2' element={<CoreList2 />} />
-          <Route path='LogisticList1' element={<LogisticList1 />} />
-          <Route path='LogisticList2' element={<LogisticList2 />} />
-          <Route path='FinanceList' element={<FinanceList />} />
-          <Route path='DocumentStorage' element={<DocumentStorage />} />
-          <Route path='VersionControl' element={<VersionControl />} />
-          <Route path='DocumentTracking' element={<DocumentTracking />} />
-          <Route path='ContractManagement' element={<ContractManagement />} />
-          <Route path='LegalDocument' element={<LegalDocument />} />
-          <Route path='RiskManagement' element={<RiskManagement />} />
-          <Route path='LitigationManagement' element={<LitigationManagement />} />
-          <Route path='CompliancesandRegulatory' element={<CompliancesandRegulatory />} />
-          <Route path='WorkflowIdentification' element={<WorkflowIdentification />} />
-          <Route path='CommunicationPlan' element={<CommunicationPlan />} />
-          <Route path='ResourcesAllocation' element={<ResourcesAllocation />} />
-          <Route path='profile' element={<ProfileUser />} />
-          <Route path='register' element={<Register />} />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="AdminList" element={<AdminList />} />
+          <Route path="HrList1" element={<HrList1 />} />
+          <Route path="HrList2" element={<HrList2 />} />
+          <Route path="HrList3" element={<HrList3 />} />
+          <Route path="HrList4" element={<HrList4 />} />
+          <Route path="CoreList1" element={<CoreList1 />} />
+          <Route path="CoreList2" element={<CoreList2 />} />
+          <Route path="LogisticList1" element={<LogisticList1 />} />
+          <Route path="LogisticList2" element={<LogisticList2 />} />
+          <Route path="FinanceList" element={<FinanceList />} />
+          <Route path="DocumentStorage" element={<DocumentStorage />} />
+          <Route path="VersionControl" element={<VersionControl />} />
+          <Route path="DocumentTracking" element={<DocumentTracking />} />
+          <Route path="ContractManagement" element={<ContractManagement />} />
+          <Route path="LegalDocument" element={<LegalDocument />} />
+          <Route path="RiskManagement" element={<RiskManagement />} />
+          <Route path="LitigationManagement" element={<LitigationManagement />} />
+          <Route path="CompliancesandRegulatory" element={<CompliancesandRegulatory />} />
+          <Route path="WorkflowIdentification" element={<WorkflowIdentification />} />
+          <Route path="CommunicationPlan" element={<CommunicationPlan />} />
+          <Route path="ResourcesAllocation" element={<ResourcesAllocation />} />
+          <Route path="profile" element={<ProfileUser />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="register" element={<Register />} />
+          <Route path="accountlist" element={<AccountList />} />
+          <Route path="requestresources" element={<RequestResources />} />
         </Routes>
-        <div className=""> {/* Ensure footer does not shrink */}
-        <Footer />
-      </div>
+        <div className="">
+          <Footer />
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default AdminHome;
