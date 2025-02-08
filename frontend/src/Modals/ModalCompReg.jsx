@@ -130,7 +130,7 @@ const ModalCompReg = ({ isOpen, onClose, regulationData, onSave }) => {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-black"
                   required
                 />
               </div>
@@ -143,7 +143,7 @@ const ModalCompReg = ({ isOpen, onClose, regulationData, onSave }) => {
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-black"
                   required
                 />
               </div>
@@ -159,7 +159,7 @@ const ModalCompReg = ({ isOpen, onClose, regulationData, onSave }) => {
                   name="status"
                   value={formData.status}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  className="w-full border bg-gray-300 text-black border-gray-300 rounded-md px-3 py-2"
                 >
                   <option value="Active">Active</option>
                   <option value="Under Review">Under Review</option>
@@ -168,14 +168,14 @@ const ModalCompReg = ({ isOpen, onClose, regulationData, onSave }) => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium  text-gray-700 mb-1">
                   Priority
                 </label>
                 <select
                   name="priority"
                   value={formData.priority}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  className="w-full border bg-gray-300 text-black border-gray-300 rounded-md px-3 py-2"
                 >
                   <option value="High">High</option>
                   <option value="Medium">Medium</option>
@@ -191,7 +191,7 @@ const ModalCompReg = ({ isOpen, onClose, regulationData, onSave }) => {
                   name="nextReview"
                   value={formData.nextReview}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  className="w-full border bg-gray-300 text-black border-gray-300 rounded-md px-3 py-2"
                   required
                 />
               </div>
@@ -207,7 +207,7 @@ const ModalCompReg = ({ isOpen, onClose, regulationData, onSave }) => {
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
-                className="w-full border border-gray-300 rounded-md px-3 py-2"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-black"
                 required
               />
             </div>
@@ -233,7 +233,7 @@ const ModalCompReg = ({ isOpen, onClose, regulationData, onSave }) => {
                       type="text"
                       value={req}
                       onChange={(e) => handleRequirementChange(index, e.target.value)}
-                      className="flex-1 border border-gray-300 rounded-md px-3 py-2"
+                      className="flex-1 border border-gray-300 rounded-md px-3 py-2 bg-white"
                       placeholder="Enter requirement"
                     />
                     <button
@@ -269,12 +269,12 @@ const ModalCompReg = ({ isOpen, onClose, regulationData, onSave }) => {
                       type="date"
                       value={update.date}
                       onChange={(e) => handleUpdateChange(index, 'date', e.target.value)}
-                      className="border border-gray-300 rounded-md px-3 py-2 w-40"
+                      className="border border-gray-300 rounded-md px-3 py-2 w-40 bg-gray-300 text-black"
                     />
                     <select
                       value={update.type}
                       onChange={(e) => handleUpdateChange(index, 'type', e.target.value)}
-                      className="border border-gray-300 rounded-md px-3 py-2"
+                      className="border border-gray-300 rounded-md px-3 py-2 bg-gray-300 text-black"
                     >
                       <option value="">Select Type</option>
                       <option value="Revision">Revision</option>
@@ -285,7 +285,7 @@ const ModalCompReg = ({ isOpen, onClose, regulationData, onSave }) => {
                       type="text"
                       value={update.description}
                       onChange={(e) => handleUpdateChange(index, 'description', e.target.value)}
-                      className="flex-1 border border-gray-300 rounded-md px-3 py-2"
+                      className="flex-1 border border-gray-300 rounded-md px-3 py-2 bg-white text-black"
                       placeholder="Update description"
                     />
                     <button

@@ -55,7 +55,7 @@ const ModalCPlan = ({ isOpen, onClose, onAddPlan }) => {
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-black border shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black"
               required
             />
           </div>
@@ -68,7 +68,7 @@ const ModalCPlan = ({ isOpen, onClose, onAddPlan }) => {
                   value={notification.type}
                   onChange={(e) => updateNotification(index, 'type', e.target.value)}
                   placeholder="Notification Type"
-                  className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 mr-2"
+                  className="flex-1 rounded-md border-gray-300 border shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 mr-2 bg-white text-black"
                   required
                 />
                 <input
@@ -76,7 +76,7 @@ const ModalCPlan = ({ isOpen, onClose, onAddPlan }) => {
                   value={notification.frequency}
                   onChange={(e) => updateNotification(index, 'frequency', e.target.value)}
                   placeholder="Frequency"
-                  className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 mr-2"
+                  className="flex-1 rounded-md border-gray-300  border shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 mr-2 bg-white text-black"
                   required
                 />
                 <button
@@ -91,7 +91,7 @@ const ModalCPlan = ({ isOpen, onClose, onAddPlan }) => {
             <button
               type="button"
               onClick={addNotification}
-              className="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center"
+              className="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center "
             >
               <Plus size={20} className="mr-2" />
               Add Notification
@@ -102,7 +102,7 @@ const ModalCPlan = ({ isOpen, onClose, onAddPlan }) => {
             <select
               value={updates.frequency}
               onChange={(e) => setUpdates({ ...updates, frequency: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black"
             >
               <option value="Daily">Daily</option>
               <option value="Weekly">Weekly</option>
@@ -112,7 +112,7 @@ const ModalCPlan = ({ isOpen, onClose, onAddPlan }) => {
               <select
                 value={updates.day}
                 onChange={(e) => setUpdates({ ...updates, day: e.target.value })}
-                className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black"
               >
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
                   <option key={day} value={day}>{day}</option>
@@ -123,7 +123,7 @@ const ModalCPlan = ({ isOpen, onClose, onAddPlan }) => {
               type="time"
               value={updates.time}
               onChange={(e) => setUpdates({ ...updates, time: e.target.value })}
-              className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-gray-300 text-black"
             />
           </div>
           <div className="flex justify-end">

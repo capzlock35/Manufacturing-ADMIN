@@ -42,14 +42,14 @@ const ModalRisk = ({ isOpen, onClose, risk, onSave, categories, severityLevels, 
             placeholder="Risk Title"
             value={newRisk.title}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500 bg-white text-black border-black"
           />
 
           <select
             name="category"
             value={newRisk.category}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500 bg-white text-black border-black"
           >
             <option value="">Select Category</option>
             {categories.map((cat) => (
@@ -63,7 +63,7 @@ const ModalRisk = ({ isOpen, onClose, risk, onSave, categories, severityLevels, 
             name="severity"
             value={newRisk.severity}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500 bg-white text-black border-black"
           >
             <option value="">Select Severity</option>
             {severityLevels.map((level) => (
@@ -77,7 +77,7 @@ const ModalRisk = ({ isOpen, onClose, risk, onSave, categories, severityLevels, 
             name="probability"
             value={newRisk.probability}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500 bg-white text-black border-black"
           >
             <option value="">Select Probability</option>
             {probabilityLevels.map((level) => (
@@ -91,7 +91,7 @@ const ModalRisk = ({ isOpen, onClose, risk, onSave, categories, severityLevels, 
             name="impact"
             value={newRisk.impact}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500 bg-white text-black border-black"
           >
             <option value="">Select Impact</option>
             {impactLevels.map((level) => (
@@ -106,7 +106,7 @@ const ModalRisk = ({ isOpen, onClose, risk, onSave, categories, severityLevels, 
             placeholder="Risk Description"
             value={newRisk.description}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500 bg-white text-black border-black"
           />
 
           <h3 className="text-lg font-semibold">Mitigation Steps</h3>
@@ -116,7 +116,7 @@ const ModalRisk = ({ isOpen, onClose, risk, onSave, categories, severityLevels, 
               type="text"
               value={step}
               onChange={(e) => handleMitigationChange(index, e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500 mb-2"
+              className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500 mb-2 bg-white text-black border-black"
               placeholder={`Step ${index + 1}`}
             />
           ))}
@@ -127,7 +127,7 @@ const ModalRisk = ({ isOpen, onClose, risk, onSave, categories, severityLevels, 
             placeholder="Responsible Party"
             value={newRisk.responsibleParty}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-500 bg-white text-black border-black"
           />
         </div>
 
