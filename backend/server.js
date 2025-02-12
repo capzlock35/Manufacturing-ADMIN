@@ -6,6 +6,11 @@ import userRouter from './routes/userRoute.js';
 import documentRouter from './routes/documentRoute.js'; // Import the documentRouter
 import resourceRoute from './routes/resourceRoute.js'; // Import the resource route
 import requestresourceRoute from './routes/requestresourcesRoute.js';
+import coreuserRouter from './routes/coreuserRouter.js';
+import financeuserRouter from './routes/financeuserRoute.js';
+import hruserRouter from './routes/hruserRoute.js';
+import logisticuserRouter from './routes/logisticuserRoute.js';
+
 
 
 const app = express();
@@ -43,6 +48,14 @@ app.use("/api/documents", documentRouter); // Prefixing routes with /api/documen
 
 // Use the user routes
 app.use("/api/user", userRouter);
+
+app.use("/api/user", coreuserRouter);
+
+app.use("/api/user", financeuserRouter);
+
+app.use("/api/user", hruserRouter);
+
+app.use("/api/user", logisticuserRouter);
 
 app.use("/api/resources", resourceRoute);
 
