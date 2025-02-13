@@ -34,6 +34,11 @@ import Footer from '../components/Footer'; // Import the Footer component
 import Settings from '../components/Settings';
 import AccountList from '../components/AccountList';
 import RequestResources from '../components/RequestResources';
+import HrCreate from '../components/HrCreate';
+import CoreCreate from '../components/CoreCreate';
+import LogisticCreate from '../components/LogisticCreate';
+import FinanceCreate from '../components/FinanceCreate';
+import AdminCreate from '../components/AdminCreate';
 
 const AdminHome = () => {
   const [role, setRole] = useState('');
@@ -80,6 +85,11 @@ const AdminHome = () => {
           <Route path="register" element={<Register />} />
           <Route path="accountlist" element={<AccountList />} />
           <Route path="requestresources" element={<RequestResources />} />
+          <Route path="HrCreate" element={<HrCreate />} />
+          <Route path="CoreCreate" element={<CoreCreate />} />
+          <Route path="LogisticCreate" element={<LogisticCreate />} />
+          <Route path="FinanceCreate" element={<FinanceCreate />} />
+          <Route path="AdminCreate" element={<AdminCreate />} />
         </Routes>
         <div className="">
           <Footer />

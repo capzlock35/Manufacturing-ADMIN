@@ -11,22 +11,66 @@ import { TiDocumentText } from "react-icons/ti";
 import { PiUsersThreeFill } from "react-icons/pi";
 import { GrUserAdmin } from "react-icons/gr";
 import jjm from "../assets/jjmlogo.jpg";
+import axios from 'axios';
+
+const baseURL = process.env.NODE_ENV === 'production'
+  ? 'https://backend-admin.jjm-manufacturing.com/api/resources'
+  : 'http://localhost:7690/api/resources';
+const documentBaseURL = process.env.NODE_ENV === 'production'
+  ? 'https://backend-admin.jjm-manufacturing.com/api/documents'
+  : 'http://localhost:7690/api/documents';
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  
-  // Notification states
   const [hasAnnouncement, setHasAnnouncement] = useState(true);
   const [hasDocumentTracking, setHasDocumentTracking] = useState(true);
   const [hasDocumentStorage, setHasDocumentStorage] = useState(true);
+  const [resourceCount, setResourceCount] = useState(0);
+  const [loadingResourceCount, setLoadingResourceCount] = useState(true);
+    const [documentCount, setDocumentCount] = useState(0);  // New state for document count
+    const [loadingDocumentCount, setLoadingDocumentCount] = useState(true);
 
   useEffect(() => {
-    // Reset notifications on mount
     setHasAnnouncement(true);
     setHasDocumentTracking(true);
     setHasDocumentStorage(true);
+
+    fetchResourceCount();
+    const intervalId = setInterval(fetchResourceCount, 60000);
+    fetchDocumentCount();
+    const documentIntervalId = setInterval(fetchDocumentCount, 60000);
+
+    return () => {
+      clearInterval(intervalId);
+       clearInterval(documentIntervalId);
+    };
   }, []);
-  
+
+  const fetchResourceCount = async () => {
+    setLoadingResourceCount(true);
+    try {
+      const response = await axios.get(baseURL);
+      setResourceCount(response.data.length);
+    } catch (error) {
+      console.error("Error fetching resource count:", error);
+      setResourceCount(0);
+    } finally {
+      setLoadingResourceCount(false);
+    }
+  };
+    const fetchDocumentCount = async () => {
+        setLoadingDocumentCount(true);
+        try {
+            const response = await axios.get(`${documentBaseURL}/get`);
+            setDocumentCount(response.data.length);
+        } catch (error) {
+            console.error("Error fetching document count:", error);
+            setDocumentCount(0);
+        } finally {
+            setLoadingDocumentCount(false);
+        }
+    };
+
   const markAnnouncementAsSeen = () => {
     setHasAnnouncement(false);
   };
@@ -44,8 +88,8 @@ const Sidebar = () => {
   };
 
   return (
-    <div 
-      className={`flex flex-col overflow-y-clip bg-white text-black border-r-2 sticky top-0 transition-all duration-300 ${
+    <div
+      className={`flex flex-col overflow-y-auto bg-white text-black border-r-2 sticky top-0 transition-all duration-300 ${
         isCollapsed ? "w-20 px-4 py-4" : "w-72 lg:w-80 px-2 py-4"
       }`}
       aria-label='Sidebar'
@@ -83,14 +127,13 @@ const Sidebar = () => {
         {/* Account Management */}
         <ul className='menu rounded-box w-56'>
           {isCollapsed && <PiUsersThreeFill className='w-5 h-5' />}
-          {!isCollapsed && 
+          {!isCollapsed &&
             <li>
               <details>
-                <summary><PiUsersThreeFill className='w-5 h-5'/>Account Management</summary>
+                <summary><PiUsersThreeFill className='w-5 h-5' />Account Management</summary>
                 <ul>
-                  <Link to="register"><li className='hover:text-blue-500'><p><GrUserAdmin/>Create Account</p></li></Link>
-                  <Link to="accountlist"><li className='hover:text-blue-500'><p><FaUserFriends/>Accounts</p></li></Link>
-
+                  <Link to="register"><li className='hover:text-blue-500'><p><GrUserAdmin />Create Account</p></li></Link>
+                  <Link to="accountlist"><li className='hover:text-blue-500'><p><FaUserFriends />Accounts</p></li></Link>
                 </ul>
               </details>
             </li>
@@ -101,21 +144,27 @@ const Sidebar = () => {
         {/* Document Management */}
         <ul className='menu rounded-box w-56'>
           {isCollapsed && <IoDocuments className='w-5 h-5' />}
-          {!isCollapsed && 
+          {!isCollapsed &&
             <li>
               <details>
-                <summary><IoDocuments className='w-5 h-5'/>Document Management</summary>
+                <summary><IoDocuments className='w-5 h-5' />Document Management</summary>
                 <ul>
-                  <Link to="DocumentStorage" onClick={markDocumentStorageAsSeen}>
-                    <li className="hover:text-blue-500 relative">
-                      <p className='flex items-center'>
-                        <IoDocument />
-                        Document Storage
-                        {hasDocumentStorage && (
-                          <span className='bg-red-500 h-2 w-2 rounded-full absolute top-2 right-3 ml-2'></span>
-                        )}
-                      </p>
-                    </li>
+                 <Link to="DocumentStorage" onClick={markDocumentStorageAsSeen}>
+                 <li className="hover:text-blue-500">
+                    <p className='flex items-center'>
+                      <IoDocument />
+                      Document Storage
+                      {!isCollapsed && (
+                        loadingDocumentCount ? (
+                          "..."
+                        ) : (
+                          <span className="text-xs text-red-500 font-bold ml-1">
+                            ({documentCount})
+                          </span>
+                        )
+                      )}
+                    </p>
+                  </li>
                   </Link>
 
                   <Link to="VersionControl" onClick={markAnnouncementAsSeen}>
@@ -141,6 +190,7 @@ const Sidebar = () => {
                       </p>
                     </li>
                   </Link>
+                  
                 </ul>
               </details>
             </li>
@@ -150,16 +200,16 @@ const Sidebar = () => {
         {/* Legal Management */}
         <ul className='menu rounded-box w-56'>
           {isCollapsed && <IoDocumentTextOutline className='w-5 h-5' />}
-          {!isCollapsed && 
+          {!isCollapsed &&
             <li>
               <details>
-                <summary><IoDocumentTextOutline className='w-5 h-5'/>Legal Management</summary>
+                <summary><IoDocumentTextOutline className='w-5 h-5' />Legal Management</summary>
                 <ul>
-                  <Link to="ContractManagement"><li className='hover:text-blue-500'><p><TiDocumentText/>Contract Management</p></li></Link>
-                  <Link to="LegalDocument"><li className='hover:text-blue-500'><p><TiDocumentText/>Legal Document</p></li></Link>
-                  <Link to="RiskManagement"><li className='hover:text-blue-500'><p><TiDocumentText/>Risk Management</p></li></Link>
-                  <Link to="LitigationManagement"><li className='hover:text-blue-500'><p><TiDocumentText/>Litigation Management</p></li></Link>
-                  <Link to="CompliancesandRegulatory"><li className='hover:text-blue-500'><p><TiDocumentText/>Compliances and Regulatory</p></li></Link>
+                  <Link to="ContractManagement"><li className='hover:text-blue-500'><p><TiDocumentText />Contract Management</p></li></Link>
+                  <Link to="LegalDocument"><li className='hover:text-blue-500'><p><TiDocumentText />Legal Document</p></li></Link>
+                  <Link to="RiskManagement"><li className='hover:text-blue-500'><p><TiDocumentText />Risk Management</p></li></Link>
+                  <Link to="LitigationManagement"><li className='hover:text-blue-500'><p><TiDocumentText />Litigation Management</p></li></Link>
+                  <Link to="CompliancesandRegulatory"><li className='hover:text-blue-500'><p><TiDocumentText />Compliances and Regulatory</p></li></Link>
                 </ul>
               </details>
             </li>
@@ -169,19 +219,35 @@ const Sidebar = () => {
         {/* Initiating Workflow */}
         <ul className='menu rounded-box w-56'>
           {isCollapsed && <GoWorkflow className='w-5 h-5' />}
-          {!isCollapsed && 
+          {!isCollapsed &&
             <li>
               <details>
-                <summary><GoWorkflow className='w-5 h-5'/>Initiating Workflow</summary>
+                <summary><GoWorkflow className='w-5 h-5' />Initiating Workflow</summary>
                 <ul>
-                  <Link to="WorkflowIdentification"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Workflow Identification</p></li></Link>
-                  <Link to="CommunicationPlan"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Communication Plan</p></li></Link>
-                  <Link to="ResourcesAllocation"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank/>Resources Allocation</p></li></Link>
+                  <Link to="WorkflowIdentification"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank />Workflow Identification</p></li></Link>
+                  <Link to="CommunicationPlan"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank />Communication Plan</p></li></Link>
+                 <Link to="ResourcesAllocation">
+                   <li className='hover:text-blue-500'>
+                    <p className='flex items-center'>
+                      <MdOutlineCheckBoxOutlineBlank />
+                      Resources Allocation
+                      {!isCollapsed && (
+                        loadingResourceCount ? (
+                          "..."
+                        ) : (
+                          <span className="text-xs text-red-500 font-bold ml-1">
+                            ({resourceCount})
+                          </span>
+                        )
+                      )}
+                    </p>
+                  </li>
+                  </Link>
+
                 </ul>
               </details>
             </li>
           }
-
         </ul>
       </div>
     </div>
