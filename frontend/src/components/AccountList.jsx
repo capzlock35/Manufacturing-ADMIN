@@ -1,47 +1,47 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+    FaUserShield,      // Admin
+    FaMoneyBill,        // Finance
+    FaUserTie,          // HR
+    FaCode,             // Core
+    FaTruck,            // Logistic
+} from 'react-icons/fa';
 
 const AccountList = () => {
   const navigate = useNavigate();
 
+  const accountTypes = [
+    { name: 'Admin', path: '/home/AdminList', icon: FaUserShield, color: 'bg-indigo-500' },
+    { name: 'Finance', path: '/home/FinanceList', icon: FaMoneyBill, color: 'bg-green-500' },
+    { name: 'HR', path: '/home/HrList1', icon: FaUserTie, color: 'bg-red-500' },
+    { name: 'Core', path: '/home/CoreList1', icon: FaCode, color: 'bg-yellow-500' },
+    { name: 'Logistic', path: '/home/LogisticList1', icon: FaTruck, color: 'bg-purple-500' },
+  ];
+
   return (
-
-
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-4">
-      <div className="bg-white shadow-lg rounded-xl p-8 mb-12 w-full max-w-3xl">
-        <div className="grid grid-cols-2 gap-8 mb-10">
-          <button
-            onClick={() => navigate('/home/AdminList')}
-            className="bg-blue-500 hover:bg-blue-600 text-white text-lg px-8 py-5 rounded-xl shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-400"
-          >
-            Admin
-          </button>
-          <button
-            onClick={() => navigate('/home/FinanceList')}
-            className="bg-green-500 hover:bg-green-600 text-white text-lg px-8 py-5 rounded-xl shadow-lg focus:outline-none focus:ring-4 focus:ring-green-400"
-          >
-            Finance
-          </button>
-        </div>
-        <div className="grid grid-cols-3 gap-8">
-          <button
-            onClick={() => navigate('/home/HrList1')}
-            className="bg-red-500 hover:bg-red-600 text-white text-lg px-8 py-5 rounded-xl shadow-lg focus:outline-none focus:ring-4 focus:ring-red-400"
-          >
-            HR
-          </button>
-          <button
-            onClick={() => navigate('/home/CoreList1')}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white text-lg px-8 py-5 rounded-xl shadow-lg focus:outline-none focus:ring-4 focus:ring-yellow-400"
-          >
-            Core
-          </button>
-          <button
-            onClick={() => navigate('/home/LogisticList1')}
-            className="bg-purple-500 hover:bg-purple-600 text-white text-lg px-8 py-5 rounded-xl shadow-lg focus:outline-none focus:ring-4 focus:ring-purple-400"
-          >
-            Logistic
-          </button>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-700 via-gray-900 to-black shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
+        <div className="relative bg-white shadow-lg sm:rounded-3xl p-5">
+          <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">Account Lists</h2>
+          <div className="grid grid-cols-3 gap-4">
+            {accountTypes.map((button, index) => (
+              <button
+                key={index}
+                onClick={() => navigate(button.path)}
+                className={`relative flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-100 transition duration-300 ${button.color} text-white`}
+              >
+                <div className="flex items-center justify-center">
+                  {button.icon && <button.icon className="h-6 w-6" />}
+                </div>
+                <div className="text-left">
+                  <h3 className="text-lg font-medium">{button.name}</h3>  {/* Display button name again */}
+                  <p className="text-sm text-gray-200">View Account List</p> {/* Constant text here */}
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
