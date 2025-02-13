@@ -6,7 +6,6 @@ const  coreuserRouter = express.Router();
 
 coreuserRouter.get("/get",getAllUser);
 coreuserRouter.post("/create",createUser);
-coreuserRouter.post("/", createUser);
 coreuserRouter.post('/login', Login);
 coreuserRouter.get("/view/:id", viewUser)
 coreuserRouter.get("/profile", authMiddleware, viewProfile);

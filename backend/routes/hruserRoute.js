@@ -5,7 +5,6 @@ const  hruserRouter = express.Router();
 
 hruserRouter.get("/get",getAllUser);
 hruserRouter.post("/create",createUser);
-hruserRouter.post("/", createUser);
 hruserRouter.post('/login', Login);
 
 export default hruserRouter;

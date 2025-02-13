@@ -1,149 +1,129 @@
 import CoreUser from "../model/coreModel.js";
-import bcrypt from 'bcryptjs'; 
-import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-const SECRET_KEY = 'BOSSING'
+const SECRET_KEY = 'BOSSING';
 
-const createUser = async (req, res) => {
-    try {
-      const { 
-        name,
-        email,  
-        password 
-      } = req.body;
-  
-      // Check if user already exists
-      const emailExists = await CoreUser.findOne({ email });
-      if (emailExists) {
-        return res.status(400).json({ message: 'Email already exists' });
-      }
-  
-      const usernameExists = await CoreUser.findOne({ name });
-      if (usernameExists) {
-        return res.status(400).json({ message: 'Username already exists' });
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      // Create new user
-      const user = await CoreUser.create({
-        name,
-        email,
-        password: hashedPassword
-      });
-  
-      // Remove password from response
-      const userResponse = user.toObject();
-      delete userResponse.password;
-  
-      res.status(201).json({
-        message: 'User created successfully',
-        user: userResponse
-      });
-  
-    } catch (error) {
-      if (error.name === 'ValidationError') {
-        return res.status(400).json({ 
-          message: 'Validation error', 
-          error: Object.values(error.errors).map(err => err.message)
-        });
-      }
-      res.status(500).json({ 
-        message: 'Error creating user', 
-        error: error.message 
-      });
-    }
-  };
-  
-  const Login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await CoreUser.findOne({ email });
-
-        if (!user) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-
-        // Check if password matches
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-
-        // Sign JWT token, include user ID and role in the payload
-        const token = jwt.sign(
-            { userid: user._id },  // Include role in the token payload
-            SECRET_KEY, 
-            { expiresIn: '1hr' }
-        );
-
-        res.json({ 
-            message: 'Login successful', 
-            token
-        });
-    } catch (error) {
-        res.status(500).json({ error: 'Error logging in' });
-    }
-};
-
-//Get All User
+// Get all users
 const getAllUser = async (req, res) => {
     try {
-      const page = parseInt(req.query.page) || 1; // Default to page 1
-      const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
-      const department = req.query.department; // Get the department from query if available
-  
-      // Build the query object
-      let query = {};
-      if (department) {
-        query.department = department; // Only fetch users from the specified department
-      }
-  
-      // Get the users with pagination and filtering by department
-      const users = await CoreUser.find(query)
-        .skip((page - 1) * limit)  // Skip users from previous pages
-        .limit(limit); // Limit the number of users per page
-  
-      // Get total count of users for pagination info
-      const totalUsers = await CoreUser.countDocuments(query);
-  
-      // Respond with paginated data
-      res.status(200).json({
-        users,
-        totalPages: Math.ceil(totalUsers / limit),  // Calculate total pages
-        currentPage: page,
-      });
+        const users = await CoreUser.find();
+        res.status(200).json(users);
     } catch (error) {
-      res.status(500).json({ error: 'Unable to get users' });
-    }
-  };
-
-  const viewUser = async(req,res) => {
-    try{
-        const userId = req.params.id;
-        const user = await CoreUser.findById(userId);
-        if (!user){
-            return res.status(401).json({ error: 'Invalid credentials' })
-        }
-        res.status(200).json({ user });
-    } catch (error) {
-        res.status(500).json({ error: 'Error logging in' })
-    }
-}
-
-const viewProfile = async (req, res) => {
-    try {
-        const userId = req.userId; // Assumes the JWT middleware sets `req.userId`
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        res.status(200).json({ user });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to retrieve profile' });
+        console.error("Error getting users:", error);
+        res.status(500).json({ message: "Failed to retrieve users" });
     }
 };
 
 
+// Create User
+const createUser = async (req, res) => {
+    try {
+        const { name, email, password, confirmPassword } = req.body;
 
-export {createUser,Login,getAllUser,viewUser,viewProfile};
+        // Check if user already exists
+        const existingUser = await CoreUser.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "User already exists" });
+        }
+
+        // Password validation
+        if (password !== confirmPassword) {
+            return res.status(400).json({ message: "Passwords do not match" });
+        }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create new user
+        const newUser = new CoreUser({
+            name,
+            email,
+            password: hashedPassword,
+        });
+
+        // Save the user
+        await newUser.save();
+
+        res.status(201).json({ message: "User created successfully", user: newUser });
+
+    } catch (error) {
+        console.error("Error creating user:", error);
+        res.status(500).json({ message: "Failed to create user" });
+    }
+};
+
+// Login
+const Login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Check if user exists
+        const user = await CoreUser.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        // Check password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        // Create token
+        const token = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
+
+        res.status(200).json({ message: "Login successful", token: token });
+
+    } catch (error) {
+        console.error("Error logging in:", error);
+        res.status(500).json({ message: "Login failed" });
+    }
+};
+
+// View User by ID
+const viewUser = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const user = await CoreUser.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json(user);
+
+    } catch (error) {
+        console.error("Error viewing user:", error);
+        res.status(500).json({ message: "Failed to view user" });
+    }
+};
+
+// View User Profile (Requires Authentication)
+const viewProfile = async (req, res) => {
+    try {
+        // The authMiddleware should have already placed the user's ID on the request object
+        const userId = req.userId;
+
+        const user = await CoreUser.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Return the user profile (excluding the password for security)
+        const userProfile = {
+            id: user._id,
+            name: user.name,
+            email: user.email
+        };
+
+        res.status(200).json(userProfile);
+
+    } catch (error) {
+        console.error("Error viewing profile:", error);
+        res.status(500).json({ message: "Failed to view profile" });
+    }
+};
+
+export { getAllUser, createUser, Login, viewUser, viewProfile };

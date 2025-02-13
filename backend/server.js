@@ -13,6 +13,8 @@ import logisticuserRouter from './routes/logisticuserRoute.js';
 
 
 
+
+
 const app = express();
 const port = process.env.PORT || 7690;
 const allowedOrigins = [
@@ -43,23 +45,25 @@ app.get("/", (req, res) => {
     res.send("Hello world");
 });
 
-// Use the document routes
-app.use("/api/documents", documentRouter); // Prefixing routes with /api/documents
 
 // Use the user routes
-app.use("/api/user", userRouter);
+app.use("/api/user", userRouter); // Admin
 
-app.use("/api/user", coreuserRouter);
+app.use("/api/coreusers", coreuserRouter); // Core
 
-app.use("/api/user", financeuserRouter);
+app.use("/api/finance", financeuserRouter); // Finance
 
-app.use("/api/user", hruserRouter);
+app.use("/api/hrusers", hruserRouter);  // HR
 
-app.use("/api/user", logisticuserRouter);
+app.use("/api/logisticusers", logisticuserRouter); // Logistic
 
-app.use("/api/resources", resourceRoute);
+// ----------------------------------------------------------------------------------------
 
-app.use("/api/requestresources", requestresourceRoute);
+app.use("/api/resources", resourceRoute); // Resources
+
+app.use("/api/requestresources", requestresourceRoute); // RequestR.
+
+app.use("/api/documents", documentRouter); // DocumentStorage
 
 app.listen(port, () => {
     console.log(`Server Started on http://localhost:${port}`);
