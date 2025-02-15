@@ -1,15 +1,25 @@
 import express from 'express';
-import {createUser,Login,getAllUsers,updateUser,viewUser,viewProfile} from '../controller/financeController.js'
+import { createUser, getAllUsers, updateUser, viewUser, viewProfile, deleteUser } from '../controller/financeController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
-const  financeuserRouter = express.Router();
+const financeuserRouter = express.Router();
 
-financeuserRouter.get("/get",getAllUsers);
-financeuserRouter.post("/create",createUser);
-financeuserRouter.post("/", createUser);
-financeuserRouter.post('/login', Login);
+// Route to get all users
+financeuserRouter.get("/get", getAllUsers);
+
+// Route to create a new user
+financeuserRouter.post("/create", createUser);
+
+// Route to update user by ID
 financeuserRouter.put("/update/:id", updateUser);
-financeuserRouter.get("/view/:id", viewUser)
+
+// Route to view user by ID
+financeuserRouter.get("/view/:id", viewUser);
+
+// Route to delete user by ID
+financeuserRouter.delete("/delete/:id", deleteUser);
+
+// Route to view user profile (protected by authMiddleware)
 financeuserRouter.get("/profile", authMiddleware, viewProfile);
 
-export default financeuserRouter  ;
+export default financeuserRouter;
