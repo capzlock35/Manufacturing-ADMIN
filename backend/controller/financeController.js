@@ -1,143 +1,154 @@
-import Finance from '../model/financeModel.js';
+// controller/financeController.js
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken'
+import { v2 as cloudinary } from 'cloudinary';
+import Finance from '../model/financeModel.js'; // Import the Finance model
 
-const SECRET_KEY = 'FINANCEADMIN'
+// Cloudinary config
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-// Create a new user
-const createUser = async (req, res) => {
-  try {
-    const {
-      image, 
-      username,
-      email,  
-      fullName,
-      password 
-    } = req.body;
+// Controller for creating a new Finance user with image upload
+export const createUser = async (req, res) => {
+    try {
+        console.log("createUser called");
 
-    // Check if user already exists
-    const emailExists = await Finance.findOne({ email });
-    if (emailExists) {
-      return res.status(400).json({ message: 'Email already exists' });
+        const { userName, password, confirmPassword, email, fullName, role } = req.body;
+        console.log("req.body", req.body);
+
+        if (!req.files || !req.files.image) {
+            console.log("No image found in req.files");
+            return res.status(400).json({ message: "Image is required" });
+        }
+        const image = req.files.image;
+        console.log("image", image);
+
+        if (!userName || !password || !confirmPassword || !email || !fullName || !role) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        if (password !== confirmPassword) {
+            return res.status(400).json({ message: "Passwords do not match" });
+        }
+
+        // Convert the Buffer to a base64 string
+        const base64Image = `data:${image.mimetype};base64,${image.data.toString('base64')}`;
+
+        let uploadedImage;
+        try {
+            console.log("Uploading to Cloudinary...");
+            uploadedImage = await cloudinary.uploader.upload(base64Image, {
+                folder: "Finance",
+            });
+            console.log("Cloudinary upload successful", uploadedImage);
+        } catch (cloudinaryError) {
+            console.error("Cloudinary Error:", cloudinaryError);
+            return res.status(500).json({ message: "Error uploading image to Cloudinary", error: cloudinaryError.message });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newUser = new Finance({
+            userName,
+            password: hashedPassword,
+            email,
+            fullName,
+            role,
+            image: {
+                public_id: uploadedImage.public_id,
+                secure_url: uploadedImage.secure_url,
+            },
+        });
+
+        await newUser.save();
+
+        res.status(201).json({
+            message: "Account created successfully",
+            user: {
+                userName,
+                email,
+                fullName,
+                role,
+                imageUrl: uploadedImage.secure_url,
+            },
+        });
+
+    } catch (error) {
+        console.error("Error creating account:", error);
+        res.status(500).json({ message: "Error creating account", error: error.message });
     }
+};
 
-    const usernameExists = await Finance.findOne({ username });
-    if (usernameExists) {
-      return res.status(400).json({ message: 'Username already exists' });
+// Placeholder functions for other routes
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await Finance.find(); // Fetch all finance users from the database
+        res.status(200).json(users); // Send the users as JSON response
+    } catch (error) {
+        console.error("Error getting all users:", error);
+        res.status(500).json({ message: "Error getting all users", error: error.message });
     }
+};
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+export const updateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { userName, email, fullName, role } = req.body; // Extract the fields you want to update
 
-    // Create new user
-    const user = await Finance.create({
-      image,
-      username,
-      email,
-      fullName,
-      password: hashedPassword
-    });
+        // Find the user by ID
+        const user = await Finance.findById(id);
 
-    // Remove password from response
-    const userResponse = user.toObject();
-    delete userResponse.password;
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
-    res.status(201).json({
-      message: 'User created successfully',
-      user: userResponse
-    });
+        // Update the user's fields
+        user.userName = userName || user.userName;
+        user.email = email || user.email;
+        user.fullName = fullName || user.fullName;
+        user.role = role || user.role;
 
-  } catch (error) {
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({ 
-        message: 'Validation error', 
-        error: Object.values(error.errors).map(err => err.message)
-      });
+        // Save the updated user
+        const updatedUser = await user.save();
+
+        // Respond with the updated user
+        res.status(200).json({ message: "User updated successfully", user: updatedUser });
+
+    } catch (error) {
+        console.error("Error updating user:", error);
+        res.status(500).json({ message: "Error updating user", error: error.message });
     }
-    res.status(500).json({ 
-      message: 'Error creating user', 
-      error: error.message 
-    });
-  }
 };
 
-const Login = async (req, res) => {
-  try {
-      const { email, password } = req.body;
-      const user = await Finance.findOne({ email });
-
-      if (!user) {
-          return res.status(401).json({ error: 'Invalid credentials' });
-      }
-
-      // Check if password matches
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-          return res.status(401).json({ error: 'Invalid credentials' });
-      }
-
-      // Sign JWT token, include user ID and role in the payload
-      const token = jwt.sign(
-          { userid: user._id },  // Include role in the token payload
-          SECRET_KEY, 
-          { expiresIn: '1hr' }
-      );
-
-      res.json({ 
-          message: 'Login successful', 
-          token
-      });
-  } catch (error) {
-      res.status(500).json({ error: 'Error logging in' });
-  }
+export const viewUser = async (req, res) => { // ADD export
+  res.status(200).json({ message: "View user" });
 };
 
-// Get all users
-const getAllUsers = async (req, res) => {
-  try {
-    const users = await Finance.find();
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+export const viewProfile = async (req, res) => { // ADD export
+  res.status(200).json({ message: "View profile" });
 };
 
-// Update a user by ID
-const updateUser = async (req, res) => {
-  try {
-    const updatedUser = await Finance.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
+export const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find the user by ID and delete
+        const deletedUser = await Finance.findByIdAndDelete(id);
+
+        if (!deletedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        console.log('Deleted in the backend');
+
+        // Respond with a success message
+        res.status(200).json({ message: "User deleted successfully", user: deletedUser });
+
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        res.status(500).json({ message: "Error deleting user", error: error.message });
     }
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
 };
-
-const viewUser = async(req,res) => {
-  try{
-      const userId = req.params.id;
-      const user = await Finance.findById(userId);
-      if (!user){
-          return res.status(401).json({ error: 'Invalid credentials' })
-      }
-      res.status(200).json({ user });
-  } catch (error) {
-      res.status(500).json({ error: 'Error logging in' })
-  }
-}
-
-const viewProfile = async (req, res) => {
-  try {
-      const userId = req.userId; // Assumes the JWT middleware sets `req.userId`
-      const user = await Finance.findById(userId);
-      if (!user) {
-          return res.status(404).json({ error: 'User not found' });
-      }
-      res.status(200).json({ user });
-  } catch (error) {
-      res.status(500).json({ error: 'Failed to retrieve profile' });
-  }
-};
-
-export {createUser,Login,getAllUsers,updateUser,viewUser,viewProfile};
