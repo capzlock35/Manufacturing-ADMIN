@@ -2,6 +2,7 @@ import express from 'express';
 import { ConnectDB } from './config/db.js';
 import "dotenv/config";
 import cors from "cors";
+import fileUpload from 'express-fileupload';
 import userRouter from './routes/userRoute.js';
 import documentRouter from './routes/documentRoute.js'; // Import the documentRouter
 import resourceRoute from './routes/resourceRoute.js'; // Import the resource route
@@ -10,9 +11,10 @@ import coreuserRouter from './routes/coreuserRouter.js';
 import financeuserRouter from './routes/financeuserRoute.js';
 import hruserRouter from './routes/hruserRoute.js';
 import logisticuserRouter from './routes/logisticuserRoute.js';
+import uploadRoute from "./routes/uploadRoute.js";
 
-
-
+import dotenv from "dotenv";
+dotenv.config();
 
 
 const app = express();
@@ -37,6 +39,8 @@ app.use(cors({
 }));
 
 app.use(express.json());  // Middleware to parse JSON
+
+app.use(fileUpload());
 
 ConnectDB();  // Establish DB connection
 
@@ -64,6 +68,8 @@ app.use("/api/resources", resourceRoute); // Resources
 app.use("/api/requestresources", requestresourceRoute); // RequestR.
 
 app.use("/api/documents", documentRouter); // DocumentStorage
+
+app.use("/api/upload", uploadRoute);
 
 app.listen(port, () => {
     console.log(`Server Started on http://localhost:${port}`);
