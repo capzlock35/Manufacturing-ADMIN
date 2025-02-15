@@ -39,6 +39,7 @@ import CoreCreate from '../components/CoreCreate';
 import LogisticCreate from '../components/LogisticCreate';
 import FinanceCreate from '../components/FinanceCreate';
 import AdminCreate from '../components/AdminCreate';
+import Upload from '../components/Upload';
 
 const AdminHome = () => {
   const [role, setRole] = useState('');
@@ -90,6 +91,7 @@ const AdminHome = () => {
           <Route path="LogisticCreate" element={<LogisticCreate />} />
           <Route path="FinanceCreate" element={<FinanceCreate />} />
           <Route path="AdminCreate" element={<AdminCreate />} />
+          <Route path="Upload" element={<Upload />} />
         </Routes>
         <div className="">
           <Footer />
