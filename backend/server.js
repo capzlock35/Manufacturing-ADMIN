@@ -12,6 +12,7 @@ import financeuserRouter from './routes/financeuserRoute.js';
 import hruserRouter from './routes/hruserRoute.js';
 import logisticuserRouter from './routes/logisticuserRoute.js';
 import uploadRoute from "./routes/uploadRoute.js";
+import authRoutes from './routes/auth.js';
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -37,6 +38,8 @@ app.use(cors({
         }
     }
 }));
+
+app.use('/api/auth', authRoutes);
 
 app.use(express.json());  // Middleware to parse JSON
 
