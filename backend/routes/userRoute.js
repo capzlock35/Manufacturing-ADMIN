@@ -5,7 +5,7 @@ import verifyToken from "../middleware/verifyToken.js"
 
 const  userRouter = express.Router();
 
-userRouter.get("/get", getAllUser);
+userRouter.get("/get",verifyToken, getAllUser);
 userRouter.post("/create",createUser);
 userRouter.post("/", createUser);
 userRouter.post('/login', Login);
