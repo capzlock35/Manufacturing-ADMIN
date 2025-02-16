@@ -1,10 +1,11 @@
 import express from 'express';
 import {getAllUser,createUser,Login,updateUser,deleteUser, viewUser, viewProfile} from '../controller/userController.js'
 import authMiddleware from '../middleware/authMiddleware.js';
+import verifyToken from "../middleware/verifyToken.js"
 
 const  userRouter = express.Router();
 
-userRouter.get("/get",getAllUser);
+userRouter.get("/get", getAllUser);
 userRouter.post("/create",createUser);
 userRouter.post("/", createUser);
 userRouter.post('/login', Login);
