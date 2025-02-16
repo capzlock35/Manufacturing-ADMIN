@@ -1,11 +1,13 @@
 import express from 'express';
 import { createUser, getAllUsers, updateUser, viewUser, viewProfile, deleteUser } from '../controller/financeController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import verifyToken from "../middleware/verifyToken.js"
+
 
 const financeuserRouter = express.Router();
 
 // Route to get all users
-financeuserRouter.get("/get", getAllUsers);
+financeuserRouter.get("/get",verifyToken, getAllUsers);
 
 // Route to create a new user
 financeuserRouter.post("/create", createUser);
