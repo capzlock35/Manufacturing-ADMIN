@@ -12,8 +12,11 @@ import financeuserRouter from './routes/financeuserRoute.js';
 import hruserRouter from './routes/hruserRoute.js';
 import logisticuserRouter from './routes/logisticuserRoute.js';
 import uploadRoute from "./routes/uploadRoute.js";
+import verifyToken from "./middleware/verifyToken.js"
 
 import dotenv from "dotenv";
+
+
 dotenv.config();
 
 
@@ -37,6 +40,7 @@ app.use(cors({
         }
     }
 }));
+app.use(verifyToken);
 
 app.use(express.json());  // Middleware to parse JSON
 
@@ -50,16 +54,17 @@ app.get("/", (req, res) => {
 });
 
 
+
 // Use the user routes
-app.use("/api/user", userRouter); // Admin
+app.use("/api/user",verifyToken, userRouter); // Admin
 
-app.use("/api/coreusers", coreuserRouter); // Core
+app.use("/api/coreusers",verifyToken, coreuserRouter); // Core
 
-app.use("/api/finance", financeuserRouter); // Finance
+app.use("/api/finance",verifyToken, financeuserRouter); // Finance
 
-app.use("/api/hrusers", hruserRouter);  // HR
+app.use("/api/hrusers",verifyToken, hruserRouter);  // HR
 
-app.use("/api/logisticusers", logisticuserRouter); // Logistic
+app.use("/api/logisticusers",verifyToken, logisticuserRouter); // Logistic
 
 // ----------------------------------------------------------------------------------------
 
