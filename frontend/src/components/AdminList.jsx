@@ -20,24 +20,55 @@ const AdminList = () => {
   const [isLoading, setIsLoading] = useState(true); // Add loading state
 
   const baseURL = process.env.NODE_ENV === 'production'
-    ? 'https://backend-admin.jjm-manufacturing.com/api/user'
-    : 'http://localhost:7690/api/user';
+  ? 'https://backend-admin.jjm-manufacturing.com/api/user'
+  : 'http://localhost:7690/api/user';
 
-  useEffect(() => {
-    setIsLoading(true); // Start loading
-    axios.get(`${baseURL}/get`, {
-      params: { page: currentPage, limit: 10, department: 'admin' }
-    })
-      .then(response => {
-        setUsers(response.data.users);
-        setTotalPages(response.data.totalPages);
-        setIsLoading(false); // Stop loading
-      })
-      .catch(err => {
-        console.log(err);
-        setIsLoading(false); // Stop loading even if there's an error
-      });
-  }, [currentPage]);
+const authURL = process.env.NODE_ENV === 'production'
+  ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-token'
+  : 'http://localhost:7690/api/auth/get-token';
+
+const fetchUsers = async () => {
+  try {
+    setIsLoading(true); // Start loading indicator
+
+    // Fetch authentication token
+    const tokenResponse = await axios.get(authURL);
+    const token = tokenResponse.data.token;
+
+    if (!token) {
+      console.error("🚨 No token received from backend!");
+      setIsLoading(false);
+      return;
+    }
+
+    // Fetch users with authentication & pagination
+    const response = await axios.get(`${baseURL}/get`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        page: currentPage,
+        limit: 10,
+        department: 'admin', // Change this if fetching different departments
+      },
+    });
+
+    console.log("✅ Users Fetched:", response.data);
+    setUsers(response.data.users);
+    setTotalPages(response.data.totalPages);
+  } catch (err) {
+    console.error("❌ Error fetching users:", err.response ? err.response.data : err.message);
+  } finally {
+    setIsLoading(false); // Stop loading
+  }
+};
+
+// Fetch users when component mounts or when `currentPage` changes
+useEffect(() => {
+  fetchUsers();
+}, [currentPage]);
+
+  
 
   const handleView = (user) => {
     setSelectedUser(user);

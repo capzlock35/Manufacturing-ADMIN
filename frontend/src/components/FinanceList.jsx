@@ -15,19 +15,41 @@
      const [editFormData, setEditFormData] = useState({}); // State for edit form data
  
      const baseURL = process.env.NODE_ENV === 'production'
-         ? 'https://backend-admin.jjm-manufacturing.com/api/finance'
-         : 'http://localhost:7690/api/finance';
- 
-     useEffect(() => {
-         axios.get(`${baseURL}/get`)
-             .then(response => {
-                 console.log("Backend Response:", response.data);
-                 setUsers(response.data);
-             })
-             .catch(err => {
-                 console.log(err);
-             });
-     }, []);
+     ? 'https://backend-admin.jjm-manufacturing.com/api/finance'
+     : 'http://localhost:7690/api/finance';
+   
+   const authURL = process.env.NODE_ENV === 'production'
+     ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-token'
+     : 'http://localhost:7690/api/auth/get-token';
+   
+   const fetchUsers = async () => {
+     try {
+       // Get token using dynamic authURL
+       const tokenResponse = await axios.get(authURL);
+       const token = tokenResponse.data.token;
+   
+       if (!token) {
+         console.error("🚨 No token received from backend!");
+         return;
+       }
+   
+       // Fetch users with authentication
+       const response = await axios.get(`${baseURL}/get`, {
+         headers: {
+           Authorization: `Bearer ${token}`, // Ensure "Bearer" is included
+         },
+       });
+   
+       console.log("✅ Backend Response:", response.data);
+       setUsers(response.data);
+     } catch (err) {
+       console.error("❌ Error fetching users:", err.response ? err.response.data : err.message);
+     }
+   };
+   
+   useEffect(() => {
+     fetchUsers();
+   }, []);
  
      const handleView = (user) => {
          setSelectedUser(user);
