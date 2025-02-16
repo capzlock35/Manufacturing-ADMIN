@@ -1,8 +1,6 @@
 import Logistic from '../model/logisticModel.js';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 
-const SECRET_KEY = 'LOGISTICADMIN';
 
 // Get all users
 const getAllUser = async (req, res) => {
@@ -58,34 +56,6 @@ const createUser = async (req, res) => {
     } catch (error) {
         console.error("Error creating user:", error);
         res.status(500).json({ message: "Failed to create user" });
-    }
-};
-
-// Login
-const Login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        // Check if user exists
-        const user = await Logistic.findOne({ email });
-        if (!user) {
-            return res.status(401).json({ message: "Invalid credentials" });
-        }
-
-        // Check password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({ message: "Invalid credentials" });
-        }
-
-        // Create token
-        const token = jwt.sign({ userId: user._id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
-
-        res.status(200).json({ message: "Login successful", token: token, role: user.role });
-
-    } catch (error) {
-        console.error("Error logging in:", error);
-        res.status(500).json({ message: "Login failed" });
     }
 };
 
@@ -147,4 +117,4 @@ const updateUser = async (req, res) => {
     }
 }
 
-export { getAllUser, createUser, Login, deleteUser,updateUser };
+export { getAllUser, createUser, deleteUser,updateUser };
