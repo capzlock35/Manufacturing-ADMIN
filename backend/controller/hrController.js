@@ -1,8 +1,6 @@
 import Hruser from "../model/hrModel.js";
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 
-const SECRET_KEY = 'HRADMIN';
 
 // Get all users
 const getAllUser = async (req, res) => {
@@ -55,33 +53,6 @@ const createUser = async (req, res) => {
     }
 };
 
-// Login
-const Login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        // Check if user exists
-        const user = await Hruser.findOne({ email });
-        if (!user) {
-            return res.status(401).json({ message: "Invalid credentials" });
-        }
-
-        // Check password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({ message: "Invalid credentials" });
-        }
-
-        // Create token
-        const token = jwt.sign({ email: user.email, id: user._id, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
-
-        res.status(200).json({ message: "Login successful", token: token, userRole: user.role });
-
-    } catch (error) {
-        console.error("Error logging in:", error);
-        res.status(500).json({ message: "Login failed" });
-    }
-};
 //Delete User
 const deleteUser = async (req, res) => {
     try {
@@ -103,4 +74,4 @@ const deleteUser = async (req, res) => {
     }
 };
 
-export { getAllUser, createUser, Login, deleteUser };
+export { getAllUser, createUser, deleteUser };
