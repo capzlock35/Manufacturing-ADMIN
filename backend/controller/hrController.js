@@ -1,3 +1,4 @@
+
 import Hruser from "../model/hrModel.js";
 import bcrypt from 'bcryptjs';
 
@@ -17,7 +18,7 @@ const getAllUser = async (req, res) => {
 // Create User
 const createUser = async (req, res) => {
     try {
-        const { firstName, lastName, email, password, confirmPassword, role } = req.body;
+        const { firstName, lastName, email, password, confirmPassword, role, Hr } = req.body; // Include Hr in destructuring
 
         // Check if user already exists
         const existingUser = await Hruser.findOne({ email });
@@ -39,7 +40,8 @@ const createUser = async (req, res) => {
             lastName,
             email,
             password: hashedPassword,
-            role
+            role,
+            Hr // Include Hr in the user object
         });
 
         // Save the user
@@ -49,29 +51,65 @@ const createUser = async (req, res) => {
 
     } catch (error) {
         console.error("Error creating user:", error);
-        res.status(500).json({ message: "Failed to create user" });
+        res.status(500).json({ message: "Failed to create user" ,error:error.message});
     }
 };
 
 //Delete User
+//Delete User
 const deleteUser = async (req, res) => {
+    console.log("deleteUser function called!");  // Add this log
+
     try {
         const { id } = req.params;
+        console.log("Deleting user with ID:", id); // Log the ID
 
         // Find the user by ID and delete
         const deletedUser = await Hruser.findByIdAndDelete(id);
 
         if (!deletedUser) {
+            console.log("User not found!"); // Log if user isn't found
             return res.status(404).json({ message: "User not found" });
         }
 
+        console.log("User deleted successfully from database:", deletedUser);  // Log success
         // Respond with a success message
         res.status(200).json({ message: "User deleted successfully", user: deletedUser });
 
     } catch (error) {
-        console.error("Error deleting user:", error);
+        console.error("Error deleting user:", error);  // Log the full error
         res.status(500).json({ message: "Error deleting user", error: error.message });
     }
 };
 
-export { getAllUser, createUser, deleteUser };
+const updateUser = async (req, res) => {
+    try {
+        const { id } = req.params; // Get the user ID from the URL
+        const { firstName, lastName, email, role, Hr } = req.body; // Get the updated data from the request body
+
+        // Find the user by ID
+        const user = await Hruser.findById(id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Update the user's fields
+        user.firstName = firstName || user.firstName; // Use the new value if provided, otherwise keep the old value
+        user.lastName = lastName || user.lastName;
+        user.email = email || user.email;
+        user.role = role || user.role;
+        user.Hr = Hr || user.Hr;
+
+        // Save the updated user
+        const updatedUser = await user.save();
+
+        res.status(200).json({ message: "User updated successfully", user: updatedUser });
+
+    } catch (error) {
+        console.error("Error updating user:", error);
+        res.status(500).json({ message: "Failed to update user", error: error.message });
+    }
+};
+
+export { getAllUser, createUser, deleteUser, updateUser };

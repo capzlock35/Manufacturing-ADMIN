@@ -17,7 +17,7 @@ const getAllUser = async (req, res) => {
 // Create User
 const createUser = async (req, res) => {
     try {
-        const { name, email, password, confirmPassword } = req.body;
+        const { name, email, password, confirmPassword, Core, role } = req.body;
 
         // Check if user already exists
         const existingUser = await CoreUser.findOne({ email });
@@ -38,6 +38,8 @@ const createUser = async (req, res) => {
             name,
             email,
             password: hashedPassword,
+            Core: Core, // Add Core
+            role: role //Add Role
         });
 
         // Save the user
@@ -85,7 +87,9 @@ const viewProfile = async (req, res) => {
         const userProfile = {
             id: user._id,
             name: user.name,
-            email: user.email
+            email: user.email,
+            Core: user.Core, // Added Core to the profile
+            role: user.role // Added role to the profile
         };
 
         res.status(200).json(userProfile);
@@ -97,23 +101,68 @@ const viewProfile = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
+  console.log("deleteUser function called!");
+
+  try {
+      const { id } = req.params;
+      console.log("Deleting user with ID:", id);
+
+      // Find the user by ID and delete
+      const deletedUser = await CoreUser.findByIdAndDelete(id); // **Corrected line**
+
+      if (!deletedUser) {
+          console.log("User not found!");
+          return res.status(404).json({ message: "User not found" });
+      }
+
+      console.log("User deleted successfully from database:", deletedUser);
+      // Respond with a success message
+      res.status(200).json({ message: "User deleted successfully", user: deletedUser });
+
+  } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Error deleting user", error: error.message });
+  }
+};
+
+// Update User by ID
+const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
+        const { name, email, password, Core, role } = req.body;
 
-        // Find the user by ID and delete
-        const deletedUser = await CoreUser.findByIdAndDelete(id);
-
-        if (!deletedUser) {
+        // Check if the user exists
+        const existingUser = await CoreUser.findById(id);
+        if (!existingUser) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Respond with a success message
-        res.status(200).json({ message: "User deleted successfully", user: deletedUser });
+        // Hash the password if it's being updated
+        let hashedPassword = existingUser.password;  // Keep the existing password by default
+        if (password) {
+            hashedPassword = await bcrypt.hash(password, 10);
+        }
+
+        // Update the user
+        const updatedUser = await CoreUser.findByIdAndUpdate(
+            id,
+            {
+                name,
+                email,
+                password: hashedPassword,
+                Core,
+                role
+            },
+            { new: true, runValidators: true } // `new: true` returns the updated document, `runValidators: true` validates the update
+        );
+
+        res.status(200).json({ message: "User updated successfully", user: updatedUser });
 
     } catch (error) {
-        console.error("Error deleting user:", error);
-        res.status(500).json({ message: "Error deleting user", error: error.message });
+        console.error("Error updating user:", error);
+        res.status(500).json({ message: "Failed to update user", error: error.message });
     }
 };
 
-export { getAllUser, createUser, viewUser, viewProfile, deleteUser };
+
+export { getAllUser, createUser, viewUser, viewProfile, deleteUser, updateUser };
