@@ -9,6 +9,6 @@ logisticuserRouter.get("/get",verifyToken, getAllUser);
 logisticuserRouter.post("/create",createUser);
 logisticuserRouter.post("/", createUser);
 logisticuserRouter.delete('/:id', deleteUser);
-logisticuserRouter.put('/:id',updateUser );
+logisticuserRouter.put('/:id', verifyToken, updateUser);
 
 export default logisticuserRouter;

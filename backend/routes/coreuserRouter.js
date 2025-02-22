@@ -7,8 +7,8 @@ const  coreuserRouter = express.Router();
 
 coreuserRouter.get("/get",verifyToken, getAllUser);
 coreuserRouter.post("/create",createUser);
-coreuserRouter.get("/view/:id", viewUser)
+coreuserRouter.get("/:id", viewUser)
 coreuserRouter.get("/profile", authMiddleware, viewProfile);
-coreuserRouter.delete('/delete/:id', deleteUser);
+coreuserRouter.delete('/:id', deleteUser);
 
 export default coreuserRouter;
