@@ -13,6 +13,8 @@ import hruserRouter from './routes/hruserRoute.js';
 import logisticuserRouter from './routes/logisticuserRoute.js';
 import uploadRoute from "./routes/uploadRoute.js";
 import authRoutes from './routes/auth.js';
+import productRouter from './routes/productRoute.js';
+import admninuserRouter from './routes/adminuserRoute.js';
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -64,7 +66,11 @@ app.use("/api/hrusers", hruserRouter);  // HR
 
 app.use("/api/logisticusers", logisticuserRouter); // Logistic
 
+app.use("/api/adminusers", admninuserRouter);
+
 // ----------------------------------------------------------------------------------------
+
+app.use('/api/product', productRouter);
 
 app.use("/api/resources", resourceRoute); // Resources
 
