@@ -17,6 +17,17 @@ const userSchema = new mongoose.Schema ({
         required: true,
         minlength: [6, "Password must at least has a 6 character long"]
     },
+    Core: {
+        type: Number,
+        enum: [1, 2],
+        required: true,
+        default: 1,
+    },
+    role: {
+        type: String,
+        enum: ["admin", "audit", "super admin"], // ADDED "audit" and "admin" and remove rest
+        default: "audit",
+    },
 });
 
 const CoreUser = mongoose.model('CoreUser', userSchema);

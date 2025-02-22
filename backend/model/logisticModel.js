@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-// Define the user schema
+
 const userSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -27,6 +27,11 @@ const userSchema = mongoose.Schema(
         "superAdmin",
       ],
       default: "pending",
+    },
+        LogisticLevel: { 
+      type: Number,
+      enum: [1, 2],     
+      required: true,    
     },
     generalSetting: {
       type: mongoose.Schema.Types.ObjectId,
