@@ -10,7 +10,11 @@ const userSchema = new mongoose.Schema({
     enum: ['Employee', 'Admin', 'Superadmin'], // Allowed roles
     default: 'Employee', // Default role
   },
-
+  Hr: {
+    type: Number,
+    enum: [1, 2, 3, 4],  //Restrict the values of HR
+    required: true,       // Optional field.  If you want it to always exist, set to `true`.
+  },
 });
 
 const Hruser = mongoose.model('Hruser', userSchema);
