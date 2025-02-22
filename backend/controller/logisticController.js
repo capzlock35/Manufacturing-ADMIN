@@ -9,14 +9,14 @@ const getAllUser = async (req, res) => {
         res.status(200).json(users);
     } catch (error) {
         console.error("Error getting users:", error);
-        res.status(500).json({ message: "Failed to retrieve users" });
+        res.status(500).json({ message: "Failed to retrieve users", error:error.message });
     }
 };
 
 // Create User
 const createUser = async (req, res) => {
     try {
-        const { name, email, password, confirmPassword, userName, phone, date, address, city, role, age, condition, verified } = req.body;
+        const { name, email, password, confirmPassword, userName, phone, date, address, city, role, age, condition, verified, LogisticLevel } = req.body;
 
         // Check if user already exists
         const existingUser = await Logistic.findOne({ email });
@@ -45,7 +45,8 @@ const createUser = async (req, res) => {
             role,
             age,
             condition,
-            verified
+            verified,
+            LogisticLevel
         });
 
         // Save the user
@@ -55,7 +56,7 @@ const createUser = async (req, res) => {
 
     } catch (error) {
         console.error("Error creating user:", error);
-        res.status(500).json({ message: "Failed to create user" });
+        res.status(500).json({ message: "Failed to create user",  error:error.message });
     }
 };
 
@@ -65,7 +66,7 @@ const deleteUser = async (req, res) => {
         const { id } = req.params;
 
         // Find the user by ID and delete
-        const deletedUser = await CoreUser.findByIdAndDelete(id);
+        const deletedUser = await Logistic.findByIdAndDelete(id);
 
         if (!deletedUser) {
             return res.status(404).json({ message: "User not found" });
@@ -83,37 +84,36 @@ const deleteUser = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, email, password, userName, phone, date, address, city, role, age, condition, verified } = req.body;
+        const { name, email, userName, phone, date, address, city, role, age, condition, verified, LogisticLevel } = req.body;
 
         // Find the user by ID
-        const user = await CoreUser.findById(id);
+        const user = await Logistic.findById(id);
 
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found" ,error:error.message});
         }
 
         // Update the user's fields
-        user.name = name || user.name
-        user.email = email || user.email
-        user.password = password || user.password // not secure
-        user.userName = userName || user.userName
-        user.phone = phone || user.phone
-        user.date = date || user.date
-        user.address = address || user.address
-        user.city = city || user.city
-        user.role = role || user.role
-        user.age = age || user.age
-        user.condition = condition || user.condition
-        user.verified = verified || user.verified
-
+        user.name = name || user.name;
+        user.email = email || user.email;
+        user.userName = userName || user.userName;
+        user.phone = phone || user.phone;
+        user.date = date || user.date;
+        user.address = address || user.address;
+        user.city = city || user.city;
+        user.role = role || user.role;
+        user.age = age || user.age;
+        user.condition = condition || user.condition;
+        user.verified = verified || user.verified;
+        user.LogisticLevel = LogisticLevel || user.LogisticLevel;
 
         // Save the updated user
         const updatedUser = await user.save();
 
-        res.status(200).json({ message: "OK user found and updated" });
+        res.status(200).json({ message: "User updated successfully", user: updatedUser,error:error.message  });
     } catch (error) {
-        console.error("OK failed to update user", error);
-        res.status(500).json({ message: "Error, could not update user" });
+        console.error("Error updating user:", error);
+        res.status(500).json({ message: "Failed to update user", error: error.message });
     }
 }
 
