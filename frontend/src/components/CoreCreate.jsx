@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { SlActionUndo } from "react-icons/sl";
 
+
 const CoreCreate = () => {
   const baseURL = process.env.NODE_ENV === 'production'
     ? 'https://backend-admin.jjm-manufacturing.com/api/coreusers'
@@ -19,6 +20,8 @@ const CoreCreate = () => {
     email: '',
     password: '',
     confirmPassword: '',
+    Core: 1, // Default to Core 1
+    role: 'audit', // Default to 'audit' role
   });
 
   const [message, setMessage] = useState('');
@@ -46,6 +49,8 @@ const CoreCreate = () => {
         email: '',
         password: '',
         confirmPassword: '',
+        Core: 1,
+        role: 'audit',
       });
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create user');
@@ -126,6 +131,41 @@ const CoreCreate = () => {
               value={formData.confirmPassword}
               onChange={handleChange}
             />
+          </div>
+
+          {/* Core Select */}
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="Core">
+              Core
+            </label>
+            <select
+              className="shadow appearance-none border rounded w-full py-2 px-3 border-black bg-white text-black leading-tight focus:outline-none focus:shadow-outline"
+              id="Core"
+              name="Core"
+              value={formData.Core}
+              onChange={handleChange}
+            >
+              <option value={1}>Core 1</option>
+              <option value={2}>Core 2</option>
+            </select>
+          </div>
+
+          {/* Role Select */}
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
+              Role
+            </label>
+            <select
+              className="shadow appearance-none border rounded w-full py-2 px-3 border-black bg-white text-black leading-tight focus:outline-none focus:shadow-outline"
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+            >
+              <option value="audit">Audit</option>
+              <option value="admin">Admin</option>
+              <option value="super admin">Super Admin</option>
+            </select>
           </div>
 
           <div className="flex items-center justify-between">

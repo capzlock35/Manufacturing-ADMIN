@@ -27,7 +27,8 @@ const LogisticCreate = () => {
     age: '',
     condition: '',
     verified: '',
-    role: 'pending', // Set default role
+    role: 'pending',
+        LogisticLevel: 1, //Set the LogisticLevel at 1 here
   });
 
   const [message, setMessage] = useState('');
@@ -64,6 +65,7 @@ const LogisticCreate = () => {
         condition: '',
         verified: '',
         role: 'pending',
+                LogisticLevel: 1, //And also here
       });
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create user');
@@ -261,6 +263,23 @@ const LogisticCreate = () => {
               value={formData.verified}
               onChange={handleChange}
             />
+          </div>
+
+          {/* LogisticLevel Select Field */}
+          <div className="mb-6">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="LogisticLevel">
+              Logistic Level
+            </label>
+            <select
+              className="shadow appearance-none border rounded w-full py-2 px-3 border-black bg-white text-black leading-tight focus:outline-none focus:shadow-outline"
+              id="LogisticLevel"
+              name="LogisticLevel"
+              value={formData.LogisticLevel}
+              onChange={handleChange}
+            >
+              <option value={1}>1</option>
+              <option value={2}>2</option>
+            </select>
           </div>
 
           <div className="mb-6">

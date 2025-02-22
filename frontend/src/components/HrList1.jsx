@@ -1,4 +1,3 @@
-// src/components/HrList1.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -6,51 +5,60 @@ import { toast } from "react-hot-toast";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import * as XLSX from 'xlsx';
 import { CiExport } from "react-icons/ci";
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 const HrList1 = () => {
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalType, setModalType] = useState('');
-    const [editFormData, setEditFormData] = useState({}); // State for edit form data
+    const [editFormData, setEditFormData] = useState({});
+    const [currentPage, setCurrentPage] = useState(1);
+    const [usersPerPage] = useState(10); // Changed to 10 users per page
+         const [isLoading, setIsLoading] = useState(true);
 
     const baseURL = process.env.NODE_ENV === 'production'
     ? 'https://backend-admin.jjm-manufacturing.com/api/hrusers'
     : 'http://localhost:7690/api/hrusers';
-  
-  const authURL = process.env.NODE_ENV === 'production'
+
+    const authURL = process.env.NODE_ENV === 'production'
     ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-token'
     : 'http://localhost:7690/api/auth/get-token';
-  
-  const fetchUsers = async () => {
-    try {
-      // Get token using dynamic authURL
-      const tokenResponse = await axios.get(authURL);
-      const token = tokenResponse.data.token;
-  
-      if (!token) {
-        console.error("🚨 No token received from backend!");
-        return;
-      }
-  
-      // Fetch HR users with authentication
-      const response = await axios.get(`${baseURL}/get`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Ensure "Bearer" is included
-        },
-      });
-  
-      console.log("✅ HR Users Response:", response.data);
-      setUsers(response.data);
-    } catch (err) {
-      console.error("❌ Error fetching HR users:", err.response ? err.response.data : err.message);
-    }
-  };
-  
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-  
+
+    const fetchUsers = async () => {
+        setIsLoading(true);
+        try {
+            // Get token using dynamic authURL
+            const tokenResponse = await axios.get(authURL);
+            const token = tokenResponse.data.token;
+
+            if (!token) {
+                console.error("🚨 No token received from backend!");
+                return;
+            }
+
+            // Fetch HR users with authentication
+            const response = await axios.get(`${baseURL}/get`, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Ensure "Bearer" is included
+                },
+            });
+
+            console.log("✅ HR Users Response:", response.data);
+            setUsers(response.data);
+        } catch (err) {
+            console.error("❌ Error fetching HR users:", err.response ? err.response.data : err.message);
+        }
+        finally {
+            setIsLoading(false);
+         }
+    };
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
 
     const handleView = (user) => {
         setSelectedUser(user);
@@ -65,7 +73,8 @@ const HrList1 = () => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            role: user.role
+            role: user.role,
+            Hr: user.Hr // Initialize Hr value
         });
         setIsModalOpen(true);
     };
@@ -77,20 +86,28 @@ const HrList1 = () => {
     };
 
     const handleDeleteUser = async (userId) => {
-      try {
-          console.log('Delete user with ID:', userId);  // Add this line
-          console.log('Base URL:', baseURL); // Add this line
-          const response = await axios.delete(`${baseURL}/${userId}`);
-          console.log('Response status:', response.status);
-          if (response.status === 200) {
-              toast.success('User deleted successfully!');
-              setUsers(users.filter(user => user._id !== userId));
-          }
-      } catch (error) {
-          console.error('Failed to delete user:', error);
-          toast.error('An error occurred while trying to delete the user.');
-      }
-  };
+        try {
+            const tokenResponse = await axios.get(authURL);
+            const token = tokenResponse.data.token;
+
+            const response = await axios.delete(`${baseURL}/${userId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.status === 200) {
+                toast.success('User deleted successfully!');
+                setUsers(users.filter(user => user._id !== userId));
+            } else {
+                console.error('Failed to delete user:', response);
+                toast.error('Failed to delete user.');
+            }
+        } catch (error) {
+            console.error('Failed to delete user:', error);
+            toast.error('An error occurred while trying to delete the user.');
+        }
+    };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
@@ -106,14 +123,27 @@ const HrList1 = () => {
         });
     };
 
-    const handleUpdateUser = async () => {
-        try {
-            const response = await axios.put(`${baseURL}/update/${selectedUser._id}`, editFormData);
+    const handleUpdateUser = async (e) => { // <---- INSIDE HrList1
+         try {
+            const tokenResponse = await axios.get(authURL);
+            const token = tokenResponse.data.token;
+
+            const response = await axios.put(`${baseURL}/${selectedUser._id}`, editFormData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
             if (response.status === 200) {
                 toast.success('User updated successfully!');
-                // Update the user in the local state
+                console.log("Response Data:", response.data);
+
                 setUsers(users.map(user => user._id === selectedUser._id ? response.data.user : user));
                 handleCloseModal();
+            } else {
+                console.error('Failed to update user:', response);
+                toast.error('Failed to update user.');
             }
         } catch (error) {
             console.error('Failed to update user:', error);
@@ -122,14 +152,26 @@ const HrList1 = () => {
     };
 
     const handleExportToExcel = () => {
-          const ws = XLSX.utils.json_to_sheet(users);
-          const wb = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-          XLSX.writeFile(wb, "Hr_users.xlsx");
-      };
+        const ws = XLSX.utils.json_to_sheet(users);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.writeFile(wb, "Hr_users.xlsx");
+    };
+
+    // Get current users for pagination
+    const indexOfLastUser = currentPage * usersPerPage;
+    const indexOfFirstUser = indexOfLastUser - usersPerPage;
+    const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+
+    // Change page
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    const prevPage = () => setCurrentPage(currentPage - 1);
+    const nextPage = () => setCurrentPage(currentPage + 1);
+    const totalPages = Math.ceil(users.length / usersPerPage);
+
 
     // Integrated Modal Component
-    const Modal = ({ user, type, onClose, onDelete }) => {
+    const Modal = ({ user, type, onClose, onDelete, onUpdate }) => {
         if (!isModalOpen) return null;
 
         return (
@@ -143,6 +185,7 @@ const HrList1 = () => {
                             <p>First Name: {user.firstName}</p>
                             <p>Last Name: {user.lastName}</p>
                             <p>Role: {user.role}</p>
+                            <p>HR Level: {user.Hr}</p> {/* Display Hr Value */}
                         </div>
                     )}
 
@@ -193,7 +236,24 @@ const HrList1 = () => {
                                     onChange={handleEditFormChange}
                                 />
                             </div>
-                            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={handleUpdateUser}>
+                            {/*HR Level Edit Form */}
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="editHr">HR Level</label>
+                                <select
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-black border-black bg-white leading-tight focus:outline-none focus:shadow-outline"
+                                    id="editHr"
+                                    name="Hr"
+                                    value={editFormData.Hr || ''}
+                                    onChange={handleEditFormChange}
+                                >
+                                    <option value={1}>1</option>
+                                    <option value={2}>2</option>
+                                    <option value={3}>3</option>
+                                    <option value={4}>4</option>
+                                </select>
+                            </div>
+
+                            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={onUpdate}> {/* UPDATED onClick */}
                                 Update User
                             </button>
                         </div>
@@ -201,20 +261,20 @@ const HrList1 = () => {
 
                     {type === 'delete' && (
                         <div>
-                        <p>Are you sure you want to delete user {user.firstName}?</p>
-                        <div className="flex justify-end mt-4">
-                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={() => {
-                                handleDeleteUser(user._id);
-                                handleCloseModal();
-                            }}>
-                                Yes, Delete
-                            </button>
-                            <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" onClick={onClose}>
-                                Cancel
-                            </button>
+                            <p>Are you sure you want to delete user {user.firstName}?</p>
+                            <div className="flex justify-end mt-4">
+                                <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={() => {
+                                    onDelete(user._id);
+                                    onClose();
+                                }}>
+                                    Yes, Delete
+                                </button>
+                                <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" onClick={onClose}>
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
                     <div className="flex justify-end mt-4">
                         {type !== 'delete' && (
@@ -239,9 +299,9 @@ const HrList1 = () => {
                 </Link>
 
                 <h1 className="text-2xl font-bold mb-4 text-black">HR Department</h1>
-                           <button onClick={handleExportToExcel} className="bg-yellow-500 text-white px-4 py-2 rounded mb-4">
-            <CiExport />
-        </button>
+                <button onClick={handleExportToExcel} className="bg-yellow-500 text-white px-4 py-2 rounded mb-4">
+                    <CiExport />
+                </button>
 
                 <table className="min-w-full bg-white">
                     <thead>
@@ -250,25 +310,68 @@ const HrList1 = () => {
                             <th className="py-3 px-6 text-left border">Last Name</th>
                             <th className="py-3 px-6 text-left border">Email</th>
                             <th className="py-3 px-6 text-left border">Role</th>
+                            <th className="py-3 px-6 text-left border">HR Level</th> {/* HR Level Header */}
                             <th className="py-3 px-6 text-center border">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="text-gray-600 text-sm font-light border">
-                        {users.map((user) => (
-                            <tr key={user._id}>
-                                <td className="py-3 px-6 text-left border-b border-gray-200">{user.firstName}</td>
-                                <td className="py-3 px-6 text-left border-b border-gray-200">{user.lastName}</td>
-                                <td className="py-3 px-6 text-left border-b border-gray-200">{user.email}</td>
-                                <td className="py-3 px-6 text-left border-b border-gray-200">{user.role}</td>
-                                <td className="py-3 px-6 text-center flex">
-                                    <button onClick={() => handleView(user)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2">View</button>
-                                    <button onClick={() => handleUpdate(user)} className="bg-green-500 text-white px-3 py-1 rounded mr-2">Update</button>
-                                    <button onClick={() => handleDelete(user)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
-                                </td>
-                            </tr>
-                        ))}
+                         {isLoading ? (
+                             // Skeleton loading state
+                             Array(usersPerPage).fill(0).map((_, index) => (
+                                 <tr key={index}>
+                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton /></td> {/* Skeleton for First Name */}
+                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton /></td> {/* Skeleton for Last Name */}
+                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton /></td> {/* Skeleton for Email */}
+                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton width={60} /></td> {/* Skeleton for Role */}
+                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton width={50} /></td> {/* Skeleton for HR Level */}
+                                     <td className="py-3 px-6 text-center border-b border-gray-200"><Skeleton width={80} /></td> {/* Skeleton for Actions */}
+                                 </tr>
+                             ))
+                         ) : (
+                            currentUsers.map((user) => ( // Use currentUsers here
+                                <tr key={user._id}>
+                                    <td className="py-3 px-6 text-left border-b border-gray-200">{user.firstName}</td>
+                                    <td className="py-3 px-6 text-left border-b border-gray-200">{user.lastName}</td>
+                                    <td className="py-3 px-6 text-left border-b border-gray-200">{user.email}</td>
+                                    <td className="py-3 px-6 text-left border-b border-gray-200">{user.role}</td>
+                                    <td className="py-3 px-6 text-left border-b border-gray-200">{user.Hr}</td>{/*Display HR Level*/}
+                                    <td className="py-3 px-6 text-center flex">
+                                        <button onClick={() => handleView(user)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2">View</button>
+                                        <button onClick={() => handleUpdate(user)} className="bg-green-500 text-white px-3 py-1 rounded mr-2">Update</button>
+                                        <button onClick={() => handleDelete(user)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
+
+                {/* Pagination */}
+                <div className="flex justify-center mt-4">
+                    <button
+                        onClick={prevPage}
+                        disabled={currentPage === 1}
+                        className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l disabled:opacity-50"
+                    >
+                        Previous
+                    </button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
+                        <button
+                            key={pageNumber}
+                            onClick={() => paginate(pageNumber)}
+                            className={`bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 ${currentPage === pageNumber ? 'bg-blue-500 text-white hover:bg-blue-700' : ''}`}
+                        >
+                            {pageNumber}
+                        </button>
+                    ))}
+                    <button
+                        onClick={nextPage}
+                        disabled={currentPage === totalPages}
+                        className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r disabled:opacity-50"
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
 
             {/* Integrated Modal */}
@@ -277,6 +380,7 @@ const HrList1 = () => {
                 type={modalType}
                 onClose={handleCloseModal}
                 onDelete={handleDeleteUser}
+                onUpdate={handleUpdateUser}  // Pass handleUpdateUser
             />
         </div>
     );
