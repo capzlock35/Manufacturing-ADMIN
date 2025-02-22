@@ -27,7 +27,7 @@ const productBaseURL = process.env.NODE_ENV === 'production'
     ? 'https://backend-admin.jjm-manufacturing.com/api/product'
     : 'http://localhost:7690/api/product'; // Added Product Base URL
 
-const Sidebar = () => {
+const SuperSide = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [hasAnnouncement, setHasAnnouncement] = useState(true);
     const [hasDocumentStorage, setHasDocumentStorage] = useState(true);
@@ -233,6 +233,7 @@ const Sidebar = () => {
                             <details>
                                 <summary><IoDocumentTextOutline className='w-5 h-5' />Legal Management</summary>
                                 <ul>
+                                    <Link to="Upload"><li className='hover:text-blue-500'><p><TiDocumentText />Upload </p></li></Link>
                                     <Link to="ContractManagement"><li className='hover:text-blue-500'><p><TiDocumentText />Contract Management</p></li></Link>
                                     <Link to="LegalDocument"><li className='hover:text-blue-500'><p><TiDocumentText />Legal Document</p></li></Link>
                                     <Link to="RiskManagement"><li className='hover:text-blue-500'><p><TiDocumentText />Risk Management</p></li></Link>
@@ -282,4 +283,4 @@ const Sidebar = () => {
     );
 };
 
-export default Sidebar;
+export default SuperSide;

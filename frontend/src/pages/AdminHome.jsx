@@ -7,7 +7,6 @@ import { Route, Routes } from 'react-router-dom';
 import DocumentStorage from '../components/DocumentStorage';
 import AdminList from '../components/AdminList';
 import VersionControl from '../components/VersionControl';
-import DocumentTracking from '../components/DocumentTracking';
 import HrList from '../components/HrList';
 import CoreList from '../components/CoreList';
 import LogisticList from '../components/LogisticList';
@@ -31,7 +30,6 @@ import ResourcesAllocation from '../components/ResourcesAllocation';
 import ProfileUser from '../components/ProfileUser';
 import Register from './Register';
 import Footer from '../components/Footer'; // Import the Footer component
-import Settings from '../components/Settings';
 import AccountList from '../components/AccountList';
 import RequestResources from '../components/RequestResources';
 import HrCreate from '../components/HrCreate';
@@ -39,7 +37,9 @@ import CoreCreate from '../components/CoreCreate';
 import LogisticCreate from '../components/LogisticCreate';
 import FinanceCreate from '../components/FinanceCreate';
 import AdminCreate from '../components/AdminCreate';
-import Upload from '../components/Upload';
+import NewEmployee from '../components/NewEmployee';
+import Product from '../components/Product';
+import SuperSide from '../components/SuperSide';
 
 const AdminHome = () => {
   const [role, setRole] = useState('');
@@ -54,7 +54,7 @@ const AdminHome = () => {
   return (
     <div className="flex h-screen overflow-auto">
       {/* Conditionally render Sidebar or StaffSide based on role */}
-      {role === 'admin' ? <Sidebar /> : role === 'staff' ? <StaffSide /> : null}
+      {role === 'admin' ? <Sidebar /> : role === 'staff' ? <StaffSide /> : role === 'superadmin' ? <SuperSide/> : null}
 
       <div className="flex-col w-full">
         <Search />
@@ -72,7 +72,6 @@ const AdminHome = () => {
           <Route path="FinanceList" element={<FinanceList />} />
           <Route path="DocumentStorage" element={<DocumentStorage />} />
           <Route path="VersionControl" element={<VersionControl />} />
-          <Route path="DocumentTracking" element={<DocumentTracking />} />
           <Route path="ContractManagement" element={<ContractManagement />} />
           <Route path="LegalDocument" element={<LegalDocument />} />
           <Route path="RiskManagement" element={<RiskManagement />} />
@@ -82,7 +81,6 @@ const AdminHome = () => {
           <Route path="CommunicationPlan" element={<CommunicationPlan />} />
           <Route path="ResourcesAllocation" element={<ResourcesAllocation />} />
           <Route path="profile" element={<ProfileUser />} />
-          <Route path="settings" element={<Settings />} />
           <Route path="register" element={<Register />} />
           <Route path="accountlist" element={<AccountList />} />
           <Route path="requestresources" element={<RequestResources />} />
@@ -91,7 +89,8 @@ const AdminHome = () => {
           <Route path="LogisticCreate" element={<LogisticCreate />} />
           <Route path="FinanceCreate" element={<FinanceCreate />} />
           <Route path="AdminCreate" element={<AdminCreate />} />
-          <Route path="Upload" element={<Upload />} />
+          <Route path="Product" element={<Product />} />
+          <Route path="NewEmployee" element={<NewEmployee />} />
         </Routes>
         <div className="">
           <Footer />
