@@ -15,6 +15,9 @@ import uploadRoute from "./routes/uploadRoute.js";
 import authRoutes from './routes/auth.js';
 import productRouter from './routes/productRoute.js';
 import admninuserRouter from './routes/adminuserRoute.js';
+import announcementRouter from './routes/announcementRoutes.js';
+import qcDataRoute from './routes/qcDataRoute.js';
+
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -26,6 +29,7 @@ const allowedOrigins = [
     'http://localhost:5173',         // Allow localhost for development
     'https://admin.jjm-manufacturing.com' // Allow production domain
 ];
+
 
 // Setup CORS dynamically
 app.use(cors({
@@ -68,7 +72,10 @@ app.use("/api/logisticusers", logisticuserRouter); // Logistic
 
 app.use("/api/adminusers", admninuserRouter);
 
+
 // ----------------------------------------------------------------------------------------
+
+app.use("/api/announcements", announcementRouter );
 
 app.use('/api/product', productRouter);
 
@@ -79,6 +86,10 @@ app.use("/api/requestresources", requestresourceRoute); // RequestR.
 app.use("/api/documents", documentRouter); // DocumentStorage
 
 app.use("/api/upload", uploadRoute);
+
+app.use("/api/qc", qcDataRoute);
+
+
 
 app.listen(port, () => {
     console.log(`Server Started on http://localhost:${port}`);
