@@ -157,6 +157,22 @@ export const viewProfile = async (req, res) => {
     }
 };
 
+
+export const getUsernameForAnnouncement = async (req, res) => {
+    try {
+      const userId = req.params.id; // Get the user ID from the URL params
+      const user = await Admin.findById(userId).select('userName'); // Select ONLY userName
+  
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      res.status(200).json({ username: user.userName }); // Send the username in the response
+    } catch (error) {
+      console.error("Error getting username for announcement:", error);
+      res.status(500).json({ error: 'Failed to retrieve username' });
+    }
+  };
+
 export const Login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -179,7 +195,7 @@ export const Login = async (req, res) => {
 
         // Sign JWT token, include user ID and role in the payload
         const token = jwt.sign(
-            { userid: user._id, role: user.role },  // Include role in the token payload
+            { userid: user._id, role: user.role },
             SECRET_KEY,
             { expiresIn: '1hr' }
         );
@@ -189,6 +205,7 @@ export const Login = async (req, res) => {
             token,
             role: user.role,
             userid: user._id, // Add the user ID to the response
+            userName: user.userName //**ADD THIS LINE HERE userName: user.userName,**
         });
     } catch (error) {
         console.error("Error logging in:", error);
