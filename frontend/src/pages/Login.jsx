@@ -52,16 +52,18 @@ const Login = () => {
             const response = await axios.post(`${baseURL}/login`, { email, password });
             console.log("Login response:", response.data);
 
-            const { token, role, userid } = response.data; // Destructure token and role
-            toast.success('Login successful'); // Show toast for successful login
+            // **Assuming your backend login response (response.data) now includes 'username'**
+            const { token, role, userid, userName } = response.data; // **Destructure username from response.data**
+            toast.success('Login successful');
 
             setEmail('');  // Reset email field
             setPassword('');  // Reset password field
 
-            // Save token and role to localStorage
+            // Save token, role, userid, and **username** to localStorage
             localStorage.setItem('token', token);
             localStorage.setItem('role', role);
-            localStorage.setItem('userid', userid); // Save the userid in Local Storage
+            localStorage.setItem('userid', userid);
+            localStorage.setItem('userName', userName); // **Store username in local storage with key 'adminUsername'**
 
             // Check for valid role (either 'admin' or 'staff' or 'superadmin') //ADDED superadmin role
             if (role === 'staff' || role === 'admin' || role === 'superadmin') {
@@ -70,7 +72,8 @@ const Login = () => {
                 // Unauthorized role
                 localStorage.removeItem('token');
                 localStorage.removeItem('role');
-                localStorage.removeItem('userid');  // remove userid too
+                localStorage.removeItem('userid');
+                localStorage.removeItem('userName'); // **Remove username from local storage too**
                 toast.error('Unauthorized role');  // Show toast for unauthorized role
             }
         } catch (error) {
@@ -78,7 +81,6 @@ const Login = () => {
             toast.error('Login failed');  // Show toast for failed login
         }
     };
-
 
     return (
         <div className="bg-white h-screen w-full">

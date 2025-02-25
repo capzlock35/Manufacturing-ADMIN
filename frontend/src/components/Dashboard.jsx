@@ -25,6 +25,10 @@ import {
     Rectangle,
     AreaChart,
     Area,
+    PieChart,
+    Pie,      // <--- Ensure Pie is here and spelled correctly
+    Cell,
+    ResponsiveContainer, // <--- Ensure ResponsiveContainer is here and spelled correctly
 } from "recharts";
 
 const data = [
@@ -63,18 +67,35 @@ const Dashboard = () => {
         const logisticURL = process.env.NODE_ENV === 'production'
         ? 'https://backend-admin.jjm-manufacturing.com/api/logisticusers'
         : 'http://localhost:7690/api/logisticusers';
-        
+
 
     const authURL = process.env.NODE_ENV === 'production'
         ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-token'
         : 'http://localhost:7690/api/auth/get-token';
-        
+
+    const announcementsBaseURL = process.env.NODE_ENV === 'production'
+        ? 'https://backend-admin.jjm-manufacturing.com/api/announcements'
+        : 'http://localhost:7690/api/announcements';
+
+        const qcMetricsURL = process.env.NODE_ENV === 'production'
+        ? 'https://backend-admin.jjm-manufacturing.com/api/qc/metrics'
+        : 'http://localhost:7690/api/qc/metrics';
+
     const [products, setProducts] = useState([]);
     const [coreUsers, setCoreUsers] = useState([]);
     const [financeUsers, setFinanceUsers] = useState([]);
     const [adminUsers, setAdminUsers] = useState([]);
     const [hrUsers, setHrUsers] = useState([]);
     const [logisticUsers, setLogisticUsers] = useState([]);
+    const [adminAnnouncements, setAdminAnnouncements] = useState([]);
+    const [qcMetrics, setQcMetrics] = useState({ goodBatches: 0, acceptableBatches: 0, badBatches: 0 });
+    const COLORS = ['#00FF00', '#FFEA00', '#ff0000']; // Green, Yellow, Red for Good, Acceptable, Bad
+
+    // REMOVE THESE LINES - No more localStorage for deployed announcements in Dashboard
+    // const [displayedAnnouncements, setDisplayedAnnouncements] = useState(() => {
+    //     const storedAnnouncements = localStorage.getItem('deployedAnnouncements');
+    //     return storedAnnouncements ? JSON.parse(storedAnnouncements) : [];
+    // });
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -106,25 +127,25 @@ const Dashboard = () => {
             }
         };
 
-        
+
         const fetchFinanceUsers = async () => {
             try {
                 // Get token using dynamic authURL
                 const tokenResponse = await axios.get(authURL);
                 const token = tokenResponse.data.token;
-            
+
                 if (!token) {
                   console.error("🚨 No token received from backend!");
                   return;
                 }
-            
+
                 // Fetch users with authentication
                 const response = await axios.get(`${financeURL}/get`, {
                   headers: {
                     Authorization: `Bearer ${token}`, // Ensure "Bearer" is included
                   },
                 });
-            
+
                 console.log("✅ Backend Response:", response.data);
                 setFinanceUsers(response.data);
               } catch (err) {
@@ -134,28 +155,28 @@ const Dashboard = () => {
 
             const fetchAdminUsers = async () => {
                 try {
-                
+
                     // Fetch authentication token
                     const tokenResponse = await axios.get(authURL);
                     const token = tokenResponse.data.token;
-                
+
                     if (!token) {
                       console.error("🚨 No token received from backend!");
                       return;
                     }
-                
+
                     // Fetch users with authentication & pagination
                     const response = await axios.get(`${adminURL}/get`, {
                       headers: {
                         Authorization: `Bearer ${token}`,
                       },
                     });
-                
+
                     setAdminUsers(response.data);
                     console.log("✅ Users Fetched:", response.data);
                   } catch (err) {
                     console.error("❌ Error fetching users:", err.response ? err.response.data : err.message);
-                  } 
+                  }
                 };
 
                 const fetchHrUsers = async () => {
@@ -163,19 +184,19 @@ const Dashboard = () => {
                         // Get token using dynamic authURL
                         const tokenResponse = await axios.get(authURL);
                         const token = tokenResponse.data.token;
-                    
+
                         if (!token) {
                           console.error("🚨 No token received from backend!");
                           return;
                         }
-                    
+
                         // Fetch users with authentication
                         const response = await axios.get(`${hrURL}/get`, {
                           headers: {
                             Authorization: `Bearer ${token}`, // Ensure "Bearer" is included
                           },
                         });
-                    
+
                         console.log("✅ Backend Response:", response.data);
                         setHrUsers(response.data);
                       } catch (err) {
@@ -188,24 +209,42 @@ const Dashboard = () => {
                             // Get token using dynamic authURL
                             const tokenResponse = await axios.get(authURL);
                             const token = tokenResponse.data.token;
-                        
+
                             if (!token) {
                               console.error("🚨 No token received from backend!");
                               return;
                             }
-                        
+
                             // Fetch users with authentication
                             const response = await axios.get(`${logisticURL}/get`, {
                               headers: {
                                 Authorization: `Bearer ${token}`, // Ensure "Bearer" is included
                               },
                             });
-                        
+
                             console.log("✅ Backend Response:", response.data);
                             setLogisticUsers(response.data);
                           } catch (err) {
                             console.error("❌ Error fetching users:", err.response ? err.response.data : err.message);
                           }
+                        };
+
+                        const fetchAdminAnnouncements = async () => {  // Function to fetch admin announcements from database
+                            try {
+                                const response = await axios.get(announcementsBaseURL); // Use the announcementsBaseURL variable
+                                setAdminAnnouncements(response.data);
+                            } catch (error) {
+                                console.error('Error fetching announcements:', error);
+                            }
+                        };
+
+                        const fetchQCMetrics = async () => { // Function to fetch QC Metrics
+                            try {
+                                const response = await axios.get(qcMetricsURL);
+                                setQcMetrics(response.data.metrics);
+                            } catch (error) {
+                                console.error('Error fetching QC Metrics:', error);
+                            }
                         };
 
         fetchProducts();
@@ -214,16 +253,31 @@ const Dashboard = () => {
         fetchAdminUsers();
         fetchHrUsers();
         fetchLogisticUsers();
+        fetchAdminAnnouncements();
+        fetchQCMetrics();
     }, []);
+
+    // MODIFIED - Filter deployed announcements directly from adminAnnouncements
+    const deployedAnnouncementsData = adminAnnouncements.filter(announcement => announcement.deployed === true);
 
     const All =  coreUsers.length + financeUsers.length + hrUsers.length + logisticUsers.length + adminUsers.length;
 
     const how = adminUsers.length;
     console.log (how);
 
+    const pieChartData = [ // Prepare Pie Chart Data
+        { name: 'Good', value: qcMetrics.goodBatches },
+        { name: 'Acceptable', value: qcMetrics.acceptableBatches },
+        { name: 'Bad', value: qcMetrics.badBatches },
+    ];
+
+    const barChartData = [ // Bar Chart Data for Quality Status Breakdown
+        { name: 'Status', Good: qcMetrics.goodBatches, Acceptable: qcMetrics.acceptableBatches, Bad: qcMetrics.badBatches },
+    ];
+
     return (
 
-        <div className="bg-gray-200 text-black h-auto p-5 bg-cover bg-center" style={{ backgroundImage: `url(${BGAdmin})` }}>
+        <div className="bg-gray-200 text-black min-h-screen p-5 bg-cover bg-center" style={{ backgroundImage: `url(${BGAdmin})` }}>
             {/* Overview Section */}
           <div className="p-4 bg-gray-100">
             <p className="font-semibold">Overview</p>
@@ -307,7 +361,7 @@ const Dashboard = () => {
                         <FaUsers  className="text-gray-600 text-xl" />
                     </div>
                     <div className="flex gap-3 my-3">
-                            <p className="text-3xl font-bold">{All}</p> {/* Display Core Users Count */}
+                            <p className="text-3xl font-bold">{All}</p>
                         </div>
                         <div className="my-3">
                              <span className="text-black">IN ALL DEPARTMENTS</span>
@@ -320,21 +374,22 @@ const Dashboard = () => {
 
             
 
-            {/* Announcements */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-gray-800">Announcements</h2>
-                    <Bell className="h-5 w-5 text-gray-500" />
+                {/* Announcements */}
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-bold text-gray-800">Announcements</h2>
+                        <Bell className="h-5 w-5 text-gray-500" />
+                    </div>
+                    <div className="space-y-4">
+                        {/* Display deployed announcements */}
+                        {deployedAnnouncementsData.map((announcement) => ( // NOW using deployedAnnouncementsData correctly
+                            <div key={announcement._id} className="border-l-4 border-blue-500 pl-4 py-2">
+                                <h3 className="font-semibold text-gray-800">{announcement.title}</h3>
+                                <p className="text-gray-600 text-sm mt-1">{announcement.description}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-                <div className="space-y-4">
-                    {announcements.map((announcement) => (
-                        <div key={announcement.id} className="border-l-4 border-blue-500 pl-4 py-2">
-                            <h3 className="font-semibold text-gray-800">{announcement.title}</h3>
-                            <p className="text-gray-600 text-sm mt-1">{announcement.message}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
 
                         {/* Products Table */}
                         <div className="mt-5 rounded-lg bg-white p-4">
@@ -396,60 +451,51 @@ const Dashboard = () => {
             </div>
 
             {/* Charts */}
-            <div className="flex gap-4 p-4 overflow-x-auto justify-between">
-                <div className="border bg-white/70 p-2 rounded-lg flex-shrink-0 md:flex-1 bg-opacity-50">
-                    <LineChart
-                        width={500}
-                        height={300}
-                        data={data}
-                        margin={{ top: 5, right: 50, left: 0, bottom: 5 }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
-                        <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
-                    </LineChart>
+            {/* Charts */}
+            <div className="flex gap-4 p-4 overflow-x-auto justify-between mt-4 flex-wrap"> {/* New row for Pie and Area charts */}
+                    {/* Pie Chart */}
+                    <div className="border bg-white/70 p-2 rounded-lg flex-shrink-0 md:flex-1 bg-opacity-100 w-full md:w-auto">
+                        <ResponsiveContainer width="100%" height={300}>
+                            <PieChart> 
+                                <Pie
+                                    data={pieChartData}
+                                    cx="50%"
+                                    cy="50%"
+                                    labelLine={false}
+                                    outerRadius={80}
+                                    fill="#8884d8"
+                                    dataKey="value"
+                                    label
+                                >
+                                    {pieChartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                            </PieChart>
+                        </ResponsiveContainer>
+                        <div className="text-center mt-2">Quality Status Distribution</div>
+                    </div>
+
+                    {/* Stacked Area Chart */}
+                    <div className="border bg-white/70 p-2 rounded-lg flex-shrink-0 md:flex-1 bg-opacity-100 w-full md:w-auto max-md:hidden"> {/* Adjusted width */}
+                        <BarChart
+                            width={430}
+                            height={300}
+                            data={barChartData}  // Changed data to barChartData
+                            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                        >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="Good" stackId="1" fill={COLORS[0]} />   {/* Changed Area to Bar */}
+                            <Bar dataKey="Acceptable" stackId="1" fill={COLORS[1]} /> {/* Changed Area to Bar */}
+                            <Bar dataKey="Bad" stackId="1" fill={COLORS[2]} />      {/* Changed Area to Bar */}
+                        </BarChart>
+                        <div className="text-center mt-2">Quality Status Breakdown (Bar Chart)</div> {/* Updated title */}
+                    </div>
                 </div>
-
-                <div className="border bg-white/70 p-2 rounded-lg flex-shrink-0  md:flex-1 bg-opacity-100">
-                    <BarChart
-                        width={430}
-                        height={300}
-                        data={data}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="pv" fill="#8884d8" activeBar={<Rectangle fill="pink" stroke="blue" />} />
-                        <Bar dataKey="uv" fill="#82ca9d" activeBar={<Rectangle fill="gold" stroke="purple" />} />
-                    </BarChart>
-                </div>
-            </div>
-
-            
-            <div className="mt-5 bg-white rounded-xl max-md:hidden">
-                <AreaChart
-                    width={430}
-                    height={300}
-                    data={data}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Area type="monotone" dataKey="uv" stackId="1" stroke="#8884d8" fill="#8884d8" />
-                    <Area type="monotone" dataKey="pv" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
-                    <Area type="monotone" dataKey="amt" stackId="1" stroke="#ffc658" fill="#ffc658" />
-                </AreaChart>
-            </div>
-
 
 
           </div> 

@@ -1,154 +1,79 @@
+// VersionControl.jsx
 import React, { useState, useEffect } from 'react';
-import ModalAnnouncement from '../Modals/ModalAnnouncement';
-
-
-const dummyAnnouncements = [
-  { id: 1, title: 'New Feature Release', content: 'We are excited to announce the release of our latest feature...', date: new Date().toISOString() },
-  { id: 2, title: 'System Maintenance', content: 'There will be a scheduled maintenance on Saturday...', date: new Date().toISOString() },
-  { id: 3, title: 'Important Update', content: 'Please update your application to the latest version...', date: new Date().toISOString() },
-];
+import { Link } from 'react-router-dom'; // If you have react-router-dom installed
 
 const VersionControl = () => {
-  const [announcements, setAnnouncements] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
-  const [modalType, setModalType] = useState(null);
-  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [hr4Announcements, setHr4Announcements] = useState([]);
 
-  useEffect(() => {
-    const storedAnnouncements = localStorage.getItem('announcements');
-    if (storedAnnouncements) {
-      setAnnouncements(JSON.parse(storedAnnouncements));
-    } else {
-      setAnnouncements(dummyAnnouncements);
-      localStorage.setItem('announcements', JSON.stringify(dummyAnnouncements));
-    }
-  }, []);
+  // useEffect(() => {
+  //   // --- Fetch HR4 Announcements (Commented out for now) ---
+  //   // Replace 'YOUR_API_ENDPOINT_FOR_HR4_ANNOUNCEMENTS' with your actual API endpoint
+  //   const fetchHr4Announcements = async () => {
+  //     try {
+  //       // const response = await axios.get('YOUR_API_ENDPOINT_FOR_HR4_ANNOUNCEMENTS');
+  //       // setHr4Announcements(response.data); // Assuming API returns an array of announcements
+  //       // --- Placeholder Data for UI Development ---
+  //       setHr4Announcements([
+  //         { id: 1, title: 'HR4 System Maintenance', description: 'Scheduled maintenance on July 20th, 2024.', date: '2024-07-20' },
+  //         { id: 2, title: 'New HR Policy Update', description: 'Please review the updated HR policy document.', date: '2024-07-15' },
+  //       ]);
+  //       console.log("Fetching HR4 announcements (commented out in code)"); // Indicate fetch attempt
+  //     } catch (error) {
+  //       console.error('Error fetching HR4 announcements:', error);
+  //       // Handle error appropriately (e.g., display error message to user)
+  //     }
+  //   };
 
-  const updateLocalStorage = (newAnnouncements) => {
-    localStorage.setItem('announcements', JSON.stringify(newAnnouncements));
-    setAnnouncements(newAnnouncements);
-  };
-
-  const handleCreate = () => {
-    setModalType('create');
-    setSelectedAnnouncement(null);
-    setIsModalOpen(true);
-  };
-
-  const handleView = (announcement) => {
-    setModalType('view');
-    setSelectedAnnouncement(announcement);
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (announcement) => {
-    setModalType('edit');
-    setSelectedAnnouncement(announcement);
-    setIsModalOpen(true);
-  };
-
-  const handleDelete = (announcement) => {
-    setModalType('delete');
-    setSelectedAnnouncement(announcement);
-    setIsModalOpen(true);
-  };
-
-  const handleDeploy = (announcement) => {
-    setSelectedAnnouncement(announcement);
-    setIsDeployModalOpen(true);
-  };
-
-  const confirmDeploy = () => {
-    // Simulate sending the announcement to HR
-    console.log('Deploying announcement:', selectedAnnouncement);
-    
-    // Show an alert with the deployment message
-    alert(`Announcement "${selectedAnnouncement.title}" has been successfully deployed to HR!`);
-
-    // Close the deployment modal
-    setIsDeployModalOpen(false);
-    setSelectedAnnouncement(null);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedAnnouncement(null);
-    setModalType(null);
-  };
-
-  const closeDeployModal = () => {
-    setIsDeployModalOpen(false);
-    setSelectedAnnouncement(null);
-  };
-
-  const handleSubmit = (data) => {
-    let newAnnouncements;
-    if (modalType === 'create') {
-      newAnnouncements = [...announcements, { ...data, id: Date.now() }];
-    } else if (modalType === 'edit') {
-      newAnnouncements = announcements.map(a => a.id === selectedAnnouncement.id ? { ...a, ...data } : a);
-    } else if (modalType === 'delete') {
-      newAnnouncements = announcements.filter(a => a.id !== selectedAnnouncement.id);
-    }
-    updateLocalStorage(newAnnouncements);
-    closeModal();
-  };
+  //   fetchHr4Announcements();
+  // }, []); // Empty dependency array means this effect runs once after the initial render
 
   return (
-    <div className="p-2 sm:p-4 min-h-screen bg-gray-200">
-      <div className="container mx-auto p-2 sm:p-4">
-        <div className="bg-white p-2 mb-6 rounded-lg shadow-md">
-         <h1 className="text-xl sm:text-2xl font-bold mb-4 text-center bg-gradient-to-r from-black to-green-300 text-transparent bg-clip-text">Version Control (Announcement)</h1>
-       </div>
-        <button
-          onClick={handleCreate}
-          className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-        >
-          Create Announcement
-        </button>
-        <div className="mt-4 border ">
-          {announcements.map((announcement) => (
-            <div key={announcement.id} className="bg-white p-4 mb-2 rounded shadow-md ">
-              <h2 className="text-lg font-bold text-black">{announcement.title}</h2>
-              <p className="text-gray-700">{announcement.content}</p>
-              <p className="text-sm text-gray-500">Published on: {new Date(announcement.date).toLocaleDateString()}</p>
-              <div className="flex justify-end space-x-2 mt-2">
-                <button onClick={() => handleView(announcement)} className="bg-green-500 text-white px-2 py-1 rounded">View</button>
-                <button onClick={() => handleEdit(announcement)} className="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
-                <button onClick={() => handleDelete(announcement)} className="bg-red-500 text-white px-2 py-1 rounded">Delete</button>
-                <button onClick={() => handleDeploy(announcement)} className="bg-blue-600 text-white px-2 py-1 rounded">Deploy</button>
-              </div>
-            </div>
-          ))}
+    <div className="min-h-screen bg-white py-6">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold text-gray-800">HR4 Announcements</h1>
+          {/* Button to go to Announcement.jsx */}
+          <Link to="/home/Announcement" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Go To Admin Announcement
+          </Link>
+          {/* If not using react-router-dom, use this instead: */}
+          {/* <button onClick={() => window.location.href = '/announcements'} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Create Admin Announcement
+          </button> */}
         </div>
-      </div>
 
-      {isModalOpen && (
-        <ModalAnnouncement
-          type={modalType}
-          announcement={selectedAnnouncement}
-          onClose={closeModal}
-          onSubmit={handleSubmit}
-        />
-      )}
-
-      {isDeployModalOpen && (
-        <div className="z-50 fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <h2 className="text-xl font-bold mb-4 bg-gradient-to-r from-black to-green-300 text-transparent bg-clip-text">Confirm Deployment</h2>
-            <p className='text-black'>Are you sure you want to deploy this announcement to HR?</p>
-            <div className="flex justify-end space-x-2 mt-4">
-              <button onClick={confirmDeploy} className="bg-blue-500 text-white px-4 py-2 rounded">
-                Yes, Deploy
-              </button>
-              <button onClick={closeDeployModal} className="bg-gray-300 text-black px-4 py-2 rounded">
-                Cancel
-              </button>
-            </div>
+        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="px-6 py-4 bg-gray-100 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-700">HR4 Announcements</h2>
+          </div>
+          <div className="p-4">
+            {hr4Announcements.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full table-auto">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {hr4Announcements.map((announcement) => (
+                      <tr key={announcement.id}>
+                        <td className="px-4 py-2 whitespace-nowrap">{announcement.title}</td>
+                        <td className="px-4 py-2">{announcement.description}</td>
+                        <td className="px-4 py-2 whitespace-nowrap">{announcement.date}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-gray-600">No HR4 announcements available.</p>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

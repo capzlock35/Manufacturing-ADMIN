@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaSearch } from "react-icons/fa";
 import { MdOutlineDarkMode } from "react-icons/md";
 import { IoMdNotificationsOutline } from "react-icons/io";
+import { IoMdChatboxes } from "react-icons/io";
+
+
 import Pic from '../assets/Mole.jpg'; // Default Image
 //import Pic from '../assets/jjmlogo.jpg';  // Another one
 //import Pic from '../assets/Mole.jpg';
@@ -76,7 +79,7 @@ const Search = () => {
                         <input
                             type="text"
                             placeholder='Search...'
-                            className='w-full p-2 pl-4 pr-12 text-gray-700 bg-transparent border-none rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-200 text-black'
+                            className='w-full p-2 pl-4 pr-12 bg-transparent border-none rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-200 text-black'
                         />
                         <button
                             type='submit'
@@ -90,6 +93,10 @@ const Search = () => {
 
                 {/* ICONS at Profile right side */}
                 <div className='flex items-center gap-3 md:gap-4'>
+                    {/* <Link to="MessageBoard">
+                        <IoMdChatboxes className='cursor-pointer text-xl md:text-2xl hover:text-blue-600 text-black' />
+                    </Link> */}
+
                     <MdOutlineDarkMode className='cursor-pointer text-xl md:text-2xl hover:text-blue-600 text-black' aria-label='dark mode' />
                     <div className='relative'>
                         <IoMdNotificationsOutline
