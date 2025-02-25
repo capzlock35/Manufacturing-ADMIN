@@ -11,6 +11,7 @@ import { TiDocumentText } from "react-icons/ti";
 import { PiUsersThreeFill } from "react-icons/pi";
 import { GrUserAdmin } from "react-icons/gr";
 import { FaUserCheck } from "react-icons/fa";
+import { GiMagnifyingGlass } from "react-icons/gi";
 
 import jjm from "../assets/jjmlogo.jpg";
 import axios from 'axios';
@@ -27,7 +28,7 @@ const productBaseURL = process.env.NODE_ENV === 'production'
     ? 'https://backend-admin.jjm-manufacturing.com/api/product'
     : 'http://localhost:7690/api/product'; // Added Product Base URL
 
-const SuperSide = () => {
+const Sidebar = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [hasAnnouncement, setHasAnnouncement] = useState(true);
     const [hasDocumentStorage, setHasDocumentStorage] = useState(true);
@@ -203,7 +204,7 @@ const SuperSide = () => {
                                     <Link to="Product">
                                         <li className='hover:text-blue-500'>
                                             <p className='flex items-center'>
-                                                <TiDocumentText />
+                                                <IoDocument />
                                                 Product
                                                 {!isCollapsed && (
                                                     loadingProductCount ? (
@@ -217,6 +218,20 @@ const SuperSide = () => {
                                             </p>
                                         </li>
                                     </Link>
+
+
+                                     <Link to="QualityControl" onClick={markAnnouncementAsSeen}>
+                                        <li className="hover:text-blue-500 relative">
+                                            <p className='flex items-center'>
+                                                <GiMagnifyingGlass  />
+                                                 Quality Control
+                                                {hasAnnouncement && (
+                                                    <span className='bg-red-500 h-2 w-2 rounded-full absolute top-2 right-3 ml-2'></span>
+                                                )}
+                                            </p>
+                                        </li>
+                                    </Link>
+                                                            
 
 
                                 </ul>
@@ -233,12 +248,10 @@ const SuperSide = () => {
                             <details>
                                 <summary><IoDocumentTextOutline className='w-5 h-5' />Legal Management</summary>
                                 <ul>
-                                    <Link to="Upload"><li className='hover:text-blue-500'><p><TiDocumentText />Upload </p></li></Link>
+                                <Link to="DocumentHr3"><li className='hover:text-blue-500'><p><TiDocumentText />Document (Hr3)</p></li></Link>
                                     <Link to="ContractManagement"><li className='hover:text-blue-500'><p><TiDocumentText />Contract Management</p></li></Link>
-                                    <Link to="LegalDocument"><li className='hover:text-blue-500'><p><TiDocumentText />Legal Document</p></li></Link>
                                     <Link to="RiskManagement"><li className='hover:text-blue-500'><p><TiDocumentText />Risk Management</p></li></Link>
-                                    <Link to="LitigationManagement"><li className='hover:text-blue-500'><p><TiDocumentText />Litigation Management</p></li></Link>
-                                    <Link to="CompliancesandRegulatory"><li className='hover:text-blue-500'><p><TiDocumentText />Compliances and Regulatory</p></li></Link>
+
                                 </ul>
                             </details>
                         </li>
@@ -283,4 +296,4 @@ const SuperSide = () => {
     );
 };
 
-export default SuperSide;
+export default Sidebar;

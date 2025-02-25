@@ -40,6 +40,10 @@ import AdminCreate from '../components/AdminCreate';
 import NewEmployee from '../components/NewEmployee';
 import Product from '../components/Product';
 import SuperSide from '../components/SuperSide';
+import Announcement from '../components/Announcement';
+import DocumentHr3 from '../components/DocumentHr3';
+import QualityControl from '../components/QualityControl';
+import MessageBoard from '../components/MessageBoard';
 
 const AdminHome = () => {
   const [role, setRole] = useState('');
@@ -73,10 +77,7 @@ const AdminHome = () => {
           <Route path="DocumentStorage" element={<DocumentStorage />} />
           <Route path="VersionControl" element={<VersionControl />} />
           <Route path="ContractManagement" element={<ContractManagement />} />
-          <Route path="LegalDocument" element={<LegalDocument />} />
           <Route path="RiskManagement" element={<RiskManagement />} />
-          <Route path="LitigationManagement" element={<LitigationManagement />} />
-          <Route path="CompliancesandRegulatory" element={<CompliancesandRegulatory />} />
           <Route path="WorkflowIdentification" element={<WorkflowIdentification />} />
           <Route path="CommunicationPlan" element={<CommunicationPlan />} />
           <Route path="ResourcesAllocation" element={<ResourcesAllocation />} />
@@ -91,6 +92,11 @@ const AdminHome = () => {
           <Route path="AdminCreate" element={<AdminCreate />} />
           <Route path="Product" element={<Product />} />
           <Route path="NewEmployee" element={<NewEmployee />} />
+          <Route path="Announcement" element={<Announcement />} />
+          <Route path="DocumentHr3" element={<DocumentHr3 />} />
+          <Route path="QualityControl" element={<QualityControl />} />
+          {/* <Route path="MessageBoard" element={<MessageBoard />} /> */}
+
         </Routes>
         <div className="">
           <Footer />

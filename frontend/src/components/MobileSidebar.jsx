@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import logo from '../assets/layout.png';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { MdOutlineScreenshotMonitor } from 'react-icons/md';
 import { FaUser, FaUserFriends } from "react-icons/fa";
@@ -11,113 +10,19 @@ import { TiDocumentText } from "react-icons/ti";
 import { PiUsersThreeFill } from "react-icons/pi";
 import { GrUserAdmin } from "react-icons/gr";
 import { FaUserCheck } from "react-icons/fa";
-
 import jjm from "../assets/jjmlogo.jpg";
-import axios from 'axios';
 
-const baseURL = process.env.NODE_ENV === 'production'
-    ? 'https://backend-admin.jjm-manufacturing.com/api/resources'
-    : 'http://localhost:7690/api/resources';
-
-const documentBaseURL = process.env.NODE_ENV === 'production'
-    ? 'https://backend-admin.jjm-manufacturing.com/api/documents'
-    : 'http://localhost:7690/api/documents';
-
-const productBaseURL = process.env.NODE_ENV === 'production'
-    ? 'https://backend-admin.jjm-manufacturing.com/api/product'
-    : 'http://localhost:7690/api/product'; // Added Product Base URL
-
-const Sidebar = () => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
-    const [hasAnnouncement, setHasAnnouncement] = useState(true);
-    const [hasDocumentStorage, setHasDocumentStorage] = useState(true);
-    const [resourceCount, setResourceCount] = useState(0);
-    const [loadingResourceCount, setLoadingResourceCount] = useState(true);
-    const [documentCount, setDocumentCount] = useState(0);
-    const [loadingDocumentCount, setLoadingDocumentCount] = useState(true);
-    const [productCount, setProductCount] = useState(0); // Added product count
-    const [loadingProductCount, setLoadingProductCount] = useState(true); // Added loading state
-
-    useEffect(() => {
-        setHasAnnouncement(true);
-        setHasDocumentStorage(true);
-
-        fetchResourceCount();
-        const intervalId = setInterval(fetchResourceCount, 60000);
-
-        fetchDocumentCount();
-        const documentIntervalId = setInterval(fetchDocumentCount, 60000);
-
-        fetchProductCount(); // Fetch product count on mount
-        const productIntervalId = setInterval(fetchProductCount, 60000); // Set interval to refetch every minute
-
-        return () => {
-            clearInterval(intervalId);
-            clearInterval(documentIntervalId);
-            clearInterval(productIntervalId); // Clear product interval on unmount
-        };
-    }, []);
-
-    const fetchResourceCount = async () => {
-        setLoadingResourceCount(true);
-        try {
-            const response = await axios.get(baseURL);
-            setResourceCount(response.data.length);
-        } catch (error) {
-            console.error("Error fetching resource count:", error);
-            setResourceCount(0);
-        } finally {
-            setLoadingResourceCount(false);
-        }
-    };
-
-    const fetchDocumentCount = async () => {
-        setLoadingDocumentCount(true);
-        try {
-            const response = await axios.get(`${documentBaseURL}/get`);
-            setDocumentCount(response.data.length);
-        } catch (error) {
-            console.error("Error fetching document count:", error);
-            setDocumentCount(0);
-        } finally {
-            setLoadingDocumentCount(false);
-        }
-    };
-
-    const fetchProductCount = async () => {
-        setLoadingProductCount(true);
-        try {
-            const response = await axios.get(productBaseURL);
-            setProductCount(response.data.length);
-        } catch (error) {
-            console.error("Error fetching product count:", error);
-            setProductCount(0);
-        } finally {
-            setLoadingProductCount(false);
-        }
-    };
-
-    const markAnnouncementAsSeen = () => {
-        setHasAnnouncement(false);
-    };
-
-    const markDocumentStorageAsSeen = () => {
-        setHasDocumentStorage(false);
-    };
-
-    const toggleSidebar = () => {
-        setIsCollapsed((prev) => !prev);
-    };
-
+const MobileSidebar = ({ isSidebarOpen, toggleSidebar,  isCollapsed, onToggleCollapse, hasAnnouncement, loadingDocumentCount, documentCount, loadingProductCount, productCount, resourceCount, loadingResourceCount }) => {
     return (
         <div
-            className={`flex flex-col overflow-y-auto bg-white text-black border-r-2 sticky top-0 transition-all duration-300 ${isCollapsed ? "w-20 px-4 py-4" : "w-72 lg:w-80 px-2 py-4"
+            className={`fixed inset-0 z-30 md:hidden bg-white text-black border-r-2  transition-transform duration-300 ease-in-out transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             aria-label='Sidebar'
+             style={{ width: '250px' }} // Fixed width for the sidebar
         >
-            {/* Toggle Button */}
+            {/* Toggle Button (inside the sidebar - for collapse) */}
             <div className='flex justify-end'>
-                <button onClick={toggleSidebar} className={`mb-4 p-1 text-base border border-gray-300 rounded-md hover:bg-gray-200 transition duration-200 ${isCollapsed ? "w-11" : "w-11"}`}
+                <button onClick={onToggleCollapse} className={`mb-4 p-1 text-base border border-gray-300 rounded-md hover:bg-gray-200 transition duration-200 ${isCollapsed ? "w-11" : "w-11"}`}
                     aria-expanded={!isCollapsed}
                     aria-label={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
                 >
@@ -171,7 +76,7 @@ const Sidebar = () => {
                             <details>
                                 <summary><IoDocuments className='w-5 h-5' />Document Management</summary>
                                 <ul>
-                                    <Link to="DocumentStorage" onClick={markDocumentStorageAsSeen}>
+                                    <Link to="DocumentStorage" >
                                         <li className="hover:text-blue-500">
                                             <p className='flex items-center'>
                                                 <IoDocument />
@@ -189,7 +94,7 @@ const Sidebar = () => {
                                         </li>
                                     </Link>
 
-                                    <Link to="VersionControl" onClick={markAnnouncementAsSeen}>
+                                    <Link to="VersionControl" >
                                         <li className="hover:text-blue-500 relative">
                                             <p className='flex items-center'>
                                                 <IoDocument />
@@ -203,7 +108,7 @@ const Sidebar = () => {
                                     <Link to="Product">
                                         <li className='hover:text-blue-500'>
                                             <p className='flex items-center'>
-                                                <IoDocument />
+                                                <TiDocumentText />
                                                 Product
                                                 {!isCollapsed && (
                                                     loadingProductCount ? (
@@ -233,52 +138,53 @@ const Sidebar = () => {
                             <details>
                                 <summary><IoDocumentTextOutline className='w-5 h-5' />Legal Management</summary>
                                 <ul>
-                                <Link to="DocumentHr3"><li className='hover:text-blue-500'><p><TiDocumentText />Document (Hr3)</p></li></Link>
                                     <Link to="ContractManagement"><li className='hover:text-blue-500'><p><TiDocumentText />Contract Management</p></li></Link>
+                                    <Link to="LegalDocument"><li className='hover:text-blue-500'><p><TiDocumentText />Legal Document</p></li></Link>
                                     <Link to="RiskManagement"><li className='hover:text-blue-500'><p><TiDocumentText />Risk Management</p></li></Link>
-
+                                    <Link to="LitigationManagement"><li className='hover:text-blue-500'><p><TiDocumentText />Litigation Management</p></li></Link>
+                                    <Link to="CompliancesandRegulatory"><li className='hover:text-blue-500'><p><TiDocumentText />Compliances and Regulatory</p></li></Link>
                                 </ul>
-                            </details>
-                        </li>
-                    }
-                </ul>
+                                </details>
+                            </li>
+                        }
+                    </ul>
 
-                {/* Initiating Workflow */}
-                <ul className='menu rounded-box w-56'>
-                    {isCollapsed && <GoWorkflow className='w-5 h-5' />}
-                    {!isCollapsed &&
-                        <li>
-                            <details>
-                                <summary><GoWorkflow className='w-5 h-5' />Initiating Workflow</summary>
-                                <ul>
-                                    <Link to="WorkflowIdentification"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank />Workflow Identification</p></li></Link>
-                                    <Link to="CommunicationPlan"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank />Communication Plan</p></li></Link>
-                                    <Link to="ResourcesAllocation">
-                                        <li className='hover:text-blue-500'>
-                                            <p className='flex items-center'>
-                                                <MdOutlineCheckBoxOutlineBlank />
-                                                Resources Allocation
-                                                {!isCollapsed && (
-                                                    loadingResourceCount ? (
-                                                        "..."
-                                                    ) : (
-                                                        <span className="text-xs text-red-500 font-bold ml-1">
-                                                            ({resourceCount})
-                                                        </span>
-                                                    )
-                                                )}
-                                            </p>
-                                        </li>
-                                    </Link>
+                    {/* Initiating Workflow */}
+                    <ul className='menu rounded-box w-56'>
+                        {isCollapsed && <GoWorkflow className='w-5 h-5' />}
+                        {!isCollapsed &&
+                            <li>
+                                <details>
+                                    <summary><GoWorkflow className='w-5 h-5' />Initiating Workflow</summary>
+                                    <ul>
+                                        <Link to="WorkflowIdentification"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank />Workflow Identification</p></li></Link>
+                                        <Link to="CommunicationPlan"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank />Communication Plan</p></li></Link>
+                                        <Link to="ResourcesAllocation">
+                                            <li className='hover:text-blue-500'>
+                                                <p className='flex items-center'>
+                                                    <MdOutlineCheckBoxOutlineBlank />
+                                                    Resources Allocation
+                                                    {!isCollapsed && (
+                                                        loadingResourceCount ? (
+                                                            "..."
+                                                        ) : (
+                                                            <span className="text-xs text-red-500 font-bold ml-1">
+                                                                ({resourceCount})
+                                                            </span>
+                                                        )
+                                                    )}
+                                                </p>
+                                            </li>
+                                        </Link>
 
-                                </ul>
-                            </details>
-                        </li>
-                    }
-                </ul>
-            </div>
+                                    </ul>
+                                </details>
+                            </li>
+                        }
+                    </ul>
+                </div>
         </div>
     );
 };
 
-export default Sidebar;
+export default MobileSidebar;
