@@ -1,80 +1,137 @@
 // VersionControl.jsx
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // If you have react-router-dom installed
-// import axios from 'axios'; // Removed axios import
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios'; // Import axios
 
 const VersionControl = () => {
-  const [hr4Announcements, setHr4Announcements] = useState([ // Keeping placeholder data for UI
-    { id: 1, title: 'HR4 System Maintenance', description: 'Scheduled maintenance on July 20th, 2024.', date: '2024-07-20' },
-    { id: 2, title: 'New HR Policy Update', description: 'Please review the updated HR policy document.', date: '2024-07-15' },
-  ]);
-  const [newAnnouncement, setNewAnnouncement] = useState({ // State for the new announcement form
+  const [hr4Announcements, setHr4Announcements] = useState([]);
+  const [newAnnouncement, setNewAnnouncement] = useState({
     title: '',
     description: '',
-    date: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // const baseURL = process.env.NODE_ENV === 'production'
-  //   ? 'YOUR_PRODUCTION_API_ENDPOINT_FOR_HR4_ANNOUNCEMENTS' // Replace with your production API endpoint
-  //   : 'http://localhost:7690/api/announcements'; // Or your local API endpoint if different - Removed baseURL and related logic
+  // --- Environment-aware URLs for Announcements and Auth ---
+  const baseURL = process.env.NODE_ENV === 'production'
+    ? 'https://backend-admin.jjm-manufacturing.com/api/vs'  // Production URL for announcements
+    : 'http://localhost:7690/api/vs'; // Local URL for announcements
 
-  // useEffect(() => { // Removed useEffect and fetchHr4Announcements
-  //   // --- Fetch HR4 Announcements ---
-  //   const fetchHr4Announcements = async () => {
-  //     try {
-  //       const response = await axios.get(baseURL); // Use baseURL for API calls
-  //       setHr4Announcements(response.data); // Assuming API returns an array of announcements
-  //     } catch (error) {
-  //       console.error('Error fetching HR4 announcements:', error);
-  //       // Handle error appropriately (e.g., display error message to user)
-  //     }
-  //   };
+  const authURL = process.env.NODE_ENV === 'production'
+    ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-token' // Production URL for auth
+    : 'http://localhost:7690/api/auth/get-token'; // Local URL for auth
 
-  //   fetchHr4Announcements();
-  // }, []); // Empty dependency array means this effect runs once after the initial render
 
-  const handleInputChange = (e) => { // Function to handle input changes in the form - Keep this
+  // --- Define fetchHr4Announcements OUTSIDE of useEffect ---
+  const fetchHr4Announcements = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Get token using dynamic authURL (similar to logistic table)
+      const tokenResponse = await axios.get(authURL);
+      const token = tokenResponse.data.token;
+
+      if (!token) {
+        console.error("🚨 No token received from backend!");
+        setError("Could not retrieve authentication token.");
+        setLoading(false);
+        return;
+      }
+
+      // Fetch HR4 announcements with authentication
+      const response = await axios.get(`${baseURL}/get`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Ensure "Bearer" is included
+        },
+      });
+
+      console.log("✅ HR4 Announcements Response:", response.data);
+      setHr4Announcements(response.data);
+    } catch (err) {
+      console.error("❌ Error fetching HR4 announcements:", err.response ? err.response.data : err.message);
+      setError(`Error fetching announcements: ${err.response ? err.response.data.message : err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  useEffect(() => {
+    // --- Call fetchHr4Announcements here for initial load ---
+    fetchHr4Announcements();
+  }, []); // Empty dependency array means this runs once after initial render
+
+
+  const handleInputChange = (e) => {
     setNewAnnouncement({ ...newAnnouncement, [e.target.name]: e.target.value });
   };
 
-  const handleCreateAnnouncement = async (e) => { // Function to handle announcement creation - Modified to be a placeholder
+  const handleCreateAnnouncement = async (e) => {
     e.preventDefault();
-    // --- Implement your API call to create HR4 announcement here ---
-    // --- Use axios.post or fetch to send data to your HR4 API endpoint ---
-    // --- Example (you need to replace 'YOUR_HR4_API_ENDPOINT' and adjust data/headers as needed): ---
-    // try {
-    //   const response = await axios.post('YOUR_HR4_API_ENDPOINT', newAnnouncement, {
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //   });
-    //   console.log("HR4 Announcement created:", response.data);
-    //   setNewAnnouncement({ title: '', description: '', date: '' }); // Clear form
-    //   // --- After successful creation, you might want to: ---
-    //   // 1. Fetch and update hr4Announcements again (if you want to display live updates)
-    //   // 2. Or, manually add the new announcement to the hr4Announcements state for immediate display
-    // } catch (error) {
-    //   console.error('Error creating HR4 announcement:', error);
-    //   // Handle error (e.g., display an error message to the user)
-    // }
-    console.log("Create HR4 Announcement form submitted with data:", newAnnouncement); // Placeholder log
-    alert("Create HR4 Announcement functionality needs to be implemented in handleCreateAnnouncement function. Check console for form data."); // Placeholder alert
-    setNewAnnouncement({ title: '', description: '', date: '' }); // Clear form for now
+    setLoading(true);
+    setError(null);
+    try {
+      // Get token before creating announcement
+      const tokenResponse = await axios.get(authURL);
+      const token = tokenResponse.data.token;
+
+      if (!token) {
+        console.error("🚨 No token received for creating announcement!");
+        setError("Could not retrieve authentication token for creating announcement.");
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.post(`${baseURL}/vscreate`,
+        {
+          title: newAnnouncement.title,
+          content: newAnnouncement.description,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("✅ HR4 Announcement created:", response.data);
+      setNewAnnouncement({ title: '', description: '' }); // Clear form
+
+      // Refresh announcements list after creating a new one
+      fetchHr4Announcements(); // <--- Call fetchHr4Announcements here to refresh!
+
+
+    } catch (err) {
+      console.error("❌ Error creating HR4 announcement:", err.response ? err.response.data : err.message);
+      setError(`Error creating announcement: ${err.response ? err.response.data.message : err.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
+
+
+  if (loading) {
+    return <div>Loading announcements...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
 
   return (
     <div className="min-h-screen bg-white py-6">
+      {/* ... rest of your component JSX (similar to previous versions) ... */}
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold text-gray-800">HR4 Announcements</h1>
-          {/* Button to go to Announcement.jsx (Admin Page - can keep for separate admin functions) */}
           <Link to="/home/Announcement" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
             Go To Admin Announcement
           </Link>
         </div>
 
-        {/* Create Announcement Form - Added Here */}
+        {/* Create Announcement Form */}
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
           <h2 className="text-lg font-semibold text-gray-700 mb-4">Create New HR4 Announcement</h2>
           <form onSubmit={handleCreateAnnouncement}>
@@ -104,19 +161,7 @@ const VersionControl = () => {
                 required
               ></textarea>
             </div>
-            <div className="mb-4">
-              <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">Date:</label>
-              <input
-                type="date"
-                id="date"
-                name="date"
-                value={newAnnouncement.date}
-                onChange={handleInputChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3  text-black bg-white border-black leading-tight focus:outline-none focus:shadow-outline"
-                placeholder="Announcement Date"
-                required
-              />
-            </div>
+            {/* Removed Date Input from Create Form as Backend Model does not use it for creation */}
             <button
               type="submit"
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -144,10 +189,10 @@ const VersionControl = () => {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {hr4Announcements.map((announcement) => (
-                      <tr key={announcement.id}>
+                      <tr key={announcement._id}>
                         <td className="px-4 py-2 whitespace-nowrap">{announcement.title}</td>
-                        <td className="px-4 py-2">{announcement.description}</td>
-                        <td className="px-4 py-2 whitespace-nowrap">{announcement.date}</td>
+                        <td className="px-4 py-2">{announcement.content}</td>
+                        <td className="px-4 py-2 whitespace-nowrap">{new Date(announcement.date).toLocaleDateString()}</td>
                       </tr>
                     ))}
                   </tbody>
