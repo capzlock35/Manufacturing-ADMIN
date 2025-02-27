@@ -91,6 +91,8 @@ app.use("/api/upload", uploadRoute);
 
 app.use("/api/qc", qcDataRoute);
 
+app.use('/api/vs', vsRoute)
+
 app.use('/api/financial-reports', financialReportRoutes);
 
 
