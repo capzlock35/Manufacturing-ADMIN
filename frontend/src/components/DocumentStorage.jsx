@@ -1,5 +1,6 @@
     import React, { useState, useEffect } from 'react';
     import axios from 'axios';
+    import { Link } from "react-router-dom";
 
     const baseURL = process.env.NODE_ENV === 'production'
         ? 'https://backend-admin.jjm-manufacturing.com/api/documents'
@@ -168,7 +169,12 @@
         return (
             <div className='flex items-center justify-center min-h-screen bg-white p-7 '>
                 <div className=" container mx-auto p-4 bg-gray-200">
-                    <h1 className="text-2xl font-bold mb-4 text-black">Document Storage</h1>
+                    <div className="flex items-center justify-between mb-4">
+                    <h1 className="text-2xl font-bold text-black">Document Storage</h1>
+                    <Link to="/home/FinancialReport" className="btn btn-inline btn-primary">
+                        FinancialReport (Finance)
+                    </Link>
+                    </div>
 
                     {/* Add/Edit Document Form */}
                     <form onSubmit={handleSubmit} className="mb-4 bg-white shadow-md rounded px-8 pt-6 pb-8">
