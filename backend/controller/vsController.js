@@ -1,8 +1,8 @@
-import Announcement from '../model/vsModel.js'
+import VSannouncement from '../model/vsModel.js'
 
 const getAnnouncements = async (req, res) => {
   try {
-    const announcements = await Announcement.find();
+    const announcements = await VSannouncement.find();
     res.json(announcements);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -10,7 +10,7 @@ const getAnnouncements = async (req, res) => {
 };
 
 const createAnnouncement = async (req, res) => {
-  const announcement = new Announcement({
+  const announcement = new VSannouncement({
     title: req.body.title,
     content: req.body.content,
   });
@@ -25,7 +25,7 @@ const createAnnouncement = async (req, res) => {
 
 const updateAnnouncement = async (req, res) => {
   try {
-    const announcement = await Announcement.findById(req.params.id);
+    const announcement = await VSannouncement.findById(req.params.id);
     if (req.body.title != null) {
       announcement.title = req.body.title;
     }
@@ -41,7 +41,7 @@ const updateAnnouncement = async (req, res) => {
 
 const deleteAnnouncement = async (req, res) => {
   try {
-    const announcement = await Announcement.findById(req.params.id);
+    const announcement = await VSannouncement.findById(req.params.id);
     await announcement.remove();
     res.json({ message: 'Announcement deleted' });
   } catch (err) {
