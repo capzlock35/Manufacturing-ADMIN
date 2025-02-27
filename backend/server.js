@@ -90,7 +90,7 @@ app.use("/api/upload", uploadRoute);
 
 app.use("/api/qc", qcDataRoute);
 
-app.use('/api/Announcement', vsRoute)
+app.use('/api/VSannouncement', vsRoute)
 
 
 
