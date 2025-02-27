@@ -44,6 +44,7 @@ import Announcement from '../components/Announcement';
 import DocumentHr3 from '../components/DocumentHr3';
 import QualityControl from '../components/QualityControl';
 import MessageBoard from '../components/MessageBoard';
+import FinancialReport from '../components/FinancialReport';
 
 const AdminHome = () => {
   const [role, setRole] = useState('');
@@ -96,7 +97,7 @@ const AdminHome = () => {
           <Route path="DocumentHr3" element={<DocumentHr3 />} />
           <Route path="QualityControl" element={<QualityControl />} />
           {/* <Route path="MessageBoard" element={<MessageBoard />} /> */}
-
+          <Route path="FinancialReport" element={<FinancialReport />} />
         </Routes>
         <div className="">
           <Footer />

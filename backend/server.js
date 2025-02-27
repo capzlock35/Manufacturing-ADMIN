@@ -18,6 +18,7 @@ import admninuserRouter from './routes/adminuserRoute.js';
 import announcementRouter from './routes/announcementRoutes.js';
 import qcDataRoute from './routes/qcDataRoute.js';
 import vsRoute from './routes/vsRoute.js'
+import financialReportRoutes from './routes/financialReportRoutes.js'; 
 
 
 import dotenv from "dotenv";
@@ -90,8 +91,7 @@ app.use("/api/upload", uploadRoute);
 
 app.use("/api/qc", qcDataRoute);
 
-app.use('/api/VSannouncement', vsRoute)
-
+app.use('/api/financial-reports', financialReportRoutes);
 
 
 app.listen(port, () => {
