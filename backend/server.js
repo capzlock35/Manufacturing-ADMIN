@@ -17,6 +17,7 @@ import productRouter from './routes/productRoute.js';
 import admninuserRouter from './routes/adminuserRoute.js';
 import announcementRouter from './routes/announcementRoutes.js';
 import qcDataRoute from './routes/qcDataRoute.js';
+import vsRoute from './routes/vsRoute.js'
 
 
 import dotenv from "dotenv";
@@ -88,6 +89,8 @@ app.use("/api/documents", documentRouter); // DocumentStorage
 app.use("/api/upload", uploadRoute);
 
 app.use("/api/qc", qcDataRoute);
+
+app.use('/api/Announcement', vsRoute)
 
 
 
