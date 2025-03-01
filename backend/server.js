@@ -23,6 +23,7 @@ import benefitDocumentRoutes from './routes/benefitDocumentRoutes.js';
 
 
 import dotenv from "dotenv";
+import hr3DocumentRoute from './routes/hr3DocumentRoute.js';
 dotenv.config();
 
 
@@ -97,6 +98,8 @@ app.use('/api/vs', vsRoute)
 app.use('/api/financial-reports', financialReportRoutes);
 
 app.use('/api/benefit-documents', benefitDocumentRoutes);
+
+app.use('/api/benefit/send-benefit-documents', hr3DocumentRoute);
 
 
 app.listen(port, () => {
