@@ -150,7 +150,7 @@ const Sidebar = () => {
                     {isCollapsed && <PiUsersThreeFill className='w-5 h-5' />}
                     {!isCollapsed &&
                         <li>
-                            <details>
+                            <details open> {/*// Remove Open to Close */}
                                 <summary><PiUsersThreeFill className='w-5 h-5' />Account Management</summary>
                                 <ul>
                                     <Link to="register"><li className='hover:text-blue-500'><p><GrUserAdmin />Create Account</p></li></Link>
@@ -168,7 +168,7 @@ const Sidebar = () => {
                     {isCollapsed && <IoDocuments className='w-5 h-5' />}
                     {!isCollapsed &&
                         <li>
-                            <details>
+                            <details open>  {/*// Remove Open to Close */}
                                 <summary><IoDocuments className='w-5 h-5' />Document Management</summary>
                                 <ul>
                                     <Link to="DocumentStorage" onClick={markDocumentStorageAsSeen}>
@@ -230,7 +230,7 @@ const Sidebar = () => {
                     {isCollapsed && <IoDocumentTextOutline className='w-5 h-5' />}
                     {!isCollapsed &&
                         <li>
-                            <details>
+                            <details open>
                                 <summary><IoDocumentTextOutline className='w-5 h-5' />Legal Management</summary>
                                 <ul>
                                 <Link to="DocumentHr3"><li className='hover:text-blue-500'><p><TiDocumentText />Document (Hr3)</p></li></Link>
@@ -248,7 +248,7 @@ const Sidebar = () => {
                     {isCollapsed && <GoWorkflow className='w-5 h-5' />}
                     {!isCollapsed &&
                         <li>
-                            <details>
+                            <details open>
                                 <summary><GoWorkflow className='w-5 h-5' />Initiating Workflow</summary>
                                 <ul>
                                     <Link to="WorkflowIdentification"><li className='hover:text-blue-500'><p><MdOutlineCheckBoxOutlineBlank />Workflow Identification</p></li></Link>

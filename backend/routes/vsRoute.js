@@ -6,7 +6,7 @@ const vsrouter = express.Router();
 
 vsrouter.get('/get',verifyToken, getAnnouncements);
 vsrouter.post('/vscreate', createAnnouncement);
-vsrouter.patch('/update:id', updateAnnouncement);
-vsrouter.delete('/delete:id', deleteAnnouncement);
+vsrouter.patch('/update/:id', updateAnnouncement);
+vsrouter.delete('/delete/:id', deleteAnnouncement);
 
 export default vsrouter;

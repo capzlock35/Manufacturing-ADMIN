@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa';
 import { SlActionUndo } from "react-icons/sl";
 
 const HrCreate = () => {
@@ -12,7 +11,7 @@ const HrCreate = () => {
     const navigate = useNavigate();
 
     const handleBack = () => {
-        navigate('/home/Register'); // Navigate to the /home/Register route
+        navigate('/home/Register');
     };
 
     const [formData, setFormData] = useState({
@@ -22,7 +21,8 @@ const HrCreate = () => {
         password: '',
         confirmPassword: '',
         role: 'Employee',
-        Hr: 1, // Default Hr value.  IMPORTANT, make sure this is here in case the form's default is not picked up
+        Hr: 1,
+        position: 'Resellers', // Default Position  <-- ADDED POSITION HERE and set a default
     });
 
     const [message, setMessage] = useState('');
@@ -43,7 +43,7 @@ const HrCreate = () => {
         }
 
         try {
-            const response = await axios.post(`${baseURL}/create`, formData); // Use baseURL
+            const response = await axios.post(`${baseURL}/create`, formData);
             setMessage(response.data.message);
             setFormData({
                 firstName: '',
@@ -52,7 +52,8 @@ const HrCreate = () => {
                 password: '',
                 confirmPassword: '',
                 role: 'Employee',
-                Hr: 1, // Reset Hr to default ALSO IMPORTANT
+                Hr: 1,
+                position: 'Resellers', // Reset Position to default  <-- ADDED POSITION HERE and reset
             });
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to create user');
@@ -184,6 +185,26 @@ const HrCreate = () => {
                             <option value="Employee">Employee</option>
                             <option value="Admin">Admin</option>
                             <option value="Superadmin">Superadmin</option>
+                        </select>
+                    </div>
+
+                    {/* Position Select Field */}
+                    <div className="mb-6">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="position">
+                            Position
+                        </label>
+                        <select
+                            className="shadow appearance-none border rounded w-full py-2 px-3 border-black bg-white text-black leading-tight focus:outline-none focus:shadow-outline"
+                            id="position"
+                            name="position"
+                            value={formData.position}
+                            onChange={handleChange}
+                        >
+                            <option value="CEO">CEO</option>
+                            <option value="Secretary">Secretary</option>
+                            <option value="Production Head">Production Head</option>
+                            <option value="Resellers Sales Head">Resellers Sales Head</option>
+                            <option value="Resellers">Resellers</option>
                         </select>
                     </div>
 

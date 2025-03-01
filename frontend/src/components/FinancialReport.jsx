@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'; // Import axios
+import { Link } from 'react-router-dom';
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 const FinancialReportsTable = () => {
     const [selectedReportId, setSelectedReportId] = useState(null);
@@ -39,7 +41,10 @@ const FinancialReportsTable = () => {
     const API_BASE_URL = process.env.NODE_ENV === 'production'
         ? 'https://backend-admin.jjm-manufacturing.com/api' 
         : 'http://localhost:7690/api'; 
-    console.log("API_BASE_URL:", API_BASE_URL);
+ 
+        const authURL = process.env.NODE_ENV === 'production'
+        ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-token'
+        : 'http://localhost:7690/api/auth/get-token';
 
     useEffect(() => {
         fetchReports();
@@ -49,6 +54,14 @@ const FinancialReportsTable = () => {
         setLoading(true);
         setError(null);
         try {
+
+                const tokenResponse = await axios.get(authURL);
+      const token = tokenResponse.data.token;
+
+      if (!token) {
+        console.error("🚨 No token received from backend!");
+        return;
+      }
             const response = await axios.get(`${API_BASE_URL}/financial-reports`);
             setReports(response.data);
         } catch (error) {
@@ -97,10 +110,14 @@ const FinancialReportsTable = () => {
     return (
         <div className="min-h-screen py-6">
             <div className="max-w-6xl mx-auto p-4 font-sans">
+
                 {error && <p className="text-red-500 mb-4">{error}</p>}
 
                 {!selectedReportId ? (
                     <>
+                                            <Link to="/home/DocumentStorage" className="mb-4 flex items-center text-blue-500 hover:text-blue-700 focus:outline-none">
+                                  <IoMdArrowRoundBack /> Back
+                                </Link>
                         <h1 className="text-2xl font-bold mb-6 text-center">Financial Reports</h1>
                         <div className="overflow-x-auto rounded-lg shadow">
                             <table className="min-w-full bg-white">

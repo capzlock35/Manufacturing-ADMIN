@@ -16,9 +16,11 @@ const getAllUser = async (req, res) => {
 
 
 // Create User
+// Create User
 const createUser = async (req, res) => {
     try {
-        const { firstName, lastName, email, password, confirmPassword, role, Hr } = req.body; // Include Hr in destructuring
+        // Include position in destructuring
+        const { firstName, lastName, email, password, confirmPassword, role, Hr, position } = req.body;
 
         // Check if user already exists
         const existingUser = await Hruser.findOne({ email });
@@ -41,7 +43,8 @@ const createUser = async (req, res) => {
             email,
             password: hashedPassword,
             role,
-            Hr // Include Hr in the user object
+            Hr, // Include Hr in the user object
+            position // Include position in the user object  <--- ADDED POSITION HERE
         });
 
         // Save the user
@@ -54,6 +57,7 @@ const createUser = async (req, res) => {
         res.status(500).json({ message: "Failed to create user" ,error:error.message});
     }
 };
+
 
 //Delete User
 //Delete User
@@ -85,7 +89,8 @@ const deleteUser = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params; // Get the user ID from the URL
-        const { firstName, lastName, email, role, Hr } = req.body; // Get the updated data from the request body
+        // Include position in destructuring
+        const { firstName, lastName, email, role, Hr, position } = req.body; // Get the updated data from the request body
 
         // Find the user by ID
         const user = await Hruser.findById(id);
@@ -95,11 +100,12 @@ const updateUser = async (req, res) => {
         }
 
         // Update the user's fields
-        user.firstName = firstName || user.firstName; // Use the new value if provided, otherwise keep the old value
+        user.firstName = firstName || user.firstName;
         user.lastName = lastName || user.lastName;
         user.email = email || user.email;
         user.role = role || user.role;
         user.Hr = Hr || user.Hr;
+        user.position = position || user.position; // Update position if provided  <-- ADDED POSITION HERE
 
         // Save the updated user
         const updatedUser = await user.save();

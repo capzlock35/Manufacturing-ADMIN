@@ -26,6 +26,9 @@ const createAnnouncement = async (req, res) => {
 const updateAnnouncement = async (req, res) => {
   try {
     const announcement = await VSannouncement.findById(req.params.id);
+    if (!announcement) { // Add check if announcement exists
+      return res.status(404).json({ message: 'Announcement not found' });
+    }
     if (req.body.title != null) {
       announcement.title = req.body.title;
     }
@@ -35,6 +38,9 @@ const updateAnnouncement = async (req, res) => {
     const updatedAnnouncement = await announcement.save();
     res.json(updatedAnnouncement);
   } catch (err) {
+    if (err.name === 'CastError' && err.kind === 'ObjectId') { // Handle invalid ID format
+      return res.status(400).json({ message: 'Invalid announcement ID format' });
+    }
     res.status(400).json({ message: err.message });
   }
 };
@@ -42,9 +48,15 @@ const updateAnnouncement = async (req, res) => {
 const deleteAnnouncement = async (req, res) => {
   try {
     const announcement = await VSannouncement.findById(req.params.id);
-    await announcement.remove();
-    res.json({ message: 'Announcement deleted' });
+    if (!announcement) { // Add check if announcement exists
+      return res.status(404).json({ message: 'Announcement not found' });
+    }
+    await VSannouncement.findByIdAndDelete(req.params.id); // Use findByIdAndDelete for direct deletion
+    res.json({ message: 'Announcement deleted successfully' }); // Improved success message
   } catch (err) {
+    if (err.name === 'CastError' && err.kind === 'ObjectId') { // Handle invalid ID format
+      return res.status(400).json({ message: 'Invalid announcement ID format' });
+    }
     res.status(500).json({ message: err.message });
   }
 };

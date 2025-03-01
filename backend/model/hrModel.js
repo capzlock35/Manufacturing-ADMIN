@@ -5,18 +5,23 @@ const userSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { 
-    type: String, 
-    enum: ['Employee', 'Admin', 'Superadmin'], // Allowed roles
-    default: 'Employee', // Default role
+  role: {
+    type: String,
+    enum: ['Employee', 'Admin', 'Superadmin'],
+    default: 'Employee',
   },
   Hr: {
     type: Number,
-    enum: [1, 2, 3, 4],  //Restrict the values of HR
-    required: true,       // Optional field.  If you want it to always exist, set to `true`.
+    enum: [1, 2, 3, 4], 
+    required: true,
+  },
+  position: { 
+    type: String,
+    enum: ['CEO', 'Secretary', 'Production Head', 'Resellers Sales Head', 'Resellers'], 
+    required: true,
   },
 });
 
 const Hruser = mongoose.model('Hruser', userSchema);
- 
+
 export default Hruser;

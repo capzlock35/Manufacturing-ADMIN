@@ -284,7 +284,7 @@ const Dashboard = () => {
 
             {/* Cards */}
             <div className="flex gap-4 p-4 overflow-x-auto flex-wrap">
-                <div className="bg-white shadow-lg w-[280px] p-5 rounded-lg mt-3 transition-transform transform hover:scale-105 hover:shadow-xl">
+                {/* <div className="bg-white shadow-lg w-[280px] p-5 rounded-lg mt-3 transition-transform transform hover:scale-105 hover:shadow-xl">
                     <div className="flex items-center justify-between">
                         <p className="text-gray-600 font-semibold text-sm">Revenue</p>
                         <HiOutlineCurrencyDollar className="text-gray-600 text-xl" />
@@ -354,7 +354,7 @@ const Dashboard = () => {
                             +₱36.50 <span className="text-gray-500">than last week</span>
                         </p>
                     </div>
-                </div>
+                </div> */}
                 <div className="bg-white shadow-lg w-[280px] p-5 rounded-lg mt-3 transition-transform transform hover:scale-105 hover:shadow-xl">
                     <div className="flex items-center justify-between">
                         <p className="text-gray-600 font-semibold text-sm">ACCOUNTS</p>
