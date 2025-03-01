@@ -1,11 +1,16 @@
 // VersionControl.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 
 const VersionControl = () => {
   const [hr4Announcements, setHr4Announcements] = useState([]);
   const [newAnnouncement, setNewAnnouncement] = useState({
+    title: '',
+    description: '',
+  });
+  const [editingAnnouncementId, setEditingAnnouncementId] = useState(null); // State to track which announcement is being edited
+  const [editFormData, setEditFormData] = useState({ // State for edit form data
     title: '',
     description: '',
   });
@@ -14,20 +19,18 @@ const VersionControl = () => {
 
   // --- Environment-aware URLs for Announcements and Auth ---
   const baseURL = process.env.NODE_ENV === 'production'
-    ? 'https://backend-admin.jjm-manufacturing.com/api/vs'  // Production URL for announcements
-    : 'http://localhost:7690/api/vs'; // Local URL for announcements
+    ? 'https://backend-admin.jjm-manufacturing.com/api/vs'
+    : 'http://localhost:7690/api/vs';
 
   const authURL = process.env.NODE_ENV === 'production'
-    ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-token' // Production URL for auth
-    : 'http://localhost:7690/api/auth/get-token'; // Local URL for auth
+    ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-token'
+    : 'http://localhost:7690/api/auth/get-token';
 
 
-  // --- Define fetchHr4Announcements OUTSIDE of useEffect ---
   const fetchHr4Announcements = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Get token using dynamic authURL (similar to logistic table)
       const tokenResponse = await axios.get(authURL);
       const token = tokenResponse.data.token;
 
@@ -38,10 +41,9 @@ const VersionControl = () => {
         return;
       }
 
-      // Fetch HR4 announcements with authentication
       const response = await axios.get(`${baseURL}/get`, {
         headers: {
-          Authorization: `Bearer ${token}`, // Ensure "Bearer" is included
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -57,9 +59,8 @@ const VersionControl = () => {
 
 
   useEffect(() => {
-    // --- Call fetchHr4Announcements here for initial load ---
     fetchHr4Announcements();
-  }, []); // Empty dependency array means this runs once after initial render
+  }, []);
 
 
   const handleInputChange = (e) => {
@@ -71,7 +72,6 @@ const VersionControl = () => {
     setLoading(true);
     setError(null);
     try {
-      // Get token before creating announcement
       const tokenResponse = await axios.get(authURL);
       const token = tokenResponse.data.token;
 
@@ -96,15 +96,97 @@ const VersionControl = () => {
       );
 
       console.log("✅ HR4 Announcement created:", response.data);
-      setNewAnnouncement({ title: '', description: '' }); // Clear form
-
-      // Refresh announcements list after creating a new one
-      fetchHr4Announcements(); // <--- Call fetchHr4Announcements here to refresh!
-
+      setNewAnnouncement({ title: '', description: '' });
+      fetchHr4Announcements();
 
     } catch (err) {
       console.error("❌ Error creating HR4 announcement:", err.response ? err.response.data : err.message);
       setError(`Error creating announcement: ${err.response ? err.response.data.message : err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditClick = (announcement) => {
+    setEditingAnnouncementId(announcement._id);
+    setEditFormData({ title: announcement.title, description: announcement.content });
+  };
+
+  const handleEditFormChange = (e) => {
+    setEditFormData({ ...editFormData, [e.target.name]: e.target.value });
+  };
+
+  const handleUpdateAnnouncement = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const tokenResponse = await axios.get(authURL);
+      const token = tokenResponse.data.token;
+
+      if (!token) {
+        console.error("🚨 No token received for updating announcement!");
+        setError("Could not retrieve authentication token for updating announcement.");
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.patch(
+        `${baseURL}/update/${editingAnnouncementId}`, // Use path parameter `:id`
+        {
+          title: editFormData.title,
+          content: editFormData.description,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("✅ HR4 Announcement updated:", response.data);
+      setEditingAnnouncementId(null); // Clear editing state
+      setEditFormData({ title: '', description: '' }); // Clear edit form
+      fetchHr4Announcements(); // Refresh announcements
+
+    } catch (err) {
+      console.error("❌ Error updating HR4 announcement:", err.response ? err.response.data : err.message);
+      setError(`Error updating announcement: ${err.response ? err.response.data.message : err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteAnnouncement = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this announcement?")) {
+      return; // Stop if user cancels
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const tokenResponse = await axios.get(authURL);
+      const token = tokenResponse.data.token;
+
+      if (!token) {
+        console.error("🚨 No token received for deleting announcement!");
+        setError("Could not retrieve authentication token for deleting announcement.");
+        setLoading(false);
+        return;
+      }
+
+      await axios.delete(`${baseURL}/delete/${id}`, { // Use path parameter `:id`
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("✅ HR4 Announcement deleted:", id);
+      fetchHr4Announcements(); // Refresh announcements
+
+    } catch (err) {
+      console.error("❌ Error deleting HR4 announcement:", err.response ? err.response.data : err.message);
+      setError(`Error deleting announcement: ${err.response ? err.response.data.message : err.message}`);
     } finally {
       setLoading(false);
     }
@@ -122,7 +204,6 @@ const VersionControl = () => {
 
   return (
     <div className="min-h-screen bg-white py-6">
-      {/* ... rest of your component JSX (similar to previous versions) ... */}
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold text-gray-800">HR4 Announcements</h1>
@@ -161,7 +242,6 @@ const VersionControl = () => {
                 required
               ></textarea>
             </div>
-            {/* Removed Date Input from Create Form as Backend Model does not use it for creation */}
             <button
               type="submit"
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -170,6 +250,56 @@ const VersionControl = () => {
             </button>
           </form>
         </div>
+
+        {/* Edit Announcement Form (Conditional rendering) */}
+        {editingAnnouncementId && (
+          <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+            <h2 className="text-lg font-semibold text-gray-700 mb-4">Edit HR4 Announcement</h2>
+            <form onSubmit={handleUpdateAnnouncement}>
+              <div className="mb-4">
+                <label htmlFor="editTitle" className="block text-gray-700 text-sm font-bold mb-2">Title:</label>
+                <input
+                  type="text"
+                  id="editTitle"
+                  name="title"
+                  value={editFormData.title}
+                  onChange={handleEditFormChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-black bg-white border-black leading-tight focus:outline-none focus:shadow-outline"
+                  placeholder="Announcement Title"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="editDescription" className="block text-gray-700 text-sm font-bold mb-2">Description:</label>
+                <textarea
+                  id="editDescription"
+                  name="description"
+                  value={editFormData.description}
+                  onChange={handleEditFormChange}
+                  rows="3"
+                  className="shadow appearance-none border rounded w-full py-2 px-3  text-black bg-white border-black leading-tight focus:outline-none focus:shadow-outline"
+                  placeholder="Announcement Description"
+                  required
+                ></textarea>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setEditingAnnouncementId(null)} // Cancel edit mode
+                  className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                >
+                  Update HR4 Announcement
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
 
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -185,6 +315,7 @@ const VersionControl = () => {
                       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th> {/* Action Column */}
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -193,6 +324,20 @@ const VersionControl = () => {
                         <td className="px-4 py-2 whitespace-nowrap">{announcement.title}</td>
                         <td className="px-4 py-2">{announcement.content}</td>
                         <td className="px-4 py-2 whitespace-nowrap">{new Date(announcement.date).toLocaleDateString()}</td>
+                        <td className="px-4 py-2 whitespace-nowrap">
+                          <button
+                            onClick={() => handleEditClick(announcement)}
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded mr-2 focus:outline-none focus:shadow-outline text-xs"
+                          >
+                            Update
+                          </button>
+                          <button
+                            onClick={() => handleDeleteAnnouncement(announcement._id)}
+                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded focus:outline-none focus:shadow-outline text-xs"
+                          >
+                            Delete
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

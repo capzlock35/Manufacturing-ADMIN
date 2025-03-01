@@ -19,6 +19,7 @@ import announcementRouter from './routes/announcementRoutes.js';
 import qcDataRoute from './routes/qcDataRoute.js';
 import vsRoute from './routes/vsRoute.js'
 import financialReportRoutes from './routes/financialReportRoutes.js'; 
+import benefitDocumentRoutes from './routes/benefitDocumentRoutes.js';
 
 
 import dotenv from "dotenv";
@@ -49,7 +50,7 @@ app.use(cors({
 
 app.use('/api/auth', authRoutes);
 
-app.use(express.json());  // Middleware to parse JSON
+app.use(express.json({ limit: '50mb' }));  // Middleware to parse JSON
 
 app.use(fileUpload());
 
@@ -94,6 +95,8 @@ app.use("/api/qc", qcDataRoute);
 app.use('/api/vs', vsRoute)
 
 app.use('/api/financial-reports', financialReportRoutes);
+
+app.use('/api/benefit-documents', benefitDocumentRoutes);
 
 
 app.listen(port, () => {

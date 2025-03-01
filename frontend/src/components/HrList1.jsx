@@ -15,16 +15,16 @@ const HrList1 = () => {
     const [modalType, setModalType] = useState('');
     const [editFormData, setEditFormData] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
-    const [usersPerPage] = useState(10); // Changed to 10 users per page
-         const [isLoading, setIsLoading] = useState(true);
+    const [usersPerPage] = useState(10);
+    const [isLoading, setIsLoading] = useState(true);
 
     const baseURL = process.env.NODE_ENV === 'production'
-    ? 'https://backend-admin.jjm-manufacturing.com/api/hrusers'
-    : 'http://localhost:7690/api/hrusers';
+        ? 'https://backend-admin.jjm-manufacturing.com/api/hrusers'
+        : 'http://localhost:7690/api/hrusers';
 
     const authURL = process.env.NODE_ENV === 'production'
-    ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-token'
-    : 'http://localhost:7690/api/auth/get-token';
+        ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-token'
+        : 'http://localhost:7690/api/auth/get-token';
 
     const fetchUsers = async () => {
         setIsLoading(true);
@@ -41,7 +41,7 @@ const HrList1 = () => {
             // Fetch HR users with authentication
             const response = await axios.get(`${baseURL}/get`, {
                 headers: {
-                    Authorization: `Bearer ${token}`, // Ensure "Bearer" is included
+                    Authorization: `Bearer ${token}`,
                 },
             });
 
@@ -49,10 +49,9 @@ const HrList1 = () => {
             setUsers(response.data);
         } catch (err) {
             console.error("❌ Error fetching HR users:", err.response ? err.response.data : err.message);
-        }
-        finally {
+        } finally {
             setIsLoading(false);
-         }
+        }
     };
 
     useEffect(() => {
@@ -69,12 +68,13 @@ const HrList1 = () => {
     const handleUpdate = (user) => {
         setSelectedUser(user);
         setModalType('update');
-        setEditFormData({  // Initialize form data with the user's current values
+        setEditFormData({
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
             role: user.role,
-            Hr: user.Hr // Initialize Hr value
+            Hr: user.Hr,
+            position: user.position // Initialize position in edit form data <---- ADDED POSITION HERE
         });
         setIsModalOpen(true);
     };
@@ -113,7 +113,7 @@ const HrList1 = () => {
         setIsModalOpen(false);
         setSelectedUser(null);
         setModalType('');
-        setEditFormData({}); // Clear edit form data
+        setEditFormData({});
     };
 
     const handleEditFormChange = (e) => {
@@ -123,8 +123,8 @@ const HrList1 = () => {
         });
     };
 
-    const handleUpdateUser = async (e) => { // <---- INSIDE HrList1
-         try {
+    const handleUpdateUser = async (e) => {
+        try {
             const tokenResponse = await axios.get(authURL);
             const token = tokenResponse.data.token;
 
@@ -158,19 +158,17 @@ const HrList1 = () => {
         XLSX.writeFile(wb, "Hr_users.xlsx");
     };
 
-    // Get current users for pagination
+    // Pagination logic
     const indexOfLastUser = currentPage * usersPerPage;
     const indexOfFirstUser = indexOfLastUser - usersPerPage;
     const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
 
-    // Change page
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
     const prevPage = () => setCurrentPage(currentPage - 1);
     const nextPage = () => setCurrentPage(currentPage + 1);
     const totalPages = Math.ceil(users.length / usersPerPage);
 
 
-    // Integrated Modal Component
     const Modal = ({ user, type, onClose, onDelete, onUpdate }) => {
         if (!isModalOpen) return null;
 
@@ -185,7 +183,8 @@ const HrList1 = () => {
                             <p>First Name: {user.firstName}</p>
                             <p>Last Name: {user.lastName}</p>
                             <p>Role: {user.role}</p>
-                            <p>HR Level: {user.Hr}</p> {/* Display Hr Value */}
+                            <p>HR Level: {user.Hr}</p>
+                            <p>Position: {user.position}</p> {/* Display Position in View Modal <---- ADDED POSITION HERE */}
                         </div>
                     )}
 
@@ -253,7 +252,25 @@ const HrList1 = () => {
                                 </select>
                             </div>
 
-                            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={onUpdate}> {/* UPDATED onClick */}
+                            {/* Position Edit Form <---- ADDED POSITION HERE */}
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="editPosition">Position</label>
+                                <select
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-black border-black bg-white leading-tight focus:outline-none focus:shadow-outline"
+                                    id="editPosition"
+                                    name="position"
+                                    value={editFormData.position || ''}
+                                    onChange={handleEditFormChange}
+                                >
+                                    <option value="CEO">CEO</option>
+                                    <option value="Secretary">Secretary</option>
+                                    <option value="Production Head">Production Head</option>
+                                    <option value="Resellers Sales Head">Resellers Sales Head</option>
+                                    <option value="Resellers">Resellers</option>
+                                </select>
+                            </div>
+
+                            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={onUpdate}>
                                 Update User
                             </button>
                         </div>
@@ -292,7 +309,7 @@ const HrList1 = () => {
         <div className="p-4 h-screen bg-gray-200">
             <div className="container mx-auto p-4">
                 {/* Back Button */}
-                <Link to="/home/accountlist"> {/* Adjust the link as needed */}
+                <Link to="/home/accountlist">
                     <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow">
                         <IoMdArrowRoundBack />
                     </button>
@@ -310,31 +327,33 @@ const HrList1 = () => {
                             <th className="py-3 px-6 text-left border">Last Name</th>
                             <th className="py-3 px-6 text-left border">Email</th>
                             <th className="py-3 px-6 text-left border">Role</th>
-                            <th className="py-3 px-6 text-left border">HR Level</th> {/* HR Level Header */}
+                            <th className="py-3 px-6 text-left border">HR Level</th>
+                            <th className="py-3 px-6 text-left border">Position</th> {/* Position Header <---- ADDED POSITION HEADER */}
                             <th className="py-3 px-6 text-center border">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="text-gray-600 text-sm font-light border">
-                         {isLoading ? (
-                             // Skeleton loading state
-                             Array(usersPerPage).fill(0).map((_, index) => (
-                                 <tr key={index}>
-                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton /></td> {/* Skeleton for First Name */}
-                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton /></td> {/* Skeleton for Last Name */}
-                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton /></td> {/* Skeleton for Email */}
-                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton width={60} /></td> {/* Skeleton for Role */}
-                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton width={50} /></td> {/* Skeleton for HR Level */}
-                                     <td className="py-3 px-6 text-center border-b border-gray-200"><Skeleton width={80} /></td> {/* Skeleton for Actions */}
-                                 </tr>
-                             ))
-                         ) : (
-                            currentUsers.map((user) => ( // Use currentUsers here
+                        {isLoading ? (
+                            Array(usersPerPage).fill(0).map((_, index) => (
+                                <tr key={index}>
+                                    <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton /></td>
+                                    <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton /></td>
+                                    <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton /></td>
+                                    <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton width={60} /></td>
+                                    <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton width={50} /></td>
+                                    <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton width={80} /></td> {/* Skeleton for Position <---- ADDED POSITION SKELETON */}
+                                    <td className="py-3 px-6 text-center border-b border-gray-200"><Skeleton width={80} /></td>
+                                </tr>
+                            ))
+                        ) : (
+                            currentUsers.map((user) => (
                                 <tr key={user._id}>
                                     <td className="py-3 px-6 text-left border-b border-gray-200">{user.firstName}</td>
                                     <td className="py-3 px-6 text-left border-b border-gray-200">{user.lastName}</td>
                                     <td className="py-3 px-6 text-left border-b border-gray-200">{user.email}</td>
                                     <td className="py-3 px-6 text-left border-b border-gray-200">{user.role}</td>
-                                    <td className="py-3 px-6 text-left border-b border-gray-200">{user.Hr}</td>{/*Display HR Level*/}
+                                    <td className="py-3 px-6 text-left border-b border-gray-200">{user.Hr}</td>
+                                    <td className="py-3 px-6 text-left border-b border-gray-200">{user.position}</td>{/* Display Position in Table <---- ADDED POSITION DATA */}
                                     <td className="py-3 px-6 text-center flex">
                                         <button onClick={() => handleView(user)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2">View</button>
                                         <button onClick={() => handleUpdate(user)} className="bg-green-500 text-white px-3 py-1 rounded mr-2">Update</button>
@@ -380,7 +399,7 @@ const HrList1 = () => {
                 type={modalType}
                 onClose={handleCloseModal}
                 onDelete={handleDeleteUser}
-                onUpdate={handleUpdateUser}  // Pass handleUpdateUser
+                onUpdate={handleUpdateUser}
             />
         </div>
     );
