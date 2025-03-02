@@ -1,6 +1,6 @@
 import express from 'express';
 import serviceteGatewayToken from '../middleware/serviceToken.js';
-import generateServiceToken from '../middleware/serviceToken.js';
+import generateServiceToken from '../middleware/gatewayToken.js';
 
 const router = express.Router();
 

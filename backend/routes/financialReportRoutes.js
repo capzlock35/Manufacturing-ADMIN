@@ -4,7 +4,7 @@ import * as financialReportController from '../controller/financialReportControl
 import verifyToken from "../middleware/verifyToken.js"
 const router = express.Router();
 
-router.post('/',verifyToken, financialReportController.createFinancialReport); // POST to create a new report
-router.get('/', financialReportController.getAllFinancialReports); // GET to get all reports
+router.post('/', financialReportController.createFinancialReport); // POST to create a new report
+router.get('/', verifyToken,financialReportController.getAllFinancialReports); // GET to get all reports
 
 export default router; // Changed from module.exports

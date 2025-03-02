@@ -5,7 +5,7 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 
 const FinancialReportsTable = () => {
     const [selectedReportId, setSelectedReportId] = useState(null);
-    const [reports, setReports] = useState([]); // Remove dummy data, start with empty array
+    const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -38,31 +38,38 @@ const FinancialReportsTable = () => {
         "updatedAt",
     ];
 
-    const API_BASE_URL = process.env.NODE_ENV === 'production'
-        ? 'https://backend-admin.jjm-manufacturing.com/api' 
-        : 'http://localhost:7690/api'; 
- 
-        const authURL = process.env.NODE_ENV === 'production'
-        ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-token'
-        : 'http://localhost:7690/api/auth/get-token';
+    // const API_BASE_URL = process.env.NODE_ENV === 'production'
+    //     ? 'https://backend-admin.jjm-manufacturing.com/api'
+    //     : 'http://localhost:7690/api';
+
+    const API_BASE_URL = 'https://gateway.jjm-manufacturing.com/finance'; // Updated API Gateway URL for finance
+
+    const authURL = process.env.NODE_ENV === 'production'
+        ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-tokenG'
+        : 'http://localhost:7690/api/auth/get-tokenG';
 
     useEffect(() => {
         fetchReports();
     }, []);
-
     const fetchReports = async () => {
         setLoading(true);
         setError(null);
         try {
+            const tokenResponse = await axios.get(authURL);
+            const token = tokenResponse.data.token;
 
-                const tokenResponse = await axios.get(authURL);
-      const token = tokenResponse.data.token;
+            console.log("tokenResponse:", tokenResponse); // ADD THIS LINE
 
-      if (!token) {
-        console.error("🚨 No token received from backend!");
-        return;
-      }
-            const response = await axios.get(`${API_BASE_URL}/financial-reports`);
+            if (!token) {
+                console.error("🚨 No token received from backend!");
+                return;
+            }
+
+            const response = await axios.get(`${API_BASE_URL}/get-financial-reports`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             setReports(response.data);
         } catch (error) {
             console.error("Error fetching reports:", error);
@@ -71,7 +78,6 @@ const FinancialReportsTable = () => {
             setLoading(false);
         }
     };
-
     const formatCurrency = (value) => {
         if (value == null || isNaN(value)) {
             return '₱ 0.00';
@@ -79,7 +85,6 @@ const FinancialReportsTable = () => {
         return `₱${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
     };
 
-    // Format date (no changes needed here)
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
         const date = new Date(dateString);
@@ -90,7 +95,6 @@ const FinancialReportsTable = () => {
         });
     };
 
-    // Get selected report
     const selectedReport = reports.find(report => report._id === selectedReportId);
 
     console.log("selectedReportId before render:", selectedReportId);
@@ -98,12 +102,10 @@ const FinancialReportsTable = () => {
 
     const handleViewDetails = (reportId) => {
         setSelectedReportId(reportId);
-        // No need to set isModalOpen here, as it's not used in this version
     };
 
     const handleCloseModal = () => {
         setSelectedReportId(null);
-        // No need to set isModalOpen here, as it's not used in this version
     };
 
 
@@ -115,9 +117,9 @@ const FinancialReportsTable = () => {
 
                 {!selectedReportId ? (
                     <>
-                                            <Link to="/home/DocumentStorage" className="mb-4 flex items-center text-blue-500 hover:text-blue-700 focus:outline-none">
-                                  <IoMdArrowRoundBack /> Back
-                                </Link>
+                        <Link to="/home/DocumentStorage" className="mb-4 flex items-center text-blue-500 hover:text-blue-700 focus:outline-none">
+                            <IoMdArrowRoundBack /> Back
+                        </Link>
                         <h1 className="text-2xl font-bold mb-6 text-center">Financial Reports</h1>
                         <div className="overflow-x-auto rounded-lg shadow">
                             <table className="min-w-full bg-white">
@@ -330,5 +332,3 @@ const FinancialReportsTable = () => {
 };
 
 export default FinancialReportsTable;
-
-
