@@ -53,7 +53,7 @@ const NewEmployee = () => {
   };
 
   return (
-    <div className="p-4 h-screen bg-white">
+    <div className="p-4 min-h-screen bg-white">
       <div className="p-4 bg-gray-200">
         <h2 className="text-2xl font-bold mb-4 text-black">New Employee List</h2>
 
