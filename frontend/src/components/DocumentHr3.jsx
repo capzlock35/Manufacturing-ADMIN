@@ -8,41 +8,48 @@ const Hr3Documents = () => {
   const [error, setError] = useState(null);
 
   // Dynamic API URL for local and production
-  const baseURL =
-  process.env.NODE_ENV === 'production'
-    ? 'https://gateway.jjm-manufacturing.com/hr3/get-documents'
-    : 'http://localhost:7687/hr3/get-documents';
+
+    const API_BASE_URL = 'https://gateway.jjm-manufacturing.com/hr3';
 
 const authURL = process.env.NODE_ENV === 'production'
-  ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-token'
-  : 'http://localhost:7690/api/auth/get-token';
+  ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-tokenG'
+  : 'http://localhost:7690/api/auth/get-tokenG';
 
 useEffect(() => {
   const fetchDocuments = async () => {
     try {
       const tokenResponse = await axios.get(authURL, { withCredentials: true });
       const token = tokenResponse.data.token;
-
+  
       if (!token) {
         console.error("🚨 No token received from backend!");
         return;
       }
-
-      const response = await axios.get(baseURL, {
-
+  
+      const response = await axios.get(`${API_BASE_URL}/get-documents`, {
         headers: {
-          Authorization: `Bearer ${token}`, // Ensure "Bearer" is included
+          Authorization: `Bearer ${token}`,
         },
       });
-
-      const data = await response.json();
-
-      // Transform API response to match frontend structure
-      const formattedDocuments = data.map(doc => ({
-        name: doc.description, // Map 'description' to 'name'
-        pdfUrl: doc.documentFile // Map 'documentFile' to 'pdfUrl'
+  
+      console.log("response.data:", response.data); // Debug log
+      console.log("response.data.documents:", response.data.documents); // Log the documents array
+  
+      // Extract the documents array
+      const documentsArray = response.data.documents; 
+  
+      // Ensure it's an array before using map
+      if (!Array.isArray(documentsArray)) {
+        console.error("❌ Expected an array but got:", documentsArray);
+        return;
+      }
+  
+      // Transform API response
+      const formattedDocuments = documentsArray.map(doc => ({
+        name: doc.description,
+        pdfUrl: doc.documentFile
       }));
-
+  
       setDocuments(formattedDocuments);
     } catch (error) {
       console.error("Error fetching documents:", error.message);
@@ -51,9 +58,9 @@ useEffect(() => {
       setLoading(false);
     }
   };
-
+  
   fetchDocuments();
-}, [baseURL]);
+}, [API_BASE_URL]);
 
   return (
     <div className="min-h-screen bg-gray-100 py-6">
