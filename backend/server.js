@@ -19,11 +19,9 @@ import announcementRouter from './routes/announcementRoutes.js';
 import qcDataRoute from './routes/qcDataRoute.js';
 import vsRoute from './routes/vsRoute.js'
 import financialReportRoutes from './routes/financialReportRoutes.js'; 
-import benefitDocumentRoutes from './routes/benefitDocumentRoutes.js';
-
-
-import dotenv from "dotenv";
 import hr3DocumentRoute from './routes/hr3DocumentRoute.js';
+import dotenv from "dotenv";
+
 dotenv.config();
 
 
@@ -97,9 +95,9 @@ app.use('/api/vs', vsRoute)
 
 app.use('/api/financial-reports', financialReportRoutes);
 
-app.use('/api/benefit-documents', benefitDocumentRoutes);
 
-app.use('/api/benefit/send-benefit-documents', hr3DocumentRoute);
+app.use('/hr3/get-documents', hr3DocumentRoute);
+
 
 
 app.listen(port, () => {
