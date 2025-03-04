@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema ({
     },
     role: {
         type: String,
-        enum: ["admin", "audit", "super admin"], // ADDED "audit" and "admin" and remove rest
+        enum: ["admin", "auditor", "audit","maintenancemanager"], // ADDED "audit" and "admin" and remove rest
         default: "audit",
     },
 });
