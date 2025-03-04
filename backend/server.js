@@ -21,6 +21,8 @@ import vsRoute from './routes/vsRoute.js'
 import financialReportRoutes from './routes/financialReportRoutes.js'; 
 import hr3DocumentRoute from './routes/hr3DocumentRoute.js';
 import dotenv from "dotenv";
+import contractRoutes from './routes/contractRoutes.js'; 
+import riskAssessmentRoutes from './routes/riskAssessmentRoutes.js';
 
 dotenv.config();
 
@@ -95,8 +97,11 @@ app.use('/api/vs', vsRoute)
 
 app.use('/api/financial-reports', financialReportRoutes);
 
+app.use('/api/contracts', contractRoutes);
 
 app.use('/hr3/get-documents', hr3DocumentRoute);
+
+app.use('/api/risk-assessments', riskAssessmentRoutes);
 
 
 
