@@ -9,58 +9,54 @@ const Hr3Documents = () => {
 
   // Dynamic API URL for local and production
 
-    const API_BASE_URL = 'https://gateway.jjm-manufacturing.com/hr3';
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+      ? 'https://backend-admin.jjm-manufacturing.com/api' // Base URL of your backend in production
+      : 'http://localhost:7690/api'; // Base URL of your backend in development
 
-const authURL = process.env.NODE_ENV === 'production'
-  ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-tokenG'
-  : 'http://localhost:7690/api/auth/get-tokenG';
 
-useEffect(() => {
-  const fetchDocuments = async () => {
-    try {
-      const tokenResponse = await axios.get(authURL, { withCredentials: true });
-      const token = tokenResponse.data.token;
-  
-      if (!token) {
-        console.error("🚨 No token received from backend!");
-        return;
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // **CHANGED LINE:** Frontend now calls your backend endpoint `/hr3-documents`
+           const response = await axios.get(`${API_BASE_URL}/hr3-documents`); // CORRECTED LINE in Hr3Documents.js
+        // No need to fetch token in frontend anymore
+
+        console.log("response.data:", response.data); // Debug log (backend response)
+        console.log("response.data.documents:", response.data.documents); // Log documents array (backend response)
+
+        // Extract the documents array from backend response
+        const documentsArray = response.data.documents;
+
+        // Ensure it's an array (backend should handle this, but good to check)
+        if (!Array.isArray(documentsArray)) {
+          console.error("❌ Expected an array from backend but got:", documentsArray);
+          setError("Unexpected data format received from server."); // More informative error
+          return;
+        }
+
+        // Transform API response (still needed as backend just proxies data)
+        const formattedDocuments = documentsArray.map(doc => ({
+          name: doc.description,
+          pdfUrl: doc.documentFile
+        }));
+
+        setDocuments(formattedDocuments);
+      } catch (error) {
+        console.error("Error fetching HR3 documents from backend:", error);
+        if (error.response) {
+          setError(`Failed to load HR3 documents. Status: ${error.response.status}. ${error.response.data.error || ''} ${error.response.data.details || ''}`);
+        } else {
+          setError("Failed to load HR3 documents. Network error.");
+        }
+      } finally {
+        setLoading(false);
       }
-  
-      const response = await axios.get(`${API_BASE_URL}/get-documents`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
-      console.log("response.data:", response.data); // Debug log
-      console.log("response.data.documents:", response.data.documents); // Log the documents array
-  
-      // Extract the documents array
-      const documentsArray = response.data.documents; 
-  
-      // Ensure it's an array before using map
-      if (!Array.isArray(documentsArray)) {
-        console.error("❌ Expected an array but got:", documentsArray);
-        return;
-      }
-  
-      // Transform API response
-      const formattedDocuments = documentsArray.map(doc => ({
-        name: doc.description,
-        pdfUrl: doc.documentFile
-      }));
-  
-      setDocuments(formattedDocuments);
-    } catch (error) {
-      console.error("Error fetching documents:", error.message);
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  fetchDocuments();
-}, [API_BASE_URL]);
+    };
+
+    fetchDocuments();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 py-6">

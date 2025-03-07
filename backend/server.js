@@ -17,12 +17,11 @@ import productRouter from './routes/productRoute.js';
 import admninuserRouter from './routes/adminuserRoute.js';
 import announcementRouter from './routes/announcementRoutes.js';
 import qcDataRoute from './routes/qcDataRoute.js';
-import vsRoute from './routes/vsRoute.js'
-import financialReportRoutes from './routes/financialReportRoutes.js'; 
-import hr3DocumentRoute from './routes/hr3DocumentRoute.js';
+import vsRoute from './routes/vsRoute.js' 
 import dotenv from "dotenv";
 import contractRoutes from './routes/contractRoutes.js'; 
 import riskAssessmentRoutes from './routes/riskAssessmentRoutes.js';
+import axios from 'axios';
 
 dotenv.config();
 
@@ -95,14 +94,97 @@ app.use("/api/qc", qcDataRoute);
 
 app.use('/api/vs', vsRoute)
 
-app.use('/api/financial-reports', financialReportRoutes);
+
 
 app.use('/api/contracts', contractRoutes);
 
-app.use('/hr3/get-documents', hr3DocumentRoute);
 
 app.use('/api/risk-assessments', riskAssessmentRoutes);
 
+const API_BASE_URL_FINANCE = 'https://gateway.jjm-manufacturing.com/finance'; // API Gateway URL for finance (KEEP THIS AS SERVER-SIDE CONSTANT)
+const authURL_FINANCE = process.env.NODE_ENV === 'production'
+    ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-tokenG' // Production token endpoint (KEEP THIS AS SERVER-SIDE CONSTANT)
+    : 'http://localhost:7690/api/auth/get-tokenG'; // Local token endpoint (KEEP THIS AS SERVER-SIDE CONSTANT)
+
+
+app.get('/api/finance-reports', async (req, res) => {
+    try {
+        // 1. Get a token from your auth service (Backend now handles token retrieval)
+        const tokenResponse = await axios.get(authURL_FINANCE); // Use the backend's authURL
+        const token = tokenResponse.data.token;
+
+        if (!token) {
+            console.error("Backend: No token received from auth service!");
+            return res.status(401).json({ error: "Failed to authenticate with token service." }); // Or appropriate error code
+        }
+
+        // 2. Make the request to the API Gateway to get financial reports (from backend)
+        const reportsResponse = await axios.get(`${API_BASE_URL_FINANCE}/get-financial-reports`, { // Use the backend's API_BASE_URL_FINANCE
+            headers: {
+                Authorization: `Bearer ${token}`, // Use the token obtained by the backend
+            },
+        });
+
+        // 3. Send the data back to the frontend
+        res.json(reportsResponse.data); // Send the reports data to the frontend
+    } catch (error) {
+        console.error("Backend error fetching reports:", error);
+        if (error.response) {
+            res.status(error.response.status).json({
+                error: "Failed to fetch financial reports from API Gateway.",
+                details: error.response.data
+            });
+        } else if (error.request) {
+            res.status(500).json({ error: "Failed to fetch financial reports. No response from API Gateway." });
+        }
+        else {
+            res.status(500).json({ error: "Failed to fetch financial reports. An unexpected error occurred on the server." });
+        }
+    }
+});
+
+
+const API_BASE_URL_HR3 = 'https://gateway.jjm-manufacturing.com/hr3'; // API Gateway URL for HR3 (SERVER-SIDE CONSTANT)
+const authURL_HR3 = process.env.NODE_ENV === 'production'
+    ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-tokenG' // Production token endpoint (SERVER-SIDE CONSTANT)
+    : 'http://localhost:7690/api/auth/get-tokenG'; // Local token endpoint (SERVER-SIDE CONSTANT)
+
+
+    app.get('/api/hr3-documents', async (req, res) => {
+    try {
+        // 1. Get a token (Backend handles token retrieval)
+        const tokenResponse = await axios.get(authURL_HR3); // Use backend's authURL_HR3
+        const token = tokenResponse.data.token;
+
+        if (!token) {
+            console.error("Backend: No token received from auth service for HR3!");
+            return res.status(401).json({ error: "Failed to authenticate with token service for HR3." });
+        }
+
+        // 2. Make request to HR3 API Gateway (from backend)
+        const documentsResponse = await axios.get(`${API_BASE_URL_HR3}/get-documents`, { // Use backend's API_BASE_URL_HR3
+            headers: {
+                Authorization: `Bearer ${token}`, // Use the token obtained by backend
+            },
+        });
+
+        // 3. Send HR3 documents data back to frontend
+        res.json(documentsResponse.data); // Send the documents data
+    } catch (error) {
+        console.error("Backend error fetching HR3 documents:", error);
+        if (error.response) {
+            res.status(error.response.status).json({
+                error: "Failed to fetch HR3 documents from API Gateway.",
+                details: error.response.data
+            });
+        } else if (error.request) {
+            res.status(500).json({ error: "Failed to fetch HR3 documents. No response from API Gateway." });
+        }
+        else {
+            res.status(500).json({ error: "Failed to fetch HR3 documents. An unexpected server error occurred." });
+        }
+    }
+});
 
 
 app.listen(port, () => {

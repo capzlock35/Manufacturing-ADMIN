@@ -41,43 +41,34 @@ const FinancialReportsTable = () => {
     // const API_BASE_URL = process.env.NODE_ENV === 'production'
     //     ? 'https://backend-admin.jjm-manufacturing.com/api'
     //     : 'http://localhost:7690/api';
+    const API_BASE_URL = process.env.NODE_ENV === 'production'
+        ? 'https://backend-admin.jjm-manufacturing.com/api' // Base URL of your backend in production
+        : 'http://localhost:7690/api'; // Base URL of your backend in development
 
-    const API_BASE_URL = 'https://gateway.jjm-manufacturing.com/finance'; // Updated API Gateway URL for finance
-
-    const authURL = process.env.NODE_ENV === 'production'
-        ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-tokenG'
-        : 'http://localhost:7690/api/auth/get-tokenG';
 
     useEffect(() => {
         fetchReports();
     }, []);
+
     const fetchReports = async () => {
         setLoading(true);
         setError(null);
         try {
-            const tokenResponse = await axios.get(authURL);
-            const token = tokenResponse.data.token;
-
-            console.log("tokenResponse:", tokenResponse); // ADD THIS LINE
-
-            if (!token) {
-                console.error("🚨 No token received from backend!");
-                return;
-            }
-
-            const response = await axios.get(`${API_BASE_URL}/get-financial-reports`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            // Frontend now calls your backend endpoint `/finance-reports`
+            const response = await axios.get(`${API_BASE_URL}/finance-reports`);
             setReports(response.data);
         } catch (error) {
-            console.error("Error fetching reports:", error);
-            setError("Failed to load financial reports.");
+            console.error("Error fetching reports from backend:", error);
+            if (error.response) {
+                setError(`Failed to load financial reports. Status: ${error.response.status}. ${error.response.data.error || ''} ${error.response.data.details || ''}`);
+            } else {
+                setError("Failed to load financial reports. Network error.");
+            }
         } finally {
             setLoading(false);
         }
     };
+
     const formatCurrency = (value) => {
         if (value == null || isNaN(value)) {
             return '₱ 0.00';
