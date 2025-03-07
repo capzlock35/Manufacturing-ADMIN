@@ -164,7 +164,8 @@ const CoreCreate = () => {
             >
               <option value="audit">Audit</option>
               <option value="admin">Admin</option>
-              <option value="super admin">Super Admin</option>
+              <option value="auditor">Auditor</option>
+              <option value="maintenancemanager">Maintenance Manager</option>
             </select>
           </div>
 

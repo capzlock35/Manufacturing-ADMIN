@@ -22,6 +22,8 @@ import dotenv from "dotenv";
 import contractRoutes from './routes/contractRoutes.js'; 
 import riskAssessmentRoutes from './routes/riskAssessmentRoutes.js';
 import axios from 'axios';
+import newEmployeeRouter from './routes/newEmployeeRoute.js';
+
 
 dotenv.config();
 
@@ -74,6 +76,8 @@ app.use("/api/hrusers", hruserRouter);  // HR
 app.use("/api/logisticusers", logisticuserRouter); // Logistic
 
 app.use("/api/adminusers", admninuserRouter);
+
+app.use("/api/newemployee", newEmployeeRouter);
 
 
 // ----------------------------------------------------------------------------------------

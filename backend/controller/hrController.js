@@ -20,7 +20,7 @@ const getAllUser = async (req, res) => {
 const createUser = async (req, res) => {
     try {
         // Include position in destructuring
-        const { firstName, lastName, email, password, confirmPassword, role, Hr, position } = req.body;
+        const { employeeId, firstName, lastName, email, password, confirmPassword, role, Hr, position } = req.body;
 
         // Check if user already exists
         const existingUser = await Hruser.findOne({ email });
@@ -38,6 +38,7 @@ const createUser = async (req, res) => {
 
         // Create new user
         const newUser = new Hruser({
+            employeeId,
             firstName,
             lastName,
             email,
