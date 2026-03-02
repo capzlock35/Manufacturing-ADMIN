@@ -19,6 +19,7 @@
      const [currentPage, setCurrentPage] = useState(1);
      const [usersPerPage] = useState(5); // You can change this to any number
           const [isLoading, setIsLoading] = useState(true);
+          const [role, setRole] = useState(null);
 
      const baseURL = process.env.NODE_ENV === 'production'
      ? 'https://backend-admin.jjm-manufacturing.com/api/finance'
@@ -60,6 +61,11 @@
      fetchUsers();
    }, []);
 
+   useEffect(() => {
+    const userRole = localStorage.getItem('role');
+    setRole(userRole);
+}, []);
+
      const handleView = (user) => {
          setSelectedUser(user);
          setModalType('view');
@@ -84,21 +90,22 @@
          setIsModalOpen(true);
      };
 
-     const handleDeleteUser = async (userId) => {
-       try {
-           console.log('Delete user with ID:', userId);
-           console.log('Base URL:', baseURL);
-           const response = await axios.delete(`${baseURL}/${userId}`);
-           console.log('Response status:', response.status);
-           if (response.status === 200) {
-               toast.success('User deleted successfully!');
-               setUsers(users.filter(user => user._id !== userId));
-           }
-       } catch (error) {
-           console.error('Failed to delete user:', error);
-           toast.error('An error occurred while trying to delete the user.');
-       }
-   };
+  const handleDeleteUser = async (userId) => {
+      try {
+          console.log('Delete user with ID:', userId);
+          console.log('Base URL:', baseURL);
+          // Correct the delete URL to match backend route "/delete/:id"
+          const response = await axios.delete(`${baseURL}/delete/${userId}`);
+          console.log('Response status:', response.status);
+          if (response.status === 200) {
+              toast.success('User deleted successfully!');
+              setUsers(users.filter(user => user._id !== userId));
+          }
+      } catch (error) {
+          console.error('Failed to delete user:', error);
+          toast.error('An error occurred while trying to delete the user.');
+      }
+  };
 
      const handleCloseModal = () => {
          setIsModalOpen(false);
@@ -299,8 +306,12 @@
                                      <td className="py-3 px-6 text-left border-b border-gray-200">{user.role}</td>
                                      <td className="py-3 px-6 text-center flex">
                                          <button onClick={() => handleView(user)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2">View</button>
-                                         <button onClick={() => handleUpdate(user)} className="bg-green-500 text-white px-3 py-1 rounded mr-2">Update</button>
-                                         <button onClick={() => handleDelete(user)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                                        {role === 'superadmin' && ( // Conditional rendering for Update and Delete
+                                            <>
+                                                <button onClick={() => handleUpdate(user)} className="bg-green-500 text-white px-3 py-1 rounded mr-2">Update</button>
+                                                <button onClick={() => handleDelete(user)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                                            </>
+                                        )}
                                      </td>
                                  </tr>
                              ))

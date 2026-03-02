@@ -1,182 +1,291 @@
-// src/components/MessageBoard.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import TimeAgo from 'react-timeago';
 
-const MessageBoard = () => {
+const baseURL = process.env.NODE_ENV === 'production'
+    ? 'https://backend-admin.jjm-manufacturing.com/api'
+    : 'http://localhost:7690/api';
+
+const adminUsersBaseURL = process.env.NODE_ENV === 'production'
+    ? 'https://backend-admin.jjm-manufacturing.com/api/adminusers'
+    : 'http://localhost:7690/api/adminusers';
+
+const CommunicationPlan = () => {
+    const [channels, setChannels] = useState([]);
+    const [selectedChannel, setSelectedChannel] = useState(null);
     const [messages, setMessages] = useState([]);
-    const [newMessageText, setNewMessageText] = useState('');
-    const [username, setUsername] = useState('');
-    const [loadingUsername, setLoadingUsername] = useState(true);
-    const ws = useRef(null);
+    const [username, setUsername] = useState(''); // Initialize username as empty string
+    const [loadingUsername, setLoadingUsername] = useState(true); // Add loadingUsername state
+    const [newChannelName, setNewChannelName] = useState('');
+    const [isAddingChannel, setIsAddingChannel] = useState(false);
+    const [messageInput, setMessageInput] = useState('');
+    const messagesEndRef = useRef(null);
 
-    // **Define base URL based on environment**
-    const baseURL = process.env.NODE_ENV === 'production'
-        ? 'https://backend-admin.jjm-manufacturing.com/api'
-        : 'http://localhost:7690/api';
-
-    // **Admin Users Base URL (for fetching username)**
-    const adminUsersBaseURL = process.env.NODE_ENV === 'production'
-        ? 'https://backend-admin.jjm-manufacturing.com/api/adminusers'
-        : 'http://localhost:7690/api/adminusers';
-
-    // **Define WebSocket URL similarly**
-    const wsURL = process.env.NODE_ENV === 'production'
-    ? 'wss://backend-admin.jjm-manufacturing.com' // **Correct: wss:// for production**
-    : 'ws://localhost:7690';
     useEffect(() => {
-        const fetchMessages = async () => {
-            try {
-                const response = await axios.get(`${baseURL}/messages`);
-                setMessages(response.data);
-            } catch (error) {
-                console.error("Error fetching messages:", error);
-            }
-        };
-
-        const fetchUsername = async () => {
-            const userid = localStorage.getItem('userid');
-            const token = localStorage.getItem('token');
-
-            if (!userid || !token) {
-                console.error("userid or token not found in local storage.");
-                setUsername("Unknown User - No UserID or Token");
-                setLoadingUsername(false);
-                return;
-            }
-
-            try {
-                const response = await axios.get(`${adminUsersBaseURL}/username/${userid}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                console.log("MessageBoard.jsx - fetchUsername - response.data:", response.data);
-                if (response.data && response.data.username) {
-                    setUsername(response.data.username);
-                } else {
-                    setUsername("Unknown User - No userName in Response");
-                }
-            } catch (error) {
-                console.error('Error fetching userName:', error);
-                setUsername('Unknown User - Fetch Error');
-            } finally {
-                setLoadingUsername(false);
-            }
-        };
-
-        fetchMessages();
-        fetchUsername();
-
-        ws.current = new WebSocket(wsURL);
-
-        ws.current.onopen = () => {
-            console.log("WebSocket connection opened");
-        };
-
-        ws.current.onmessage = event => {
-            console.log("WebSocket onmessage event triggered");
-            console.log("WebSocket message data received:", event.data);
-
-            try {
-                const message = JSON.parse(event.data);
-                console.log("Parsed message from WebSocket:", message);
-                setMessages(prevMessages => {
-                    console.log("Previous messages state:", prevMessages);
-                    const updatedMessages = [...prevMessages, message];
-                    console.log("Updated messages state:", updatedMessages);
-                    return updatedMessages;
-                });
-                console.log("Messages state updated successfully");
-            } catch (error) {
-                console.error("Error parsing WebSocket message data:", error);
-            }
-        };
-
-        ws.current.onclose = () => {
-            console.log("WebSocket connection closed");
-        };
-
-        ws.current.onerror = error => {
-            console.error("WebSocket error:", error);
-        };
-
-        return () => {
-            if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-                ws.current.close();
-            }
-        };
+        fetchChannels();
+        fetchUsername(); // Fetch username on component mount
     }, []);
 
-    const handleSendMessage = () => {
-        if (newMessageText.trim() && username) {
-            if (ws.current && ws.current.readyState === WebSocket.OPEN) { // **Check connection state**
-                const messagePayload = { username, message: newMessageText };
-                ws.current.send(JSON.stringify(messagePayload));
-                setNewMessageText('');
-            } else {
-                console.error("WebSocket connection is not open. Cannot send message.");
-                alert("Could not send message. WebSocket connection is not open."); // Inform user
-            }
-        } else if (!username && !loadingUsername) {
-            alert("Username could not be determined. Please refresh the page or contact support.");
+    useEffect(() => {
+        if (selectedChannel) {
+            fetchMessages(selectedChannel._id);
+        } else {
+            setMessages([]);
+        }
+    }, [selectedChannel]);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const fetchChannels = async () => {
+        try {
+            const response = await axios.get(`${baseURL}/channels`);
+            setChannels(response.data);
+        } catch (error) {
+            console.error("Error fetching channels:", error);
         }
     };
 
-    return (
-        <div className="min-h-screen bg-white py-6"> {/* Main background is white */}
-            <div className="container mx-auto p-4 flex flex-col h-full"> {/* Main container flex column */}
+    const fetchMessages = async (channelId) => {
+        try {
+            const response = await axios.get(`${baseURL}/messages/channel/${channelId}`);
+            setMessages(response.data);
+        } catch (error) {
+            console.error("Error fetching messages:", error);
+        }
+    };
 
-                {/* **Container 1: Title + Username Area - Light Yellow Background** */}
-                <div className="mb-4 p-2 bg-yellow-50 border-b border-gray-200"> {/* Added bg-yellow-50 */}
-                    <h2 className="text-2xl font-bold mb-2 text-black">Message Board</h2>
-                    {loadingUsername ? (
-                        <p>Loading username...</p>
-                    ) : (
-                        <div>
-                            <p className="block text-gray-700 text-sm font-bold mb-0">Logged in as: <span className="font-normal">{username || 'Guest'}</span></p>
-                        </div>
-                    )}
+    const fetchUsername = async () => {
+        const userid = localStorage.getItem('userid');
+        const token = localStorage.getItem('token');
+
+        if (!userid || !token) {
+            console.error("userid or token not found in local storage.");
+            setUsername("Unknown User - No UserID or Token");
+            setLoadingUsername(false);
+            return;
+        }
+
+        try {
+            const response = await axios.get(`${adminUsersBaseURL}/username/${userid}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log("CommunicationPlan.jsx - fetchUsername - response.data:", response.data);
+            if (response.data && response.data.username) {
+                setUsername(response.data.username);
+            } else {
+                setUsername("Unknown User - No userName in Response");
+            }
+        } catch (error) {
+            console.error('Error fetching userName:', error);
+            setUsername('Unknown User - Fetch Error');
+        } finally {
+            setLoadingUsername(false);
+        }
+    };
+
+
+    const handleChannelSelect = (channel) => {
+        setSelectedChannel(channel);
+    };
+
+    const handleSendMessage = async (messageContent) => {
+        if (!selectedChannel) return;
+
+        if (!username && !loadingUsername) {
+            alert("Username could not be determined. Please refresh the page or contact support.");
+            return; // Exit if username is not available
+        }
+
+        try {
+            const response = await axios.post(`${baseURL}/messages`, {
+                channelId: selectedChannel._id,
+                username: username, // Use fetched username here
+                content: messageContent,
+            });
+            if (response.status === 201) {
+                fetchMessages(selectedChannel._id);
+            }
+        } catch (error) {
+            console.error("Error sending message:", error);
+        }
+    };
+
+    const handleAddChannel = async (channelName) => {
+        try {
+            const response = await axios.post(`${baseURL}/channels`, { name: channelName });
+            if (response.status === 201) {
+                fetchChannels();
+            }
+        } catch (error) {
+            console.error("Error adding channel:", error);
+        }
+    };
+
+    // Channel List Handlers
+    const handleAddChannelClick = () => {
+        setIsAddingChannel(true);
+    };
+
+    const handleCreateChannel = () => {
+        if (newChannelName.trim()) {
+            handleAddChannel(newChannelName);
+            setNewChannelName('');
+            setIsAddingChannel(false);
+        }
+    };
+
+    const handleCancelAddChannel = () => {
+        setIsAddingChannel(false);
+        setNewChannelName('');
+    };
+
+    // Message Section Handlers
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const handleInputChange = (e) => {
+        setMessageInput(e.target.value);
+    };
+
+    const handleSendMessageClick = () => {
+        if (messageInput.trim()) {
+            handleSendMessage(messageInput);
+            setMessageInput('');
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessageClick();
+        }
+    };
+
+    const Message = ({ message }) => {
+        return (
+            <div className="mb-2 p-3 bg-gray-100 rounded-lg shadow-sm">
+                <div className="font-semibold">{message.username}</div>
+                <div className="text-gray-700">{message.content}</div>
+                <div className="text-sm text-gray-500 mt-1">
+                    <TimeAgo date={message.timestamp} />
                 </div>
+            </div>
+        );
+    };
 
-                {/* **Container 2: Chatbox (Message Display Area) - Light Gray Background** */}
-                <div className="flex flex-col mb-4 border rounded p-2 h-96 overflow-y-auto flex-grow text-black border-black bg-gray-200"> {/* Added bg-gray-50 */}
-                    {messages.map(msg => {
-                        const isCurrentUserMessage = msg.username === username;
-                        return (
-                            <div
-                                key={msg._id}
-                                className={`mb-2 p-2 rounded bg-gray-100 ${isCurrentUserMessage ? 'self-end bg-blue-100 text-right' : 'self-start bg-gray-100 text-left'}`}
-                            >
-                                <p className="font-bold">{msg.username} <span className="text-sm font-normal text-gray-500">{new Date(msg.timestamp).toLocaleString()}</span></p>
-                                <p>{msg.message}</p>
-                            </div>
-                        );
-                    })}
-                    {messages.length === 0 && <p className="text-gray-500 text-center">No messages yet. Be the first to post!</p>}
-                </div>
 
-                {/* **Container 3: Send Message Area - Light Green Background** */}
-                <div className="flex p-2 bg-green-50 border-t border-gray-200"> {/* Added bg-green-50 */}
+    const ChannelListComponent = () => (
+        <div>
+            <h2 className="text-xl font-semibold mb-4">Channels</h2>
+            <ul>
+                {channels.map(channel => (
+                    <li
+                        key={channel._id}
+                        onClick={() => handleChannelSelect(channel)}
+                        className={`py-2 px-3 rounded cursor-pointer hover:bg-gray-300 ${selectedChannel && selectedChannel._id === channel._id ? 'bg-gray-300 font-semibold' : ''}`}
+                    >
+                        Channel: {channel.name}
+                    </li>
+                ))}
+            </ul>
+
+            {!isAddingChannel ? (
+                <button
+                    onClick={handleAddChannelClick}
+                    className="mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                >
+                    + Add Channel
+                </button>
+            ) : (
+                <div className="mt-4">
                     <input
                         type="text"
-                        placeholder="Enter your message..."
-                        className="shadow appearance-none border rounded w-full py-2 px-3 bg-white text-black border-black leading-tight focus:outline-none focus:shadow-outline mr-2"
-                        value={newMessageText}
-                        onChange={(e) => setNewMessageText(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' ? handleSendMessage() : null}
+                        placeholder="Channel Name"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
+                        value={newChannelName}
+                        onChange={(e) => setNewChannelName(e.target.value)}
+                    />
+                    <div className="flex space-x-2">
+                        <button
+                            onClick={handleCreateChannel}
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        >
+                            Create
+                        </button>
+                        <button
+                            onClick={handleCancelAddChannel}
+                            className="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+
+    const MessageSectionComponent = () => {
+        if (!selectedChannel) {
+            return <div className="text-gray-500 italic">Select a channel to view messages.</div>;
+        }
+
+        return (
+            <div>
+                <h2 className="text-xl font-semibold mb-4">Channel: {selectedChannel.name}</h2>
+                {loadingUsername ? (
+                    <p>Loading username...</p> // Or display loading indicator if preferred
+                ) : (
+                    <p className="mb-2 text-sm text-gray-600">Logged in as: {username || 'Unknown'}</p>
+                )}
+
+                {/* Message Display Area */}
+                <div className="overflow-y-auto h-[calc(100vh-300px)] p-2 border rounded bg-white shadow-sm"> {/* Adjusted height */}
+                    {messages.map(message => (
+                        <Message key={message._id} message={message} />
+                    ))}
+                    <div ref={messagesEndRef} />
+                </div>
+
+                {/* Message Input Area */}
+                <div className="mt-4">
+                    <textarea
+                        placeholder="Type your message..."
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        rows="3"
+                        value={messageInput}
+                        onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
                     />
                     <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        type="button"
-                        onClick={handleSendMessage}
+                        onClick={handleSendMessageClick}
+                        className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                     >
                         Send
                     </button>
                 </div>
+            </div>
+        );
+    };
 
+
+    return (
+        <div className="flex h-screen bg-gray-100">
+            {/* Channel List Sidebar */}
+            <div className="w-64 bg-gray-200 p-4">
+                <ChannelListComponent />
+            </div>
+
+            {/* Message Section */}
+            <div className="flex-1 p-4 flex flex-col justify-between">
+                <MessageSectionComponent />
             </div>
         </div>
     );
 };
 
-export default MessageBoard;
+export default CommunicationPlan;

@@ -1,13 +1,15 @@
  // src/components/CoreList1.jsx
  import React, { useState, useEffect } from 'react';
  import axios from 'axios';
- import { Link } from 'react-router-dom';
+ import { Link } from 'react-router-dom'; // Link is already imported
  import { toast } from "react-hot-toast";
  import { IoMdArrowRoundBack } from "react-icons/io";
  import * as XLSX from 'xlsx';
  import { CiExport } from "react-icons/ci";
+ import { FaUserSlash, FaList } from "react-icons/fa"; // Added FaList for inactive list icon
  import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
+ import 'react-loading-skeleton/dist/skeleton.css';
+
 
  const CoreList1 = () => {
      const [users, setUsers] = useState([]);
@@ -16,8 +18,9 @@ import 'react-loading-skeleton/dist/skeleton.css';
      const [modalType, setModalType] = useState('');
      const [editFormData, setEditFormData] = useState({});
      const [currentPage, setCurrentPage] = useState(1);
-     const [usersPerPage] = useState(10); // 10 accounts per page
+     const [usersPerPage] = useState(10);
      const [isLoading, setIsLoading] = useState(true);
+     const [role, setRole] = useState(null);
 
      const baseURL = process.env.NODE_ENV === 'production'
          ? 'https://backend-admin.jjm-manufacturing.com/api/coreusers'
@@ -27,36 +30,41 @@ import 'react-loading-skeleton/dist/skeleton.css';
          ? 'https://backend-admin.jjm-manufacturing.com/api/auth/get-token'
          : 'http://localhost:7690/api/auth/get-token';
 
-     const fetchUsers = async () => {
-            setIsLoading(true);
+     // --- MODIFIED: Fetch only ACTIVE users ---
+     const fetchActiveUsers = async () => {
+         setIsLoading(true);
          try {
-             // Get token using dynamic authURL
              const tokenResponse = await axios.get(authURL);
              const token = tokenResponse.data.token;
 
              if (!token) {
                  console.error("🚨 No token received from backend!");
+                 toast.error("Authentication failed. Please log in again.");
+                 setIsLoading(false);
                  return;
              }
 
-             // Fetch users with authentication
-             const response = await axios.get(`${baseURL}/get`, {
-                 headers: {
-                     Authorization: `Bearer ${token}`, // Ensure "Bearer" is included
-                 },
+             const response = await axios.get(`${baseURL}/getActiveUsers`, {
+                 headers: { Authorization: `Bearer ${token}` },
              });
 
-             console.log("✅ Backend Response:", response.data);
+             console.log("✅ Backend Response (Active Users):", response.data);
              setUsers(response.data);
          } catch (err) {
-             console.error("❌ Error fetching users:", err.response ? err.response.data : err.message);
+             console.error("❌ Error fetching active users:", err.response ? err.response.data : err.message);
+             toast.error("Failed to load users.");
          } finally {
-            setIsLoading(false);
+             setIsLoading(false);
          }
      };
 
      useEffect(() => {
-         fetchUsers();
+         fetchActiveUsers();
+     }, []);
+
+     useEffect(() => {
+         const userRole = localStorage.getItem('role');
+         setRole(userRole);
      }, []);
 
      const handleView = (user) => {
@@ -68,12 +76,18 @@ import 'react-loading-skeleton/dist/skeleton.css';
      const handleUpdate = (user) => {
          setSelectedUser(user);
          setModalType('update');
-         setEditFormData({  // Initialize form data with the user's current values
+         setEditFormData({
              name: user.name,
              email: user.email,
-             Core: user.Core, // Initialize Core
-             role: user.role // Initialize role
+             Core: user.Core,
+             role: user.role
          });
+         setIsModalOpen(true);
+     };
+
+     const handleDeactivateClick = (user) => {
+         setSelectedUser(user);
+         setModalType('deactivate');
          setIsModalOpen(true);
      };
 
@@ -83,35 +97,66 @@ import 'react-loading-skeleton/dist/skeleton.css';
          setIsModalOpen(true);
      };
 
-     const handleDeleteUser = async (userId) => {
+     const handleDeactivateUser = async (userId) => {
+         setIsLoading(true);
          try {
              const tokenResponse = await axios.get(authURL);
              const token = tokenResponse.data.token;
+             if (!token) { toast.error("Auth error"); setIsLoading(false); return; }
 
-             const response = await axios.delete(`${baseURL}/${userId}`, {
-                 headers: {
-                     Authorization: `Bearer ${token}`,
-                 },
+             const response = await axios.patch(`${baseURL}/deactivateUser/${userId}`, {}, {
+                 headers: { Authorization: `Bearer ${token}` },
              });
 
              if (response.status === 200) {
-                 toast.success('User deleted successfully!');
-                 setUsers(users.filter(user => user._id !== userId));
+                 toast.success('User removed (deactivated) successfully!');
+                 setUsers(prevUsers => prevUsers.filter(user => user._id !== userId));
+                 handleCloseModal();
+             } else {
+                 console.error('Failed to deactivate user:', response);
+                 toast.error('Failed to remove user.');
+             }
+         } catch (error) {
+             console.error('Error deactivating user:', error.response ? error.response.data : error.message);
+             toast.error('An error occurred while removing the user.');
+         } finally {
+             setIsLoading(false);
+         }
+     };
+
+     const handleDeleteUser = async (userId) => {
+         setIsLoading(true);
+         try {
+             const tokenResponse = await axios.get(authURL);
+             const token = tokenResponse.data.token;
+             if (!token) { toast.error("Auth error"); setIsLoading(false); return; }
+
+             const response = await axios.delete(`${baseURL}/${userId}`, {
+                 headers: { Authorization: `Bearer ${token}` },
+             });
+
+             if (response.status === 200) {
+                 toast.success('User permanently deleted!');
+                 setUsers(prevUsers => prevUsers.filter(user => user._id !== userId));
+                 handleCloseModal();
              } else {
                  console.error('Failed to delete user:', response);
                  toast.error('Failed to delete user.');
              }
          } catch (error) {
-             console.error('Failed to delete user:', error);
-             toast.error('An error occurred while trying to delete the user.');
+             console.error('Error deleting user:', error.response ? error.response.data : error.message);
+             toast.error('An error occurred while deleting the user.');
+         } finally {
+             setIsLoading(false);
          }
      };
+
 
      const handleCloseModal = () => {
          setIsModalOpen(false);
          setSelectedUser(null);
          setModalType('');
-         setEditFormData({}); // Clear edit form data
+         setEditFormData({});
      };
 
      const handleEditFormChange = (e) => {
@@ -122,47 +167,66 @@ import 'react-loading-skeleton/dist/skeleton.css';
      };
 
      const handleUpdateUser = async () => {
+         setIsLoading(true);
          try {
-             const response = await axios.put(`${baseURL}/update/${selectedUser._id}`, editFormData);
+             const tokenResponse = await axios.get(authURL);
+             const token = tokenResponse.data.token;
+             if (!token) { toast.error("Auth error"); setIsLoading(false); return; }
+
+             const response = await axios.put(`${baseURL}/update/${selectedUser._id}`, editFormData, {
+                 headers: { Authorization: `Bearer ${token}` },
+             });
+
              if (response.status === 200) {
                  toast.success('User updated successfully!');
-                 // Update the user in the local state
-                 setUsers(users.map(user => user._id === selectedUser._id ? response.data.user : user));
+                 setUsers(prevUsers => prevUsers.map(user =>
+                     user._id === selectedUser._id ? { ...user, ...response.data.user } : user
+                 ));
                  handleCloseModal();
              }
          } catch (error) {
-             console.error('Failed to update user:', error);
-             toast.error('An error occurred while trying to update the user.');
+             console.error('Failed to update user:', error.response ? error.response.data : error.message);
+             toast.error('An error occurred while updating the user.');
+         } finally {
+             setIsLoading(false);
          }
      };
 
      const handleExportToExcel = () => {
-         const ws = XLSX.utils.json_to_sheet(users);
+         const dataToExport = users.map(user => ({
+             Name: user.name,
+             Email: user.email,
+             Core: user.Core,
+             Role: user.role,
+             Status: user.status
+         }));
+         const ws = XLSX.utils.json_to_sheet(dataToExport);
          const wb = XLSX.utils.book_new();
-         XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-         XLSX.writeFile(wb, "Core_users.xlsx");
+         XLSX.utils.book_append_sheet(wb, ws, "Active_Users");
+         XLSX.writeFile(wb, "Active_Core_Users.xlsx");
      };
 
-     // Get current users for pagination
      const indexOfLastUser = currentPage * usersPerPage;
      const indexOfFirstUser = indexOfLastUser - usersPerPage;
      const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
 
-     // Change page
      const paginate = (pageNumber) => setCurrentPage(pageNumber);
-     const prevPage = () => setCurrentPage(currentPage - 1);
-     const nextPage = () => setCurrentPage(currentPage + 1);
+     const prevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
+     const nextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
      const totalPages = Math.ceil(users.length / usersPerPage);
 
+     const Modal = ({ user, type, onClose }) => {
+         if (!isModalOpen || !user) return null;
 
-     // Integrated Modal Component
-     const Modal = ({ user, type, onClose, onDelete }) => {
-         if (!isModalOpen) return null;
+         let title = "User Details";
+         if (type === 'update') title = "Update User";
+         if (type === 'delete') title = "Confirm Permanent Delete";
+         if (type === 'deactivate') title = "Confirm Removal";
 
          return (
              <div className="fixed top-0 z-50 left-0 w-full h-full bg-gray-500 bg-opacity-75 flex items-center justify-center">
                  <div className="bg-white p-8 rounded shadow-md w-96">
-                     <h2 className="text-2xl font-bold text-black mb-4">{type === 'view' ? 'View User' : type === 'update' ? 'Update User' : 'Delete User'}</h2>
+                     <h2 className="text-2xl font-bold text-black mb-4">{title}</h2>
 
                      {type === 'view' && (
                          <div>
@@ -170,62 +234,45 @@ import 'react-loading-skeleton/dist/skeleton.css';
                              <p>Email: {user.email}</p>
                              <p>Core: {user.Core}</p>
                              <p>Role: {user.role}</p>
+                             <p>Status: {user.status}</p>
                          </div>
                      )}
 
                      {type === 'update' && (
                          <div>
-                             {/* Update Form */}
                              <div className="mb-4">
                                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="editName">Name</label>
                                  <input
                                      className="shadow appearance-none border rounded w-full py-2 px-3 text-black border-black bg-white leading-tight focus:outline-none focus:shadow-outline"
-                                     id="editName"
-                                     type="text"
-                                     name="name"
-                                     value={editFormData.name || ''}
-                                     onChange={handleEditFormChange}
+                                     id="editName" type="text" name="name" value={editFormData.name || ''} onChange={handleEditFormChange}
                                  />
                              </div>
                              <div className="mb-4">
                                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="editEmail">Email</label>
                                  <input
-                                     className="shadow appearance-none border rounded w-full py-2 px-3  text-black border-black bg-white leading-tight focus:outline-none focus:shadow-outline"
-                                     id="editEmail"
-                                     type="email"
-                                     name="email"
-                                     value={editFormData.email || ''}
-                                     onChange={handleEditFormChange}
+                                     className="shadow appearance-none border rounded w-full py-2 px-3 text-black border-black bg-white leading-tight focus:outline-none focus:shadow-outline"
+                                     id="editEmail" type="email" name="email" value={editFormData.email || ''} onChange={handleEditFormChange}
                                  />
                              </div>
-                             {/* Core Select in Update Form */}
                              <div className="mb-4">
                                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="editCore">Core</label>
                                  <select
                                      className="shadow appearance-none border rounded w-full py-2 px-3 border-black bg-white text-black leading-tight focus:outline-none focus:shadow-outline"
-                                     id="editCore"
-                                     name="Core"
-                                     value={editFormData.Core || 1}
-                                     onChange={handleEditFormChange}
-                                 >
+                                     id="editCore" name="Core" value={editFormData.Core || 1} onChange={handleEditFormChange} >
                                      <option value={1}>Core 1</option>
                                      <option value={2}>Core 2</option>
                                  </select>
                              </div>
-
-                             {/* Role Select in Update Form */}
                              <div className="mb-4">
                                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="editRole">Role</label>
                                  <select
                                      className="shadow appearance-none border rounded w-full py-2 px-3 border-black bg-white text-black leading-tight focus:outline-none focus:shadow-outline"
-                                     id="editRole"
-                                     name="role"
-                                     value={editFormData.role || 'audit'}
-                                     onChange={handleEditFormChange}
-                                 >
+                                     id="editRole" name="role" value={editFormData.role || 'audit'} onChange={handleEditFormChange} >
                                      <option value="audit">Audit</option>
+                                     <option value="auditor">Auditor</option>
+                                     <option value="maintenancemanager">Maintenance Manager</option>
                                      <option value="admin">Admin</option>
-                                     <option value="super admin">Super Admin</option>
+                                     <option value="superadmin">Super Admin</option>
                                  </select>
                              </div>
                              <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={handleUpdateUser}>
@@ -234,15 +281,14 @@ import 'react-loading-skeleton/dist/skeleton.css';
                          </div>
                      )}
 
-                     {type === 'delete' && (
+                     {type === 'deactivate' && (
                          <div>
-                             <p>Are you sure you want to delete user {user.name}?</p>
+                             <p className='text-black'>Are you sure you want to remove user <span className='font-bold'>{user.name}</span> from the active list?</p>
+                             <p className='text-sm text-gray-600 mb-4'>(This will mark them as inactive.)</p>
                              <div className="flex justify-end mt-4">
-                                 <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={() => {
-                                     handleDeleteUser(user._id);
-                                     handleCloseModal();
-                                 }}>
-                                     Yes, Delete
+                                 <button className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded mr-2"
+                                         onClick={() => handleDeactivateUser(user._id)}>
+                                     Yes, Remove
                                  </button>
                                  <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" onClick={onClose}>
                                      Cancel
@@ -251,33 +297,68 @@ import 'react-loading-skeleton/dist/skeleton.css';
                          </div>
                      )}
 
-                     <div className="flex justify-end mt-4">
-                         {type !== 'delete' && (
+                     {type === 'delete' && (
+                         <div>
+                             <p className='text-black'>Are you sure you want to <span className='font-bold text-red-600'>permanently delete</span> user <span className='font-bold'>{user.name}</span>?</p>
+                             <p className='text-sm text-red-700 mb-4'>(This action cannot be undone.)</p>
+                             <div className="flex justify-end mt-4">
+                                 <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2"
+                                         onClick={() => handleDeleteUser(user._id)}>
+                                     Yes, Delete Permanently
+                                 </button>
+                                 <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" onClick={onClose}>
+                                     Cancel
+                                 </button>
+                             </div>
+                         </div>
+                     )}
+
+                     {(type === 'view' || type === 'update') && (
+                         <div className="flex justify-end mt-4">
                              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={onClose}>
                                  Close
                              </button>
-                         )}
-                     </div>
+                         </div>
+                     )}
                  </div>
              </div>
          );
      };
 
+
      return (
          <div className="p-4 h-screen bg-gray-200">
              <div className="container mx-auto p-4">
-                 {/* Back Button */}
-                 <Link to="/home/accountlist"> {/* Adjust the link as needed */}
-                     <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow">
-                         <IoMdArrowRoundBack />
-                     </button>
-                 </Link>
+                 {/* --- MODIFIED Header Section --- */}
+                 <div className="flex justify-between items-center mb-4">
+                     {/* Back Button */}
+                     <Link to="/home/accountlist">
+                         <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow flex items-center"> {/* Added flex */}
+                             <IoMdArrowRoundBack className="mr-1" /> Back {/* Added margin */}
+                         </button>
+                     </Link>
 
-                 <h1 className="text-2xl font-bold mb-4 text-black">Core Department</h1>
-                 <button onClick={handleExportToExcel} className="bg-yellow-500 text-white px-4 py-2 rounded mb-4">
-                     <CiExport />
-                 </button>
+                     {/* Title */}
+                     <h1 className="text-2xl font-bold text-black text-center flex-grow">Core Department - Active Users</h1> {/* Added centering and grow */}
 
+                     {/* Action Buttons Group */}
+                     <div className="flex items-center space-x-2"> {/* Group buttons */}
+                         {/* --- NEW Link to Inactive List --- */}
+                         <Link to="/home/InactiveCoreList" title="View Inactive Users">
+                            <button className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded shadow flex items-center">
+                                <FaList className="mr-1" /> Inactive {/* Added icon and text */}
+                            </button>
+                         </Link>
+                         {/* Export Button */}
+                         <button onClick={handleExportToExcel} title="Export Active Users" className="bg-yellow-500 text-white px-4 py-2 rounded shadow flex items-center"> {/* Added flex */}
+                             <CiExport className="mr-1"/> Export {/* Added margin */}
+                         </button>
+                     </div>
+                 </div>
+                 {/* --- End of MODIFIED Header Section --- */}
+
+
+                 {/* Table - No Design Change */}
                  <table className="min-w-full bg-white">
                      <thead>
                          <tr className="bg-gray-300 text-gray-600 uppercase text-sm leading-normal">
@@ -290,68 +371,77 @@ import 'react-loading-skeleton/dist/skeleton.css';
                      </thead>
                      <tbody className="text-gray-600 text-sm font-light border">
                          {isLoading ? (
-                             // Skeleton loading state
                              Array(usersPerPage).fill(0).map((_, index) => (
-                                 <tr key={index}>
-                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton /></td> {/* Skeleton for Name */}
-                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton /></td> {/* Skeleton for Email */}
-                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton width={50} /></td> {/* Skeleton for Core */}
-                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton width={60} /></td> {/* Skeleton for Role */}
-                                     <td className="py-3 px-6 text-center border-b border-gray-200"><Skeleton width={80} /></td> {/* Skeleton for Actions */}
+                                 <tr key={index} className="border-b border-gray-200">
+                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton /></td>
+                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton /></td>
+                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton width={50} /></td>
+                                     <td className="py-3 px-6 text-left border-b border-gray-200"><Skeleton width={60} /></td>
+                                     <td className="py-3 px-6 text-center border-b border-gray-200"><Skeleton width={120} /></td>
                                  </tr>
                              ))
                          ) : (
-                             currentUsers.map((user) => ( // Use currentUsers here
-                                 <tr key={user._id}>
+                            currentUsers.length > 0 ? currentUsers.map((user) => (
+                                 <tr key={user._id} className="border-b border-gray-200">
                                      <td className="py-3 px-6 text-left border-b border-gray-200">{user.name}</td>
                                      <td className="py-3 px-6 text-left border-b border-gray-200">{user.email}</td>
                                      <td className="py-3 px-6 text-left border-b border-gray-200">{user.Core}</td>
                                      <td className="py-3 px-6 text-left border-b border-gray-200">{user.role}</td>
-                                     <td className="py-3 px-6 text-center flex">
+                                     <td className="py-3 px-6 text-center border-b border-gray-200">
                                          <button onClick={() => handleView(user)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2">View</button>
-                                         <button onClick={() => handleUpdate(user)} className="bg-green-500 text-white px-3 py-1 rounded mr-2">Update</button>
-                                         <button onClick={() => handleDelete(user)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                                         {role === 'superadmin' && (
+                                             <>
+                                                 <button onClick={() => handleUpdate(user)} className="bg-green-500 text-white px-3 py-1 rounded mr-2">Update</button>
+                                                 <button onClick={() => handleDeactivateClick(user)} className="bg-yellow-500 text-white px-3 py-1 rounded mr-2">Remove</button>
+                                                 {/* <button onClick={() => handleDelete(user)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button> */}
+                                             </>
+                                         )}
                                      </td>
                                  </tr>
-                             ))
+                             )) : (
+                                <tr>
+                                    <td colSpan="5" className="text-center py-4 text-gray-500 border-b border-gray-200">No active users found.</td>
+                                </tr>
+                             )
                          )}
                      </tbody>
                  </table>
 
-                 {/* Pagination */}
-                 <div className="flex justify-center mt-4">
-                     <button
-                         onClick={prevPage}
-                         disabled={currentPage === 1}
-                         className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l disabled:opacity-50"
-                     >
-                         Previous
-                     </button>
-                     {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
+                 {/* Pagination - No Design Change */}
+                 {!isLoading && users.length > usersPerPage && (
+                     <div className="flex justify-center mt-4">
                          <button
-                             key={pageNumber}
-                             onClick={() => paginate(pageNumber)}
-                             className={`bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 ${currentPage === pageNumber ? 'bg-blue-500 text-white hover:bg-blue-700' : ''}`}
+                             onClick={prevPage}
+                             disabled={currentPage === 1}
+                             className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l disabled:opacity-50"
                          >
-                             {pageNumber}
+                             Previous
                          </button>
-                     ))}
-                     <button
-                         onClick={nextPage}
-                         disabled={currentPage === totalPages}
-                         className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r disabled:opacity-50"
-                     >
-                         Next
-                     </button>
-                 </div>
+                         {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
+                             <button
+                                 key={pageNumber}
+                                 onClick={() => paginate(pageNumber)}
+                                 className={`bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 ${currentPage === pageNumber ? 'bg-blue-500 text-white hover:bg-blue-700' : ''}`}
+                             >
+                                 {pageNumber}
+                             </button>
+                         ))}
+                         <button
+                             onClick={nextPage}
+                             disabled={currentPage === totalPages}
+                             className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r disabled:opacity-50"
+                         >
+                             Next
+                         </button>
+                     </div>
+                 )}
              </div>
 
-             {/* Integrated Modal */}
+             {/* Modal Rendering */}
              <Modal
                  user={selectedUser}
                  type={modalType}
                  onClose={handleCloseModal}
-                 onDelete={handleDeleteUser}
              />
          </div>
      );

@@ -11,6 +11,15 @@ const ProfileUser = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    // State for Change Password Modal
+    const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmNewPassword, setConfirmNewPassword] = useState("");
+    const [changePasswordMessage, setChangePasswordMessage] = useState("");
+    const [changePasswordError, setChangePasswordError] = useState("");
+
+
     const baseURL = process.env.NODE_ENV === 'production'
         ? 'https://backend-admin.jjm-manufacturing.com/api/adminusers'
         : 'http://localhost:7690/api/adminusers';
@@ -120,7 +129,60 @@ const ProfileUser = () => {
         return <p>No user data available.</p>;
     }
 
-        const age = calculateAge(userData.birthday);
+    const age = calculateAge(userData.birthday);
+
+    const openChangePasswordModal = () => {
+        setIsChangePasswordModalOpen(true);
+        setChangePasswordMessage(""); // Clear any previous messages
+        setChangePasswordError("");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmNewPassword("");
+    };
+
+    const closeChangePasswordModal = () => {
+        setIsChangePasswordModalOpen(false);
+    };
+
+    const handleChangePasswordSubmit = async (e) => {
+        e.preventDefault();
+        setChangePasswordMessage("");
+        setChangePasswordError("");
+
+        if (!currentPassword || !newPassword || !confirmNewPassword) {
+            setChangePasswordError("All fields are required.");
+            return;
+        }
+
+        if (newPassword !== confirmNewPassword) {
+            setChangePasswordError("New passwords do not match.");
+            return;
+        }
+
+        const token = localStorage.getItem("token");
+        try {
+            const response = await axios.put(
+                `${baseURL}/change-password`,
+                { currentPassword, newPassword, confirmNewPassword },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+
+            setChangePasswordMessage(response.data.message);
+            setChangePasswordError("");
+            // Optionally clear password fields and close modal after successful change
+            setCurrentPassword("");
+            setNewPassword("");
+            setConfirmNewPassword("");
+            // closeChangePasswordModal(); // Decide if you want to close automatically
+        } catch (err) {
+            console.error("Error changing password:", err);
+            setChangePasswordError(err.response?.data?.message || "Failed to change password.");
+            setChangePasswordMessage("");
+        }
+    };
+
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100"> {/* min-h-screen for full height */}
@@ -133,7 +195,7 @@ const ProfileUser = () => {
                          className="w-full h-full object-cover"
                       />
                  </div>
-                
+
                 {/* Profile Content */}
                 <div className="flex flex-col md:flex-row p-8">
                     {/* Profile Picture and User Info */}
@@ -143,26 +205,33 @@ const ProfileUser = () => {
                             <img
                                 src={userData.image.secure_url}
                                 alt="Profile Picture"
-                                className="w-48 h-48 rounded-full border-4 border-white transform -translate-y-24" 
+                                className="w-48 h-48 rounded-full border-4 border-white transform -translate-y-24"
                             />
                         )}
 
                         {/* User Info */}
                         <div className="text-center mt-2 transform -translate-y-24">
                             <p className="text-sm text-gray-500">@{userData.userName}</p>
-                            <h1 className="text-3xl font-semibold text-gray-800">{userData.firstName} {userData.lastName}</h1> 
-                            <p className="text-lg text-gray-600">{userData.role}</p> 
+                            <h1 className="text-3xl font-semibold text-gray-800">{userData.firstName} {userData.lastName}</h1>
+                            <p className="text-lg text-gray-600">{userData.role}</p>
                         </div>
+                         {/* Change Password Button */}
+                         <button
+                            onClick={openChangePasswordModal}
+                            className="mt-4 py-2 px-4 bg-yellow-500 hover:bg-yellow-700 text-white font-bold rounded focus:outline-none focus:shadow-outline"
+                        >
+                            Change Password
+                        </button>
                     </div>
 
                     {/* Stats and Details */}
                     <div className="md:w-2/3 mt-6 md:mt-0">
-                        <h2 className="text-xl font-semibold text-gray-700 mb-4">User Details</h2> 
+                        <h2 className="text-xl font-semibold text-gray-700 mb-4">User Details</h2>
                         <p className="text-gray-600">Email: {userData.email}</p>
                         <p className="text-gray-600">Birthday: {userData.birthday} ({age})</p>
                         <p className="text-gray-600">Gender: {userData.gender}</p>
-                            <p className="text-gray-600">First Name: {userData.firstName}</p>
-                            <p className="text-gray-600">Last Name: {userData.lastName}</p>
+                        <p className="text-gray-600">First Name: {userData.firstName}</p>
+                        <p className="text-gray-600">Last Name: {userData.lastName}</p>
                     </div>
                 </div>
 
@@ -170,12 +239,76 @@ const ProfileUser = () => {
                 <div className="p-8">
                     <button
                         onClick={() => navigate("/home")}
-                        className="w-full py-3 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded focus:outline-none focus:shadow-outline" 
+                        className="w-full py-3 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded focus:outline-none focus:shadow-outline"
                     >
                         Back to Dashboard
                     </button>
                 </div>
             </div>
+
+            {/* Change Password Modal */}
+            {isChangePasswordModalOpen && (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="my-modal">
+                    <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                        <div className="mt-3 text-center">
+                            <h3 className="text-lg leading-6 font-medium text-gray-900">Change Password</h3>
+                            <div className="mt-2 px-7 py-3">
+                                <form onSubmit={handleChangePasswordSubmit}>
+                                    <div className="mb-4">
+                                        <label htmlFor="currentPassword" className="block text-gray-700 text-sm font-bold mb-2">Current Password</label>
+                                        <input
+                                            type="password"
+                                            id="currentPassword"
+                                            placeholder="Current Password"
+                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value={currentPassword}
+                                            onChange={(e) => setCurrentPassword(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="newPassword" className="block text-gray-700 text-sm font-bold mb-2">New Password</label>
+                                        <input
+                                            type="password"
+                                            id="newPassword"
+                                            placeholder="New Password"
+                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="mb-6">
+                                        <label htmlFor="confirmNewPassword" className="block text-gray-700 text-sm font-bold mb-2">Confirm New Password</label>
+                                        <input
+                                            type="password"
+                                            id="confirmNewPassword"
+                                            placeholder="Confirm New Password"
+                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value={confirmNewPassword}
+                                            onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                        />
+                                    </div>
+
+                                    {changePasswordError && <p className="text-red-500 text-xs italic mb-2">{changePasswordError}</p>}
+                                    {changePasswordMessage && <p className="text-green-500 text-xs italic mb-2">{changePasswordMessage}</p>}
+
+                                    <div className="flex items-center justify-between">
+                                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                                            Change Password
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
+                                            onClick={closeChangePasswordModal}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

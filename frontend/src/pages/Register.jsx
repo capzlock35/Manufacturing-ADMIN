@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     FaUserShield,      // Admin
@@ -10,6 +10,12 @@ import {
 
 const Register = () => {
   const navigate = useNavigate();
+  const [role, setRole] = useState(null); // State to store user role
+
+  useEffect(() => {
+    const userRole = localStorage.getItem('role');
+    setRole(userRole);
+  }, []);
 
   const buttonData = [
     { path: '/home/FinanceCreate', label: 'Finance', icon: FaMoneyBill, color: 'bg-green-500' },
@@ -34,20 +40,30 @@ const Register = () => {
               if (button.label === 'Logistic') orderClass = 'order-4';
               if (button.label === 'HR') orderClass = 'order-5';
 
+              const isRestricted = role === 'admin' || role === 'staff';
+
               return (
-                <button
-                  key={index}
-                  onClick={() => navigate(button.path)}
-                  className={`relative flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-100 transition duration-300 ${button.color} text-white ${orderClass}`}
-                >
-                  <div className="flex items-center justify-center">
-                    <button.icon className="h-6 w-6" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-lg font-medium">{button.label}</h3>
-                    <p className="text-sm text-gray-200">Create a new {button.label.toLowerCase()} account</p>
-                  </div>
-                </button>
+                <div key={index} className="relative"> {/* Make the div relative for absolute positioning */}
+                  <button
+                    onClick={!isRestricted ? () => navigate(button.path) : undefined}
+                    className={`relative flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-100 transition duration-300 ${button.color} text-white ${orderClass}`}
+                  >
+                    <div className="flex items-center justify-center">
+                      <button.icon className="h-6 w-6" />
+                    </div>
+                    <div className="text-left">
+                      <h3 className="text-lg font-medium">{button.label}</h3>
+                      <p className="text-sm text-gray-200">Create a new {button.label.toLowerCase()} account</p>
+                    </div>
+                  </button>
+                  {isRestricted && (
+                    <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black bg-opacity-50"> {/* Overlay */}
+                      <p className="text-white text-center font-bold text-lg">
+                        Authorize <br /> Superadmin <br /> Role Only
+                      </p>
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>

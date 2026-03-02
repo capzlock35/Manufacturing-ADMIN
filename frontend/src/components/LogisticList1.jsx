@@ -18,6 +18,7 @@
      const [currentPage, setCurrentPage] = useState(1);
      const [usersPerPage] = useState(10); // 10 users per page
      const [isLoading, setIsLoading] = useState(true);
+               const [role, setRole] = useState(null);
 
      const baseURL = process.env.NODE_ENV === 'production'
      ? 'https://backend-admin.jjm-manufacturing.com/api/logisticusers'
@@ -58,6 +59,12 @@
    useEffect(() => {
      fetchUsers();
    }, []);
+
+               useEffect(() => {
+                const userRole = localStorage.getItem('role');
+                setRole(userRole);
+            }, []);
+   
 
      const handleView = (user) => {
          setSelectedUser(user);
@@ -121,26 +128,19 @@
          });
      };
 
-        const handleUpdateUser = async () => {
-         try {
-              const tokenResponse = await axios.get(authURL);
-       const token = tokenResponse.data.token;
-             const response = await axios.put(`${baseURL}/update/${selectedUser._id}`, editFormData,
-              {
-                     'Content-Type': 'application/json',
-                     Authorization: `Bearer ${token}`,
-                 });
-             if (response.status === 200) {
-                 toast.success('User updated successfully!');
-                 // Update the user in the local state
-                 setUsers(users.map(user => user._id === selectedUser._id ? response.data.user : user));
-                 handleCloseModal();
-             }
-         } catch (error) {
-             console.error('Failed to update user:', error);
-             toast.error('An error occurred while trying to update the user.');
-         }
-     };
+     const handleUpdateUser = async () => {
+        try {
+            const response = await axios.put(`${baseURL}/update/${selectedUser._id}`, editFormData);
+            if (response.status === 200) {
+                toast.success('User updated successfully!');
+                setUsers(users.map(user => user._id === selectedUser._id ? response.data.user : user));
+                handleCloseModal();
+            }
+        } catch (error) {
+            console.error('Failed to update user:', error);
+            toast.error('An error occurred while trying to update the user.');
+        }
+    };
 
      const handleExportToExcel = () => {
            const ws = XLSX.utils.json_to_sheet(users);
@@ -404,8 +404,12 @@
                                      <td className="py-3 px-6 text-left border-b border-gray-200">{user.LogisticLevel}</td>
                                      <td className="py-3 px-6 text-center flex">
                                          <button onClick={() => handleView(user)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2">View</button>
-                                         <button onClick={() => handleUpdate(user)} className="bg-green-500 text-white px-3 py-1 rounded mr-2">Update</button>
-                                         <button onClick={() => handleDelete(user)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                                         {role === 'superadmin' && ( // Conditional rendering for Update and Delete
+                                            <>
+                                                <button onClick={() => handleUpdate(user)} className="bg-green-500 text-white px-3 py-1 rounded mr-2">Update</button>
+                                                <button onClick={() => handleDelete(user)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                                            </>
+                                        )}
                                      </td>
                                  </tr>
                              ))

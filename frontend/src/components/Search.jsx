@@ -75,7 +75,7 @@ const Search = () => {
 
                 {/* Search form */}
                 <form action="" className="md:flex flex-grow mx-auto max-w-xl md:max-w-lg sm:max-w-sm min-[500px]:max-w-sm">
-                    <div className='relative flex items-center w-full bg-gray-100 border rounded-full shadow-md'>
+                    {/* <div className='relative flex items-center w-full bg-gray-100 border rounded-full shadow-md'>
                         <input
                             type="text"
                             placeholder='Search...'
@@ -88,7 +88,7 @@ const Search = () => {
                             <FaSearch />
                         </button>
                         <div className='absolute right-10 h-5 w-px bg-gray-300'></div>
-                    </div>
+                    </div> */}
                 </form>
 
                 {/* ICONS at Profile right side */}
@@ -97,19 +97,19 @@ const Search = () => {
                         <IoMdChatboxes className='cursor-pointer text-xl md:text-2xl hover:text-blue-600 text-black' />
                     </Link> */}
 
-                    <MdOutlineDarkMode className='cursor-pointer text-xl md:text-2xl hover:text-blue-600 text-black' aria-label='dark mode' />
+                    {/* <MdOutlineDarkMode className='cursor-pointer text-xl md:text-2xl hover:text-blue-600 text-black' aria-label='dark mode' /> */}
                     <div className='relative'>
-                        <IoMdNotificationsOutline
+                        {/* <IoMdNotificationsOutline
                             className='cursor-pointer text-xl md:text-2xl hover:text-blue-600 text-black'
                             aria-label='Notification'
                             onClick={toggleNotifications}
-                        />
+                        /> */}
                         {/* Red dot notification indicator */}
-                        {hasNewNotifications && (
+                        {/* {hasNewNotifications && (
                             <span className="absolute right-0 top-0 h-2 w-2 bg-red-500 rounded-full animate-pulse"></span>
-                        )}
+                        )} */}
                         {/* Notification dropdown */}
-                        {isNotificationOpen && (
+                        {/* {isNotificationOpen && (
                             <div className='absolute right-0 z-10 mt-2 bg-white rounded-lg shadow-lg w-64'>
                                 <ul className='p-2'>
                                     {notifications.length > 0 ? notifications.map(notification => (
@@ -121,7 +121,7 @@ const Search = () => {
                                     )}
                                 </ul>
                             </div>
-                        )}
+                        )} */}
                     </div>
                     <div className='relative dropdown dropdown-end'>
                         <img

@@ -1,7 +1,10 @@
 // frontend/src/components/RiskAssessment/RiskManagement.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate, Link } from 'react-router-dom'; // Import Link
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Label, LabelList
+} from 'recharts';
 
 // Define BASE_URL based on environment
 const BASE_URL = process.env.NODE_ENV === 'production'
@@ -9,14 +12,14 @@ const BASE_URL = process.env.NODE_ENV === 'production'
     : 'http://localhost:7690/api/risk-assessments';
 
 const RiskManagement = () => {
-  const navigate = useNavigate(); // Hook for navigation (you might not need navigate anymore if not routing)
+  const navigate = useNavigate();
   const [riskAssessments, setRiskAssessments] = useState([]);
   const [loadingList, setLoadingList] = useState(true);
   const [errorList, setErrorList] = useState(null);
-  const [showForm, setShowForm] = useState(false); // State to control form visibility
-  const [isEditMode, setIsEditMode] = useState(false); // State to track if form is in edit mode
-  const [currentAssessmentId, setCurrentAssessmentId] = useState(null); // State to hold ID of assessment being edited
-  const [formData, setFormData] = useState({     // State for form data
+  const [showForm, setShowForm] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [currentAssessmentId, setCurrentAssessmentId] = useState(null);
+  const [formData, setFormData] = useState({
     title: '',
     description: '',
     category: 'Other',
@@ -26,31 +29,30 @@ const RiskManagement = () => {
     status: 'Open',
     reviewDate: '',
   });
-  const [loadingForm, setLoadingForm] = useState(false); // Loading state for form submission
-  const [errorForm, setErrorForm] = useState(null);     // Error state for form submission
-  const [viewingAssessmentId, setViewingAssessmentId] = useState(null); // NEW STATE: To track which assessment to view details for
-  const [viewingAssessmentDetails, setViewingAssessmentDetails] = useState(null); // NEW STATE: To hold details of the assessment being viewed
-  const [loadingViewDetails, setLoadingViewDetails] = useState(false); // NEW STATE: Loading state for fetching view details
-  const [errorViewDetails, setErrorViewDetails] = useState(null);     // NEW STATE: Error state for fetching view details
+  const [loadingForm, setLoadingForm] = useState(false);
+  const [errorForm, setErrorForm] = useState(null);
+  const [viewingAssessmentId, setViewingAssessmentId] = useState(null);
+  const [viewingAssessmentDetails, setViewingAssessmentDetails] = useState(null);
+  const [loadingViewDetails, setLoadingViewDetails] = useState(false);
+  const [errorViewDetails, setErrorViewDetails] = useState(null);
 
 
-  console.log("RiskManagement component is being rendered!"); // Component render log
+  console.log("RiskManagement component is being rendered!");
 
   useEffect(() => {
-    // Fetch Risk Assessments List
+    // Fetch ACTIVE Risk Assessments List
     const fetchRiskAssessments = async () => {
       setLoadingList(true);
       setErrorList(null);
       try {
-        const response = await axios.get(BASE_URL);
-        console.log("API Response Data:", response.data);
-        console.log("Type of response.data:", typeof response.data);
+        const response = await axios.get(BASE_URL); // BASE_URL already fetches active ones by default
+        console.log("API Response Data (Active):", response.data);
         setRiskAssessments(response.data);
         setLoadingList(false);
       } catch (err) {
         setErrorList(err.message);
         setLoadingList(false);
-        console.error("Error fetching risk assessments:", err);
+        console.error("Error fetching active risk assessments:", err);
       }
     };
     fetchRiskAssessments();
@@ -62,7 +64,7 @@ const RiskManagement = () => {
         setLoadingForm(true);
         setErrorForm(null);
         try {
-          const response = await axios.get(`${BASE_URL}/${currentAssessmentId}`); // Fetch assessment to edit
+          const response = await axios.get(`${BASE_URL}/${currentAssessmentId}`);
           setFormData(response.data);
         } catch (err) {
           setErrorForm(err.message);
@@ -73,12 +75,11 @@ const RiskManagement = () => {
       };
       fetchAssessmentForEdit();
     } else if (!isEditMode) {
-      resetForm(); // Reset form when not in edit mode
+      resetForm();
     }
   }, [isEditMode, currentAssessmentId]);
 
   useEffect(() => {
-    // Fetch Risk Assessment Details for View
     if (viewingAssessmentId) {
       const fetchAssessmentDetails = async () => {
         setLoadingViewDetails(true);
@@ -95,7 +96,7 @@ const RiskManagement = () => {
       };
       fetchAssessmentDetails();
     } else {
-      setViewingAssessmentDetails(null); // Clear details when not viewing
+      setViewingAssessmentDetails(null);
     }
   }, [viewingAssessmentId]);
 
@@ -125,17 +126,17 @@ const RiskManagement = () => {
     setErrorForm(null);
     try {
       if (isEditMode) {
-        await axios.put(`${BASE_URL}/${currentAssessmentId}`, formData); // PUT request for update
+        await axios.put(`${BASE_URL}/${currentAssessmentId}`, formData);
         alert('Risk Assessment updated successfully!');
       } else {
-        await axios.post(BASE_URL, formData); // POST request to create new assessment
+        await axios.post(BASE_URL, formData);
         alert('Risk Assessment created successfully!');
       }
       setShowForm(false);
       setIsEditMode(false);
       setCurrentAssessmentId(null);
       resetForm();
-      // Refetch the risk assessment list to update the view
+      // Refetch the risk assessment list to update the view (active list)
       const response = await axios.get(BASE_URL);
       setRiskAssessments(response.data);
     } catch (err) {
@@ -152,7 +153,7 @@ const RiskManagement = () => {
     setIsEditMode(false);
     setCurrentAssessmentId(null);
     resetForm();
-    setViewingAssessmentId(null); // Hide details view when showing form
+    setViewingAssessmentId(null);
   };
 
   const handleCancelForm = () => {
@@ -166,33 +167,61 @@ const RiskManagement = () => {
     setShowForm(true);
     setIsEditMode(true);
     setCurrentAssessmentId(id);
-    setViewingAssessmentId(null); // Hide details view when showing form
+    setViewingAssessmentId(null);
   };
 
   const handleDeleteClick = async (id) => {
-    if (window.confirm("Are you sure you want to delete this risk assessment?")) {
+    if (window.confirm("Are you sure you want to PERMANENTLY DELETE this risk assessment? This action cannot be undone.")) {
       try {
-        await axios.delete(`${BASE_URL}/${id}`);
-        alert('Risk Assessment deleted successfully!');
-        // Update the list after successful deletion
+        await axios.delete(`${BASE_URL}/${id}`); // Hard delete
+        alert('Risk Assessment permanently deleted successfully!');
+        // Update the list after successful deletion (active list)
         const response = await axios.get(BASE_URL);
         setRiskAssessments(response.data);
-        setViewingAssessmentId(null); // Hide details view after deletion
+        setViewingAssessmentId(null);
       } catch (err) {
         console.error("Error deleting risk assessment:", err);
-        alert('Failed to delete risk assessment.');
+        alert('Failed to permanently delete risk assessment.');
       }
     }
   };
 
+  const handleRemoveClick = async (id) => { // Soft delete (archive)
+    if (window.confirm("Are you sure you want to REMOVE this risk assessment? It will be moved to archive.")) {
+      try {
+        await axios.patch(`${BASE_URL}/${id}/archive`); // Call the archive endpoint
+        alert('Risk Assessment removed to archive successfully!');
+        // Update the list after successful remove (active list)
+        const response = await axios.get(BASE_URL);
+        setRiskAssessments(response.data);
+        setViewingAssessmentId(null);
+      } catch (err) {
+        console.error("Error removing risk assessment:", err);
+        alert('Failed to remove risk assessment to archive.');
+      }
+    }
+  };
+
+
   const handleViewClick = (id) => {
-    setViewingAssessmentId(id); // Set the ID to view details
-    setShowForm(false);         // Hide form if it's open
+    setViewingAssessmentId(id);
+    setShowForm(false);
   };
 
   const handleBackToList = () => {
-    setViewingAssessmentId(null); // Clear the viewing ID to go back to the list
-    setViewingAssessmentDetails(null); // Clear detailed assessment data
+    setViewingAssessmentId(null);
+    setViewingAssessmentDetails(null);
+  };
+
+  const getNumericalValue = (level) => {
+    switch (level) {
+      case 'Very Low': return 1;
+      case 'Low': return 2;
+      case 'Medium': return 3;
+      case 'High': return 4;
+      case 'Very High': return 5;
+      default: return 0; // Or handle error/unknown cases
+    }
   };
 
 
@@ -205,21 +234,85 @@ const RiskManagement = () => {
       return <div className="text-red-500 p-4">Error: {errorList}</div>;
     }
 
-    if (viewingAssessmentId && viewingAssessmentDetails) { // Render details if viewingAssessmentId is set
+    if (viewingAssessmentId && viewingAssessmentDetails) {
       return renderRiskAssessmentDetails();
     }
 
+    // Prepare chart data for Recharts
+    const chartData = riskAssessments.map(assessment => ({
+      name: assessment.title,
+      likelihood: getNumericalValue(assessment.likelihood),
+      impact: getNumericalValue(assessment.impact),
+    }));
+
 
     return (
-      <div className="min-h-screen py-6"> 
+      <div className="min-h-screen py-6">
       <div>
-        <div className="mb-4">
-          <button onClick={handleCreateNewClick} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Create New Risk Assessment
-          </button>
+        <div className="mb-4 flex justify-between items-center"> {/* Use flex to align buttons */}
+          <div> {/* Container for Create New button */}
+            <button onClick={handleCreateNewClick} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+              Create New Risk Assessment
+            </button>
+          </div>
+          <div> {/* Container for Inactive Assessments Link */}
+            <Link to="/home/InactiveRiskAssessments" className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-2 inline-block"> {/* ml-2 for spacing */}
+              View Inactive Assessments
+            </Link>
+          </div>
         </div>
+
+        {/* Recharts Line Chart Container */}
+        <div className="mb-6">
+          <LineChart width={700} height={300} data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 30 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name"  >
+              <Label value="Risk Assessment Title" offset={0} position="bottom" />
+            </XAxis>
+            <YAxis domain={[0, 6]} ticks={[1, 2, 3, 4, 5]} tickFormatter={(value) => {
+                switch (value) {
+                    case 1: return 'Very Low';
+                    case 2: return 'Low';
+                    case 3: return 'Medium';
+                    case 4: return 'High';
+                    case 5: return 'Very High';
+                    default: return '';
+                }
+            }}>
+              <Label value="Risk Level" angle={-90} position='left' style={{ textAnchor: 'middle' }} />
+            </YAxis>
+            <Tooltip />
+            <Legend verticalAlign="top" height={36}/>
+            <Line type="monotone" dataKey="likelihood" stroke="#82ca9d" strokeWidth={2} label={<LabelList dataKey="likelihood" position="top" formatter={(value) => {
+                 switch (value) {
+                    case 1: return 'Very Low';
+                    case 2: return 'Low';
+                    case 3: return 'Medium';
+                    case 4: return 'High';
+                    case 5: return 'Very High';
+                    default: return '';
+                }
+            }}/>}>
+             </Line>
+            <Line type="monotone" dataKey="impact" stroke="#8884d8" strokeWidth={2} label={<LabelList dataKey="impact" position="top" formatter={(value) => {
+                 switch (value) {
+                    case 1: return 'Very Low';
+                    case 2: return 'Low';
+                    case 3: return 'Medium';
+                    case 4: return 'High';
+                    case 5: return 'Very High';
+                    default: return '';
+                }
+            }}/>}/>
+          </LineChart>
+           <div className="text-center mb-4">
+              Risk Assessment Likelihood and Impact
+            </div>
+        </div>
+
+
         {riskAssessments.length === 0 ? (
-          <p>No risk assessments found.</p>
+          <p>No active risk assessments found.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-300 shadow-md">
@@ -244,7 +337,8 @@ const RiskManagement = () => {
                     <td className="py-2 px-4 border-b space-x-2">
                       <button onClick={() => handleViewClick(assessment._id)} className="inline-block bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded-sm focus:outline-none focus:shadow-outline">View</button>
                       <button onClick={() => handleEditClick(assessment._id)} className="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded-sm focus:outline-none focus:shadow-outline">Update</button>
-                      <button onClick={() => handleDeleteClick(assessment._id)} className="inline-block bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded-sm focus:outline-none focus:shadow-outline">Delete</button>
+                      <button onClick={() => handleRemoveClick(assessment._id)} className="inline-block bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded-sm focus:outline-none focus:shadow-outline">Remove</button>
+                      {/* <button onClick={() => handleDeleteClick(assessment._id)} className="inline-block bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded-sm focus:outline-none focus:shadow-outline">Delete</button> */}
                     </td>
                   </tr>
                 ))}
@@ -265,13 +359,13 @@ const RiskManagement = () => {
       return <div className="text-red-500 p-4">Error: {errorViewDetails}</div>;
     }
     if (!viewingAssessmentDetails) {
-      return <div className="text-center p-4">Could not load Risk Assessment Details.</div>; // Should not happen ideally
+      return <div className="text-center p-4">Could not load Risk Assessment Details.</div>;
     }
 
     const assessment = viewingAssessmentDetails;
 
     return (
-      <div className="min-h-screen py-6">         
+      <div className="min-h-screen py-6">
         <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
           <h2 className="text-2xl font-bold mb-4">Risk Assessment Details</h2>
           <h3 className="text-xl font-semibold mb-2">{assessment.title}</h3>
@@ -382,12 +476,10 @@ const RiskManagement = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Risk Assessments</h2>
-      {showForm ? renderRiskAssessmentForm() : renderRiskAssessmentList()} {/* Conditional rendering */}
+      <h2 className="text-2xl font-bold mb-4">Active Risk Assessments</h2> {/* Updated title */}
+      {showForm ? renderRiskAssessmentForm() : renderRiskAssessmentList()}
     </div>
   );
 };
 
-
-
-export default RiskManagement;
+export default RiskManagement;  

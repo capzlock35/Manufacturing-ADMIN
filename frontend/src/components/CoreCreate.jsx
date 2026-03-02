@@ -21,7 +21,7 @@ const CoreCreate = () => {
     password: '',
     confirmPassword: '',
     Core: 1, // Default to Core 1
-    role: 'audit', // Default to 'audit' role
+    role: 'audit', // Default to 'audit' role - you can change this default if needed
   });
 
   const [message, setMessage] = useState('');
@@ -50,7 +50,7 @@ const CoreCreate = () => {
         password: '',
         confirmPassword: '',
         Core: 1,
-        role: 'audit',
+        role: 'audit', // Reset role to default 'audit' after successful submission, adjust if different default is desired
       });
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create user');
@@ -166,6 +166,7 @@ const CoreCreate = () => {
               <option value="admin">Admin</option>
               <option value="auditor">Auditor</option>
               <option value="maintenancemanager">Maintenance Manager</option>
+              <option value="superadmin">Superadmin</option> {/* ADDED SUPERADMIN OPTION HERE */}
             </select>
           </div>
 

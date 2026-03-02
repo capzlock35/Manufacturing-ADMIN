@@ -27,6 +27,15 @@ const productBaseURL = process.env.NODE_ENV === 'production'
     ? 'https://backend-admin.jjm-manufacturing.com/api/product'
     : 'http://localhost:7690/api/product'; // Added Product Base URL
 
+    const contractBaseURL = process.env.NODE_ENV === 'production'
+    ? 'https://backend-admin.jjm-manufacturing.com/api/contracts'
+    : 'http://localhost:7690/api/contracts'; // Added Contract Base URL
+
+    const riskBaseURL = process.env.NODE_ENV === 'production'
+    ? 'https://backend-admin.jjm-manufacturing.com/api/risk-assessments'
+    : 'http://localhost:7690/api/risk-assessments';
+
+
 const Sidebar = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [hasAnnouncement, setHasAnnouncement] = useState(true);
@@ -37,6 +46,10 @@ const Sidebar = () => {
     const [loadingDocumentCount, setLoadingDocumentCount] = useState(true);
     const [productCount, setProductCount] = useState(0); // Added product count
     const [loadingProductCount, setLoadingProductCount] = useState(true); // Added loading state
+    const [contractCount, setContractCount] = useState(0); // Added contract count
+    const [loadingContractCount, setLoadingContractCount] = useState(true); // Added loading state for contracts
+    const [riskCount, setRiskCount] = useState(0); // Added contract count
+    const [loadingRiskCount, setLoadingRiskCount] = useState(true); // Added loading state for contracts
 
     useEffect(() => {
         setHasAnnouncement(true);
@@ -51,10 +64,18 @@ const Sidebar = () => {
         fetchProductCount(); // Fetch product count on mount
         const productIntervalId = setInterval(fetchProductCount, 60000); // Set interval to refetch every minute
 
+        fetchContracts(); // Fetch product count on mount
+        const contractIntervalId = setInterval(fetchContracts, 60000); // Set interval to refetch every minute
+
+        fetchRisk(); // Fetch product count on mount
+        const riskIntervalId = setInterval(fetchRisk, 60000); // Set interval to refetch every minute
+
         return () => {
             clearInterval(intervalId);
             clearInterval(documentIntervalId);
             clearInterval(productIntervalId); // Clear product interval on unmount
+            clearInterval(contractIntervalId); // Clear product interval on unmount
+            clearInterval(riskIntervalId); // Clear product interval on unmount
         };
     }, []);
 
@@ -94,6 +115,32 @@ const Sidebar = () => {
             setProductCount(0);
         } finally {
             setLoadingProductCount(false);
+        }
+    };
+
+    const fetchContracts = async () => {
+        setLoadingContractCount(true);
+        try {
+            const response = await axios.get(`${contractBaseURL}/contracts`);
+            setContractCount(response.data.length);
+        } catch (error) {
+            console.error("Error fetching contract count:", error);
+            setContractCount(0);
+        } finally {
+            setLoadingContractCount(false);
+        }
+    };
+
+    const fetchRisk = async () => {
+        setLoadingRiskCount(true);
+        try {
+            const response = await axios.get(riskBaseURL);
+            setRiskCount(response.data.length);
+        } catch (error) {
+            console.error("Error fetching Risk count:", error);
+            setRiskCount(0);
+        } finally {
+            setLoadingRiskCount(false);
         }
     };
 
@@ -174,7 +221,7 @@ const Sidebar = () => {
                                     <Link to="DocumentStorage" onClick={markDocumentStorageAsSeen}>
                                         <li className="hover:text-blue-500">
                                             <p className='flex items-center'>
-                                                <IoDocument />
+                                                <IoDocument size={20}/>
                                                 Document Storage
                                                 {!isCollapsed && (
                                                     loadingDocumentCount ? (
@@ -200,7 +247,7 @@ const Sidebar = () => {
                                             </p>
                                         </li>
                                     </Link>
-                                    <Link to="Product">
+                                    {/* <Link to="Product">
                                         <li className='hover:text-blue-500'>
                                             <p className='flex items-center'>
                                                 <IoDocument />
@@ -216,7 +263,7 @@ const Sidebar = () => {
                                                 )}
                                             </p>
                                         </li>
-                                    </Link>
+                                    </Link> */}
 
 
                                 </ul>
@@ -234,8 +281,44 @@ const Sidebar = () => {
                                 <summary><IoDocumentTextOutline className='w-5 h-5' />Legal Management</summary>
                                 <ul>
                                 <Link to="DocumentHr3"><li className='hover:text-blue-500'><p><TiDocumentText />Document (Hr3)</p></li></Link>
-                                    <Link to="ContractManagement"><li className='hover:text-blue-500'><p><TiDocumentText />Contract Management</p></li></Link>
-                                    <Link to="RiskManagement"><li className='hover:text-blue-500'><p><TiDocumentText />Risk Management</p></li></Link>
+                                <Link to="AuditReport"><li className='hover:text-blue-500'><p><TiDocumentText />Audit Report</p></li></Link>
+
+                                    <Link to="ContractManagement">
+                                        <li className='hover:text-blue-500'>
+                                            <p className='flex items-center'>
+                                                <TiDocumentText size={20}/>
+                                                Contract Management
+                                                {!isCollapsed && (
+                                                    loadingContractCount ? (
+                                                        "..."
+                                                    ) : (
+                                                        <span className="text-xs text-red-500 font-bold ml-1">
+                                                            ({contractCount})
+                                                        </span>
+                                                    )
+                                                )}
+                                            </p>
+                                        </li>
+                                    </Link>
+
+
+                                    <Link to="RiskManagement">
+                                        <li className='hover:text-blue-500'>
+                                            <p className='flex items-center'>
+                                                <TiDocumentText size={20}/>
+                                                Risk Management
+                                                {!isCollapsed && (
+                                                    loadingRiskCount ? (
+                                                        "..."
+                                                    ) : (
+                                                        <span className="text-xs text-red-500 font-bold ml-1">
+                                                            ({riskCount})
+                                                        </span>
+                                                    )
+                                                )}
+                                            </p>
+                                        </li>
+                                    </Link>
 
                                 </ul>
                             </details>

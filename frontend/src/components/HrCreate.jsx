@@ -15,6 +15,7 @@ const HrCreate = () => {
     };
 
     const [formData, setFormData] = useState({
+        employeeId: '',
         firstName: '',
         lastName: '',
         email: '',
@@ -22,7 +23,7 @@ const HrCreate = () => {
         confirmPassword: '',
         role: 'Employee',
         Hr: 1,
-        position: 'Resellers', // Default Position  <-- ADDED POSITION HERE and set a default
+        position: '', // Initialize position as an empty string (no default needed now)
     });
 
     const [message, setMessage] = useState('');
@@ -46,6 +47,7 @@ const HrCreate = () => {
             const response = await axios.post(`${baseURL}/create`, formData);
             setMessage(response.data.message);
             setFormData({
+                employeeId: '',
                 firstName: '',
                 lastName: '',
                 email: '',
@@ -53,7 +55,7 @@ const HrCreate = () => {
                 confirmPassword: '',
                 role: 'Employee',
                 Hr: 1,
-                position: 'Resellers', // Reset Position to default  <-- ADDED POSITION HERE and reset
+                position: '', // Reset position to empty string
             });
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to create user');
@@ -77,7 +79,23 @@ const HrCreate = () => {
                 {error && <div className="bg-red-200 text-red-800 p-3 rounded mb-4">{error}</div>}
 
                 <form onSubmit={handleSubmit}>
-                    {/* First Name, Last Name, Email, fields here (same as before) */}
+                    {/* Employee ID Field */}
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="employeeId">
+                            Employee ID
+                        </label>
+                        <input
+                            className="shadow appearance-none border rounded w-full py-2 px-3 border-black bg-white text-black leading-tight focus:outline-none focus:shadow-outline"
+                            id="employeeId"
+                            type="number"
+                            name="employeeId"
+                            placeholder="Employee ID"
+                            value={formData.employeeId}
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    {/* First Name Field */}
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="firstName">
                             First Name
@@ -92,6 +110,8 @@ const HrCreate = () => {
                             onChange={handleChange}
                         />
                     </div>
+
+                    {/* Last Name Field */}
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="lastName">
                             Last Name
@@ -106,6 +126,8 @@ const HrCreate = () => {
                             onChange={handleChange}
                         />
                     </div>
+
+                    {/* Email Field */}
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
                             Email
@@ -121,6 +143,7 @@ const HrCreate = () => {
                         />
                     </div>
 
+                    {/* Password Field */}
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
                             Password
@@ -136,7 +159,7 @@ const HrCreate = () => {
                         />
                     </div>
 
-                    {/* New Confirm Password Field */}
+                    {/* Confirm Password Field */}
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmPassword">
                             Confirm Password
@@ -151,6 +174,7 @@ const HrCreate = () => {
                             onChange={handleChange}
                         />
                     </div>
+
                      {/* Hr Select Field */}
                     <div className="mb-6">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="Hr">
@@ -170,7 +194,7 @@ const HrCreate = () => {
                         </select>
                     </div>
 
-                    {/* Role select here (same as before) */}
+                    {/* Role select here */}
                     <div className="mb-6">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
                             Role
@@ -188,24 +212,20 @@ const HrCreate = () => {
                         </select>
                     </div>
 
-                    {/* Position Select Field */}
+                    {/* Position Text Input Field - CHANGED FROM SELECT TO INPUT */}
                     <div className="mb-6">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="position">
                             Position
                         </label>
-                        <select
+                        <input
                             className="shadow appearance-none border rounded w-full py-2 px-3 border-black bg-white text-black leading-tight focus:outline-none focus:shadow-outline"
                             id="position"
+                            type="text" // Changed to type="text"
                             name="position"
+                            placeholder="Position"
                             value={formData.position}
                             onChange={handleChange}
-                        >
-                            <option value="CEO">CEO</option>
-                            <option value="Secretary">Secretary</option>
-                            <option value="Production Head">Production Head</option>
-                            <option value="Resellers Sales Head">Resellers Sales Head</option>
-                            <option value="Resellers">Resellers</option>
-                        </select>
+                        />
                     </div>
 
                     <div className="flex items-center justify-between">

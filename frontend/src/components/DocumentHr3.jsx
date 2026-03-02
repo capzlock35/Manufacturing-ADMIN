@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 const Hr3Documents = () => {
   const [documents, setDocuments] = useState([]);
@@ -46,7 +47,7 @@ const Hr3Documents = () => {
       } catch (error) {
         console.error("Error fetching HR3 documents from backend:", error);
         if (error.response) {
-          setError(`Failed to load HR3 documents. Status: ${error.response.status}. ${error.response.data.error || ''} ${error.response.data.details || ''}`);
+          setError(`Failed to load HR3 documents. Status: ${error.response.status}. ${error.response.data.error || ''} ${error.response.data.error || ''} ${error.response.data.details || ''}`);
         } else {
           setError("Failed to load HR3 documents. Network error.");
         }
@@ -63,10 +64,32 @@ const Hr3Documents = () => {
       <div className="container mx-auto p-4">
         <h2 className="text-2xl font-bold mb-4">HR3 Documents</h2>
 
-        {loading && <div className="text-center">Loading...</div>}
-        {error && <div className="text-red-500 text-center">Error: {error}</div>}
-
-        {!loading && !error && documents.length > 0 ? (
+        {loading ? ( // Show skeleton loading when loading is true
+          <div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full border-collapse table-auto">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-4 py-2 border"><Skeleton width={100} /></th>
+                    <th className="px-4 py-2 border"><Skeleton width={100} /></th>
+                    <th className="px-4 py-2 border"><Skeleton width={80} /></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from({ length: 3 }).map((_, index) => ( // Render 3 skeleton rows as example
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-4 py-2 border"><Skeleton /></td>
+                      <td className="px-4 py-2 border"><Skeleton width={150} /></td>
+                      <td className="px-4 py-2 border"><Skeleton width={100} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="text-red-500 text-center">Error: {error}</div>
+        ) : !loading && !error && documents.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full border-collapse table-auto">
               <thead className="bg-gray-100">
