@@ -1,4 +1,3 @@
-// controllers/riskAssessmentController.js
 import RiskAssessment from '../model/RiskAssessment.js';
 
 // Create a new Risk Assessment
@@ -12,15 +11,26 @@ export const createRiskAssessment = async (req, res) => {
   }
 };
 
-// Get all Risk Assessments
+// Get all ACTIVE Risk Assessments (default)
 export const getAllRiskAssessments = async (req, res) => {
   try {
-    const riskAssessments = await RiskAssessment.find().sort({ createdAt: -1 }); // Sort by newest first
+    const riskAssessments = await RiskAssessment.find({ isActive: true }).sort({ createdAt: -1 }); // Filter for isActive: true
     res.status(200).json(riskAssessments); // 200 OK
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Get all INACTIVE Risk Assessments (for archive/deleted view)
+export const getInactiveRiskAssessments = async (req, res) => {
+  try {
+    const riskAssessments = await RiskAssessment.find({ isActive: false }).sort({ createdAt: -1 }); // Filter for isActive: false
+    res.status(200).json(riskAssessments); // 200 OK
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 
 // Get a Risk Assessment by ID
 export const getRiskAssessmentById = async (req, res) => {
@@ -52,7 +62,7 @@ export const updateRiskAssessment = async (req, res) => {
   }
 };
 
-// Delete a Risk Assessment
+// Delete a Risk Assessment (Hard Delete - Use with caution)
 export const deleteRiskAssessment = async (req, res) => {
   try {
     const deletedRiskAssessment = await RiskAssessment.findByIdAndDelete(req.params.id);
@@ -60,6 +70,40 @@ export const deleteRiskAssessment = async (req, res) => {
       return res.status(404).json({ message: 'Risk Assessment not found' });
     }
     res.status(200).json({ message: 'Risk Assessment deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Soft Delete (Archive) a Risk Assessment
+export const softDeleteRiskAssessment = async (req, res) => {
+  try {
+    const updatedRiskAssessment = await RiskAssessment.findByIdAndUpdate(
+      req.params.id,
+      { isActive: false }, // Set isActive to false for soft delete
+      { new: true } // Return the updated document
+    );
+    if (!updatedRiskAssessment) {
+      return res.status(404).json({ message: 'Risk Assessment not found' });
+    }
+    res.status(200).json({ message: 'Risk Assessment archived successfully', data: updatedRiskAssessment });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Restore (Undo Soft Delete) a Risk Assessment
+export const restoreRiskAssessment = async (req, res) => {
+  try {
+    const updatedRiskAssessment = await RiskAssessment.findByIdAndUpdate(
+      req.params.id,
+      { isActive: true }, // Set isActive back to true to restore
+      { new: true } // Return the updated document
+    );
+    if (!updatedRiskAssessment) {
+      return res.status(404).json({ message: 'Risk Assessment not found' });
+    }
+    res.status(200).json({ message: 'Risk Assessment restored successfully', data: updatedRiskAssessment });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -25,10 +25,17 @@ const userSchema = new mongoose.Schema ({
     },
     role: {
         type: String,
-        enum: ["admin", "auditor", "audit","maintenancemanager"], // ADDED "audit" and "admin" and remove rest
+        enum: ["admin", "auditor", "audit","maintenancemanager", "superadmin"],
         default: "audit",
     },
-});
+    // --- ADDED STATUS FIELD ---
+    status: {
+        type: String,
+        enum: ["active", "inactive"], // Allowed values
+        default: "active",            // Default value
+    },
+    // --- END OF ADDED STATUS FIELD ---
+}, { timestamps: true }); // Added timestamps for better tracking (optional but good practice)
 
 const CoreUser = mongoose.model('CoreUser', userSchema);
 

@@ -1,28 +1,14 @@
+import { v2 as cloudinary } from 'cloudinary';
 import Document from "../model/documentModel.js";
-import cloudinary from 'cloudinary';
 import "dotenv/config";
-import fs from 'fs';
-import multer from 'multer';
-import path from 'path';
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/');  // Store files in the 'uploads' directory
-    },
-    filename: function (req, file, cb) {
-        const ext = path.extname(file.originalname);
-        cb(null, Date.now() + ext);  // Unique filename
-    }
-});
-
-const upload = multer({ storage: storage });
-
-// Configure Cloudinary (put this at the top of your controller)
+// **Cloudinary Configuration - Moved here!**
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
+
 
 // Helper function to add a tracking event
 const addTrackingEvent = async (documentId, message) => {
@@ -43,47 +29,40 @@ const addTrackingEvent = async (documentId, message) => {
 
 // Create a new document
 const createDocument = async (req, res) => {
-  upload.single('file')(req, res, async (err) => {
-    if (err) {
-      console.error("Multer error:", err);
-      return res.status(500).json({ error: 'File upload error: ' + err.message });
-    }
-
     try {
-      const { title, date, category, status, description } = req.body;
-      let attachmentName = '';
-      if (req.file) {
-        try {
-          const result = await cloudinary.uploader.upload(req.file.path, {
-            folder: "documents",
-            resource_type: "auto"
-          });
-          attachmentName = result.secure_url;
-          // Delete the temporary file (optional, but good practice)
-          fs.unlinkSync(req.file.path);
-        } catch (cloudinaryErr) {
-          console.error("Cloudinary error:", cloudinaryErr);
-          return res.status(500).json({ error: 'Cloudinary upload error: ' + cloudinaryErr.message });
+        const { title, date, category, status, description, fileBase64, fileName } = req.body;
+        let attachmentName = '';
+
+        if (fileBase64) { // Expecting base64 encoded file in req.body.fileBase64 and fileName
+            try {
+                const result = await cloudinary.uploader.upload(fileBase64, {
+                    folder: "documents",
+                    resource_type: "auto",
+                    public_id: fileName ? fileName.split('.')[0] : Date.now() // Use filename or timestamp as public_id
+                });
+                attachmentName = result.secure_url;
+            } catch (cloudinaryErr) {
+                console.error("Cloudinary error:", cloudinaryErr);
+                return res.status(500).json({ error: 'Cloudinary upload error: ' + cloudinaryErr.message });
+            }
         }
-      }
 
-      const document = new Document({
-        title,
-        date,
-        category,
-        status,
-        description,
-        attachmentName
-      });
+        const document = new Document({
+            title,
+            date,
+            category,
+            status,
+            description,
+            attachmentName
+        });
 
-      await document.save();
-      await addTrackingEvent(document._id, `Document "${title}" created.`);
-      res.status(201).json({ message: 'Document created successfully', document });
+        await document.save();
+        await addTrackingEvent(document._id, `Document "${title}" created.`);
+        res.status(201).json({ message: 'Document created successfully', document });
     } catch (error) {
-      console.error("Error creating document:", error);
-      res.status(500).json({ error: 'Error creating document: ' + error.message });
+        console.error("Error creating document:", error);
+        res.status(500).json({ error: 'Error creating document: ' + error.message });
     }
-  });
 };
 
 // Get all documents - NO PAGINATION
@@ -127,48 +106,40 @@ const viewDocument = async (req, res) => {
 
 // Update a document
 const updateDocument = async (req, res) => {
-   upload.single('file')(req, res, async (err) => {
-    if (err) {
-      console.error("Multer error:", err);
-      return res.status(500).json({ error: 'File upload error: ' + err.message });
-    }
-
     try {
-      const documentId = req.params.id;
-      const { title, date, category, status, description } = req.body;
-      let attachmentName = req.body.attachmentName // to keep existing one
+        const documentId = req.params.id;
+        const { title, date, category, status, description, fileBase64, fileName, existingAttachmentName } = req.body; // Expecting existingAttachmentName to keep the old URL if no new file
+        let attachmentName = existingAttachmentName || ''; // Keep existing URL if available
 
-      if (req.file) {
-        try {
-          const result = await cloudinary.uploader.upload(req.file.path, {
-            folder: "documents",
-            resource_type: "auto"
-          });
-          attachmentName = result.secure_url;
-          // Delete the temporary file (optional, but good practice)
-          fs.unlinkSync(req.file.path);
-        } catch (cloudinaryErr) {
-          console.error("Cloudinary error:", cloudinaryErr);
-          return res.status(500).json({ error: 'Cloudinary upload error: ' + cloudinaryErr.message });
+        if (fileBase64) { // If new fileBase64 is provided, upload to Cloudinary
+            try {
+                const result = await cloudinary.uploader.upload(fileBase64, {
+                    folder: "documents",
+                    resource_type: "auto",
+                    public_id: fileName ? fileName.split('.')[0] : Date.now() // Use filename or timestamp as public_id
+                });
+                attachmentName = result.secure_url;
+            } catch (cloudinaryErr) {
+                console.error("Cloudinary error:", cloudinaryErr);
+                return res.status(500).json({ error: 'Cloudinary upload error: ' + cloudinaryErr.message });
+            }
         }
-      }
 
-      const updatedDocument = await Document.findByIdAndUpdate(documentId,
-        { title, date, category, status, description, attachmentName },
-        { new: true }
-      );
+        const updatedDocument = await Document.findByIdAndUpdate(documentId,
+            { title, date, category, status, description, attachmentName },
+            { new: true }
+        );
 
-      if (!updatedDocument) {
-        return res.status(404).json({ error: 'Document not found' });
-      }
-      await addTrackingEvent(documentId, `Document "${title}" updated.`);
+        if (!updatedDocument) {
+            return res.status(404).json({ error: 'Document not found' });
+        }
+        await addTrackingEvent(documentId, `Document "${title}" updated.`);
 
-      res.status(200).json(updatedDocument);  // Return the updated document
+        res.status(200).json(updatedDocument);  // Return the updated document
     } catch (error) {
-      console.error("Error updating document:", error);
-      res.status(500).json({ error: 'Failed to update document' });
+        console.error("Error updating document:", error);
+        res.status(500).json({ error: 'Failed to update document' });
     }
-  });
 };
 
 // Delete a document

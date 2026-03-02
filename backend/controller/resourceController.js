@@ -27,16 +27,18 @@ export const getResourceById = async (req, res) => {
 
 // Create a new resource
 // Create a new resource
+// Create a new resource
 export const createResource = async (req, res) => {
     try {
         const resource = new Resource({
-            resourceName: req.body.resourceName, // ADDED THIS
+            resourceName: req.body.resourceName,
             name: req.body.name,
             type: req.body.type,
             description: req.body.description,
             quantity: req.body.quantity,
             unit: req.body.unit,
             allocatedTo: req.body.allocatedTo,
+            completedDate: req.body.completedDate, // Expect completedDate from request body
         });
 
         const newResource = await resource.save();
@@ -48,6 +50,7 @@ export const createResource = async (req, res) => {
 };
 // Update a resource
 // Update a resource
+// Update a resource
 export const updateResource = async (req, res) => {
     try {
         const resource = await Resource.findById(req.params.id);
@@ -55,13 +58,14 @@ export const updateResource = async (req, res) => {
             return res.status(404).json({ message: 'Resource not found' });
         }
 
-        resource.resourceName = req.body.resourceName; // ADDED THIS
+        resource.resourceName = req.body.resourceName;
         resource.name = req.body.name;
         resource.type = req.body.type;
         resource.description = req.body.description;
         resource.quantity = req.body.quantity;
         resource.unit = req.body.unit;
         resource.allocatedTo = req.body.allocatedTo;
+        resource.completedDate = req.body.completedDate; // Allow updating completedDate
 
         const updatedResource = await resource.save();
         res.json(updatedResource);

@@ -28,10 +28,14 @@ const riskAssessmentSchema = new mongoose.Schema({
   mitigationStrategies: {
     type: String,
   },
-  status: {
+  workflowStatus: { // Renamed from 'status' to be clearer about workflow
     type: String,
     enum: ['Open', 'In Progress', 'Closed', 'Resolved'],
     default: 'Open',
+  },
+  isActive: { // New field for soft delete
+    type: Boolean,
+    default: true, // Default to active
   },
   assessmentDate: {
     type: Date,

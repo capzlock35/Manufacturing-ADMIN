@@ -1,4 +1,3 @@
-// routes/riskAssessmentRoutes.js
 import express from 'express';
 import {
   createRiskAssessment,
@@ -6,15 +5,22 @@ import {
   getRiskAssessmentById,
   updateRiskAssessment,
   deleteRiskAssessment,
+  softDeleteRiskAssessment,
+  restoreRiskAssessment,
+  getInactiveRiskAssessments // Import the new function
 } from '../controller/riskAssessmentController.js';
 
 const router = express.Router();
 
-router.post('/', createRiskAssessment);        // Create a new Risk Assessment
-router.get('/', getAllRiskAssessments);         // Get all Risk Assessments
-router.get('/:id', getRiskAssessmentById);    // Get a Risk Assessment by ID
-router.put('/:id', updateRiskAssessment);      // Update a Risk Assessment (full update)
-router.patch('/:id', updateRiskAssessment);    // Update a Risk Assessment (partial update - same controller func)
-router.delete('/:id', deleteRiskAssessment);     // Delete a Risk Assessment
+router.post('/', createRiskAssessment);
+router.get('/', getAllRiskAssessments);         // Get all ACTIVE Risk Assessments (default)
+router.get('/inactive', getInactiveRiskAssessments); // New route to get INACTIVE Risk Assessments
+router.get('/:id', getRiskAssessmentById);
+router.put('/:id', updateRiskAssessment);
+router.patch('/:id', updateRiskAssessment);
+router.delete('/:id', deleteRiskAssessment);
+
+router.patch('/:id/archive', softDeleteRiskAssessment);
+router.patch('/:id/restore', restoreRiskAssessment);
 
 export default router;

@@ -1,59 +1,59 @@
 import CoreUser from "../model/coreModel.js";
 import bcrypt from 'bcryptjs';
 
+// --- Existing Functions (Mostly Unchanged) ---
 
-// Get all users
+// Get ALL users (regardless of status)
 const getAllUser = async (req, res) => {
     try {
-        const users = await CoreUser.find();
+        const users = await CoreUser.find(); // Gets all users
         res.status(200).json(users);
     } catch (error) {
-        console.error("Error getting users:", error);
+        console.error("Error getting all users:", error);
         res.status(500).json({ message: "Failed to retrieve users" });
     }
 };
 
-
-// Create User
+// Create User (Defaults to 'active' status via schema)
 const createUser = async (req, res) => {
     try {
         const { name, email, password, confirmPassword, Core, role } = req.body;
 
-        // Check if user already exists
         const existingUser = await CoreUser.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: "User already exists" });
         }
 
-        // Password validation
         if (password !== confirmPassword) {
             return res.status(400).json({ message: "Passwords do not match" });
         }
 
-        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create new user
         const newUser = new CoreUser({
             name,
             email,
             password: hashedPassword,
-            Core: Core, // Add Core
-            role: role //Add Role
+            Core: Core,
+            role: role
+            // status defaults to 'active' from schema
         });
 
-        // Save the user
         await newUser.save();
-
         res.status(201).json({ message: "User created successfully", user: newUser });
 
     } catch (error) {
         console.error("Error creating user:", error);
-        res.status(500).json({ message: "Failed to create user" });
+        let errorMessage = "Failed to create user";
+        if (error.name === 'ValidationError') {
+             errorMessage = Object.values(error.errors).map(val => val.message).join(', ');
+             return res.status(400).json({ message: errorMessage });
+        }
+        res.status(500).json({ message: errorMessage });
     }
 };
 
-// View User by ID
+// View User by ID (Includes status)
 const viewUser = async (req, res) => {
     try {
         const userId = req.params.id;
@@ -71,28 +71,17 @@ const viewUser = async (req, res) => {
     }
 };
 
-// View User Profile (Requires Authentication)
+// View User Profile (Includes status)
 const viewProfile = async (req, res) => {
     try {
-        // The authMiddleware should have already placed the user's ID on the request object
-        const userId = req.userId;
-
-        const user = await CoreUser.findById(userId);
+        const userId = req.userId; // Assuming authMiddleware provides this
+        const user = await CoreUser.findById(userId).select('-password'); // Exclude password
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Return the user profile (excluding the password for security)
-        const userProfile = {
-            id: user._id,
-            name: user.name,
-            email: user.email,
-            Core: user.Core, // Added Core to the profile
-            role: user.role // Added role to the profile
-        };
-
-        res.status(200).json(userProfile);
+        res.status(200).json(user); // Includes status
 
     } catch (error) {
         console.error("Error viewing profile:", error);
@@ -100,69 +89,167 @@ const viewProfile = async (req, res) => {
     }
 };
 
-const deleteUser = async (req, res) => {
-  console.log("deleteUser function called!");
-
-  try {
-      const { id } = req.params;
-      console.log("Deleting user with ID:", id);
-
-      // Find the user by ID and delete
-      const deletedUser = await CoreUser.findByIdAndDelete(id); // **Corrected line**
-
-      if (!deletedUser) {
-          console.log("User not found!");
-          return res.status(404).json({ message: "User not found" });
-      }
-
-      console.log("User deleted successfully from database:", deletedUser);
-      // Respond with a success message
-      res.status(200).json({ message: "User deleted successfully", user: deletedUser });
-
-  } catch (error) {
-      console.error("Error deleting user:", error);
-      res.status(500).json({ message: "Error deleting user", error: error.message });
-  }
-};
-
-// Update User by ID
+// Update User by ID (Can update any field including status)
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, email, password, Core, role } = req.body;
+        const { name, email, password, Core, role, status } = req.body;
 
-        // Check if the user exists
-        const existingUser = await CoreUser.findById(id);
-        if (!existingUser) {
-            return res.status(404).json({ message: "User not found" });
+        const updateData = {};
+        if (name) updateData.name = name;
+        if (email) updateData.email = email;
+        if (Core) updateData.Core = Core;
+        if (role) updateData.role = role;
+        if (status && ["active", "inactive"].includes(status)) {
+             updateData.status = status;
         }
 
-        // Hash the password if it's being updated
-        let hashedPassword = existingUser.password;  // Keep the existing password by default
         if (password) {
-            hashedPassword = await bcrypt.hash(password, 10);
+            updateData.password = await bcrypt.hash(password, 10);
         }
 
-        // Update the user
+        if (Object.keys(updateData).length === 0) {
+             return res.status(400).json({ message: "No update data provided" });
+        }
+
         const updatedUser = await CoreUser.findByIdAndUpdate(
             id,
-            {
-                name,
-                email,
-                password: hashedPassword,
-                Core,
-                role
-            },
-            { new: true, runValidators: true } // `new: true` returns the updated document, `runValidators: true` validates the update
-        );
+            updateData,
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
         res.status(200).json({ message: "User updated successfully", user: updatedUser });
 
     } catch (error) {
         console.error("Error updating user:", error);
-        res.status(500).json({ message: "Failed to update user", error: error.message });
+        let errorMessage = "Failed to update user";
+        if (error.name === 'ValidationError') {
+             errorMessage = Object.values(error.errors).map(val => val.message).join(', ');
+             return res.status(400).json({ message: errorMessage });
+        }
+        if (error.code === 11000) {
+             return res.status(400).json({ message: "Email already in use." });
+        }
+        res.status(500).json({ message: errorMessage, error: error.message });
+    }
+};
+
+// --- ORIGINAL deleteUser (Hard Delete - Permanent Removal) ---
+const deleteUser = async (req, res) => {
+  console.log("deleteUser function called (PERMANENTLY REMOVING)!");
+  try {
+      const { id } = req.params;
+      console.log("Permanently deleting user with ID:", id);
+
+      // Find the user by ID and PERMANENTLY delete
+      const deletedUser = await CoreUser.findByIdAndDelete(id);
+
+      if (!deletedUser) {
+          console.log("User not found for deletion!");
+          return res.status(404).json({ message: "User not found" });
+      }
+
+      console.log("User permanently deleted from database:", deletedUser);
+      res.status(200).json({ message: "User permanently deleted successfully", user: deletedUser });
+
+  } catch (error) {
+      console.error("Error permanently deleting user:", error);
+      res.status(500).json({ message: "Error permanently deleting user", error: error.message });
+  }
+};
+
+
+// --- NEW Functions for Status Management ---
+
+// Deactivate User (Set status to 'inactive' - Soft Remove)
+const deactivateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log("Deactivating user with ID:", id);
+
+        const updatedUser = await CoreUser.findByIdAndUpdate(
+            id,
+            { status: 'inactive' },
+            { new: true } // Return the updated document
+        ).select('-password'); // Exclude password from response
+
+        if (!updatedUser) {
+            console.log("User not found for deactivation!");
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        console.log("User status set to inactive:", updatedUser);
+        res.status(200).json({ message: "User deactivated successfully", user: updatedUser });
+
+    } catch (error) {
+        console.error("Error deactivating user:", error);
+        res.status(500).json({ message: "Error deactivating user", error: error.message });
+    }
+};
+
+// Reactivate User (Set status to 'active' - Undo Soft Remove)
+const reactivateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log("Reactivating user with ID:", id);
+
+        const updatedUser = await CoreUser.findByIdAndUpdate(
+            id,
+            { status: 'active' },
+            { new: true } // Return the updated document
+        ).select('-password'); // Exclude password from response
+
+        if (!updatedUser) {
+            console.log("User not found for reactivation!");
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        console.log("User status set to active:", updatedUser);
+        res.status(200).json({ message: "User reactivated successfully", user: updatedUser });
+
+    } catch (error) {
+        console.error("Error reactivating user:", error);
+        res.status(500).json({ message: "Error reactivating user", error: error.message });
+    }
+};
+
+// Get only ACTIVE users
+const getActiveUsers = async (req, res) => {
+    try {
+        const activeUsers = await CoreUser.find({ status: 'active' }).select('-password'); // Find only active users
+        res.status(200).json(activeUsers);
+    } catch (error) {
+        console.error("Error getting active users:", error);
+        res.status(500).json({ message: "Failed to retrieve active users" });
+    }
+};
+
+// Get only INACTIVE users
+const getInactiveUsers = async (req, res) => {
+    try {
+        const inactiveUsers = await CoreUser.find({ status: 'inactive' }).select('-password'); // Find only inactive users
+        res.status(200).json(inactiveUsers);
+    } catch (error) {
+        console.error("Error getting inactive users:", error);
+        res.status(500).json({ message: "Failed to retrieve inactive users" });
     }
 };
 
 
-export { getAllUser, createUser, viewUser, viewProfile, deleteUser, updateUser };
+// --- Update Exports ---
+export {
+    getAllUser,
+    createUser,
+    viewUser,
+    viewProfile,
+    updateUser,
+    deleteUser, // Original hard delete
+    deactivateUser, // New soft delete
+    reactivateUser, // New undo soft delete
+    getActiveUsers, // New get active only
+    getInactiveUsers // New get inactive only
+};

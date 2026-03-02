@@ -8,7 +8,7 @@ const qcDataSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
-        timestamp: {
+        timestamp: { // Timestamp of QC data submission
             type: Date,
             default: Date.now,
         },
@@ -32,9 +32,18 @@ const qcDataSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
+        ingredients: { // Added ingredients field
+            type: String,
+            required: false, // Make optional or true as needed
+            default: '',
+        },
+        expirationDate: { // Added expiration date field
+            type: Date,
+            required: true, // Usually required for products
+        },
         status: {
             type: String,
-            enum: ["Good", "Acceptable", "Bad"], // Updated enum values to Good, Acceptable, Bad
+            enum: ["Good", "Acceptable", "Bad"],
             required: true,
         },
         testResults: {
@@ -42,7 +51,7 @@ const qcDataSchema = new mongoose.Schema(
             default: {},
         },
     },
-    { timestamps: true }
+    { timestamps: true } // Adds createdAt and updatedAt timestamps managed by Mongoose
 );
 
 const QCData = mongoose.model("QCData", qcDataSchema);
